@@ -4,11 +4,12 @@ import { Platform, StyleSheet, StatusBar, View } from "react-native";
 import colours from "./config/colours";
 import LoginPage from "./pages/LoginPage";
 import LoginSignupPage from "./pages/LoginSignupPage";
+import SignupPage from "./pages/SignupPage";
 
 const Stack = createNativeStackNavigator();
 
 // export default function App() {
-//   return <LoginPage />;
+//   return <SignupPage />;
 // }
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen name="Login Page" component={LoginPage} />
+        <Stack.Screen name="Sign up Page" component={SignupPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

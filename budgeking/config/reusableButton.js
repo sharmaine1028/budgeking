@@ -1,5 +1,11 @@
 import React from "react";
-import { TouchableOpacity, StyleSheet, Dimensions, Text } from "react-native";
+import {
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  Text,
+  TextInput,
+} from "react-native";
 import colours from "./colours";
 
 function reusableButton(props) {
@@ -20,6 +26,18 @@ export function BlackButton({ text, handlePress, moreStyle }) {
   );
 }
 
+export function BrownTextInput({ placeholder, onChangeText }) {
+  return (
+    <>
+      <TextInput
+        style={styles.input}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+      />
+    </>
+  );
+}
+
 const styles = StyleSheet.create({
   text: {
     color: colours.white,
@@ -30,9 +48,20 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     padding: 10,
     margin: 10,
+    alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colours.black,
+  },
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+    backgroundColor: colours.lightBrown,
+    borderRadius: 25,
+    width: 320,
+    height: 46,
   },
 });
 
