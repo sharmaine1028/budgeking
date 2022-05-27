@@ -1,32 +1,30 @@
 import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
-import colours from "../config/colours";
+import { StyleSheet, View } from "react-native";
+import { BlackButton } from "../config/reusableButton";
 
-function LoginSignupPage(props) {
+function LoginSignupPage({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.logo} />
-      <TouchableOpacity
-        activeOpacity={0.7}
-        style={styles.loginButton}
-        title="Login"
-        onPress={console.log("Login")}
-      >
-        <Text style={styles.text}>Login</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        activeOpacity={0.7}
-        style={styles.signUpButton}
-        onPress={console.log("Sign up")}
-      >
-        <Text style={styles.text}>Sign up</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <BlackButton
+          text={"Login"}
+          moreStyle={styles.loginButton}
+          handlePress={() => navigation.navigate("Login Page")}
+        />
+        <BlackButton
+          text={"Sign Up"}
+          moreStyle={styles.signUpButton}
+          handlePress={() => navigation.navigate("Sign up Page")}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  buttonContainer: {},
+
   container: {
     flex: 1,
     alignItems: "center",
@@ -40,28 +38,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#D9D9D9",
   },
   loginButton: {
-    width: 134,
-    height: 50,
-    backgroundColor: colours.black,
-    borderRadius: 999,
-    top: 10,
-    padding: 10,
-    margin: 10,
-    alignItems: "center",
-    justifyContent: "center",
+    position: "relative",
+    top: 30,
   },
   signUpButton: {
-    width: 134,
-    height: 50,
-    backgroundColor: colours.black,
-    borderRadius: 999,
-    padding: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    bottom: 50,
-  },
-  text: {
-    color: colours.white,
+    position: "absolute",
+    bottom: 100,
   },
 });
 

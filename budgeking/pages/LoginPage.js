@@ -5,37 +5,35 @@ import {
   TextInput,
   onChangeText,
   onChangeNumber,
+  StatusBar,
+  Image,
 } from "react-native";
 import colours from "../config/colours";
+import { BlackButton, BrownTextInput } from "../config/reusableButton";
 
 function LoginPage(props) {
   return (
-    <View>
-      <View></View>
-      <TextInput
-        style={styles.input}
-        onChangeText={onChangeText}
-        placeholder="Username/Email"
+    <View style={styles.container}>
+      <Image
+        style={styles.image}
+        source={require("../assets/loginsignup/profile.png")}
       />
-      <TextInput
-        style={styles.input}
-        onChangeText={onChangeNumber}
-        placeholder="Password"
-      />
+      <BrownTextInput placeholder={"Username/Email"} />
+      <BrownTextInput placeholder={"Password"} />
+      <BlackButton text="Login" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-    backgroundColor: colours.lightBrown,
-    borderRadius: 25,
-    width: 320,
-    height: 46,
+  container: {
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    alignItems: "center",
+  },
+  image: {
+    width: 200,
+    height: 200,
+    alignSelf: "center",
   },
 });
 
