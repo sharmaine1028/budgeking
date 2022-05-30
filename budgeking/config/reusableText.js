@@ -1,6 +1,9 @@
 import React from "react";
 import { StyleSheet, View, Text } from "react-native";
+<<<<<<< HEAD
 import colours from "./colours";
+=======
+>>>>>>> c34ad90f750e0b02551c58587a2c18f65bd24b31
 
 function reusableText(props) {
   return <div></div>;
@@ -19,6 +22,7 @@ export function Footer({ onPress, text, desc }) {
   );
 }
 
+<<<<<<< HEAD
 export function Title({ text, style }) {
   return (
     <View style={{ justifyContent: "space-between" }}>
@@ -27,6 +31,8 @@ export function Title({ text, style }) {
   );
 }
 
+=======
+>>>>>>> c34ad90f750e0b02551c58587a2c18f65bd24b31
 const styles = StyleSheet.create({
   footerView: {
     alignItems: "center",
@@ -41,9 +47,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
+<<<<<<< HEAD
   title: {
     color: colours.black,
     fontSize: 20,
   },
+=======
+>>>>>>> c34ad90f750e0b02551c58587a2c18f65bd24b31
 });
 export default reusableText;

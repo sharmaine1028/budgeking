@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   ImageBackground,
   StyleSheet,
   StatusBar,
-  Image,
-  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import colours from "../config/colours";
@@ -15,8 +14,12 @@ import {
   AddButton,
 } from "../config/reusableButton";
 import { Footer } from "../config/reusableText";
+<<<<<<< HEAD
 import { auth, db } from "../config/firebase";
 import { collection, addDoc } from "firebase/firestore";
+=======
+import { auth } from "../config/firebase";
+>>>>>>> c34ad90f750e0b02551c58587a2c18f65bd24b31
 
 export default class SignupPage extends React.Component {
   constructor() {
@@ -51,6 +54,7 @@ export default class SignupPage extends React.Component {
       this.setState({
         isLoading: true,
       });
+<<<<<<< HEAD
 
       const collectionRef = collection(db, "users");
 
@@ -130,6 +134,87 @@ export default class SignupPage extends React.Component {
           onPress={this.onFooterLinkPress}
         />
         <View style={{ height: 60 }} />
+=======
+
+      auth
+        .createUserWithEmailAndPassword(this.state.email, this.state.password)
+        .then((res) => {
+          res.user.updateProfile({ displayName: this.state.username });
+          alert("Log in with your new account");
+          console.log("User registered successfully");
+          this.setState({
+            isLoading: false,
+            username: "",
+            email: "",
+            password: "",
+          });
+          this.props.navigation.navigate("Login");
+        })
+        .catch((error) => {
+          if (error.code === "auth/email-already-in-use") {
+            alert("That email address is already in use!");
+          }
+
+          if (error.code === "auth/invalid-email") {
+            alert("Invalid email");
+          }
+          console.log(error.message);
+          this.props.navigation.navigate("Signup");
+        });
+    }
+  };
+
+  render() {
+    if (this.state.isLoading) {
+      return (
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color="#9E9E9E" />
+        </View>
+      );
+    }
+    return (
+      <KeyboardAwareScrollView
+        style={styles.container}
+        scrollEnabled={false}
+        contentContainerStyle={{
+          alignItems: "center",
+          justifyContent: "center",
+          flex: 1,
+        }}
+      >
+        <ImageBackground
+          style={styles.image}
+          source={require("../assets/loginsignup/profile.png")}
+        >
+          <View style={styles.button}></View>
+          <AddButton moreStyle={styles.addButton} />
+        </ImageBackground>
+
+        <BrownTextInput
+          placeholder={"Email"}
+          onChangeText={(val) => this.updateInputVal(val, "email")}
+          value={this.state.email}
+        />
+        <BrownTextInput
+          placeholder={"Username"}
+          onChangeText={(val) => this.updateInputVal(val, "username")}
+          value={this.state.username}
+        />
+        <BrownTextInput
+          placeholder={"Password"}
+          onChangeText={(val) => this.updateInputVal(val, "password")}
+          value={this.state.password}
+          maxLength={15}
+          secureTextEntry={true}
+        />
+
+        <BlackButton text="Sign up" onPress={this.handleSignUp} />
+        <Footer
+          desc={"Already have an account?"}
+          text={"Log in"}
+          onPress={this.onFooterLinkPress}
+        />
+>>>>>>> c34ad90f750e0b02551c58587a2c18f65bd24b31
       </KeyboardAwareScrollView>
     );
   }
@@ -137,9 +222,6 @@ export default class SignupPage extends React.Component {
 
 const styles = StyleSheet.create({
   addButton: {
-    width: 30,
-    height: 30,
-    position: "absolute",
     left: 160,
     top: 160,
   },

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "38796120587",
+    "firebase_url": "https://budgeking-fd4fa-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "budgeking-fd4fa",
+    "storage_bucket": "budgeking-fd4fa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:38796120587:android:aed8c63d092f46f631ad0e",
+        "android_client_info": {
+          "package_name": "com.budgeking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "38796120587-i61gja0vkjqhj5k0u33o96ssje8m91lg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfhbhEWg4bGhNQe6wtzrLCFS3uKIXgNYE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "38796120587-i61gja0vkjqhj5k0u33o96ssje8m91lg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "38796120587-4bmn7n7bsi93jtv2qk3ntoj61pmabong.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.budgeking"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

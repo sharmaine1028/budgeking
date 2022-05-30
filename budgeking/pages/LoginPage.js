@@ -1,7 +1,14 @@
 import React from "react";
-import { StyleSheet, View, StatusBar, Image } from "react-native";
+import {
+  StyleSheet,
+  View,
+  StatusBar,
+  Image,
+  ActivityIndicator,
+} from "react-native";
+import { auth } from "../config/firebase";
 import { BlackButton, BrownTextInput } from "../config/reusableButton";
-import { auth } from "../config/fire";
+import { Footer } from "../config/reusableText";
 
 export default class LoginPage extends React.Component {
   constructor() {
@@ -107,14 +114,20 @@ export default class LoginPage extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  buttonContainer: { top: 50 },
   container: {
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
     alignItems: "center",
     justifyContent: "center, ",
   },
-  image: {
-    width: 200,
-    height: 200,
-    alignSelf: "center",
+  logo: {
+    bottom: 20,
+    width: 223,
+    height: 146,
+    overflow: "visible",
+    resizeMode: "contain",
   },
 });
