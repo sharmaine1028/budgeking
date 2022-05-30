@@ -40,7 +40,6 @@ export default class LoginPage extends React.Component {
       auth
         .signInWithEmailAndPassword(this.state.email, this.state.password)
         .then((res) => {
-          console.log(res);
           console.log("User logged in successfully!");
           this.setState({
             isLoading: false,
@@ -61,11 +60,12 @@ export default class LoginPage extends React.Component {
           if (error.code === "auth/wrong-password") {
             alert("Wrong password");
           }
-          // this.setState({
-          //   isLoading: false,
-          //   email: "",
-          //   password: "",
-          // });
+
+          this.setState({
+            isLoading: false,
+            email: "",
+            password: "",
+          });
 
           console.log(error.message);
           this.setState({ isLoading: false });
@@ -78,7 +78,7 @@ export default class LoginPage extends React.Component {
     if (this.state.isLoading) {
       return (
         <View style={styles.container}>
-          <ActivityIndicator size="large" color="#9E9E9E" />
+          <ActivityIndicator size="large" color="#9E9E9E" alignItems="center" />
         </View>
       );
     }
