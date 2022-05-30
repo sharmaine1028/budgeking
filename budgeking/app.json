@@ -29,6 +29,12 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "description": "Budgeting app with simple and clean user interface"
+
+    "description": "Budgeting app with simple and clean user interface",
+    "packagerOpts": {
+      "sourceExts": [
+        "cjs"
+      ]
+    }
   }
 }
