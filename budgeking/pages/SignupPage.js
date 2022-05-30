@@ -67,12 +67,13 @@ export default class SignupPage extends React.Component {
         .catch((error) => {
           if (error.code === "auth/email-already-in-use") {
             alert("That email address is already in use!");
-          }
-
-          if (error.code === "auth/invalid-email") {
+          } else if (error.code === "auth/invalid-email") {
             alert("Invalid email");
+          } else {
+            alert(error.message);
           }
           console.log(error.message);
+          this.setState({ isLoading: false });
           this.props.navigation.navigate("Signup");
         });
     }
@@ -81,7 +82,7 @@ export default class SignupPage extends React.Component {
   render() {
     if (this.state.isLoading) {
       return (
-        <View style={styles.container}>
+        <View style={(styles.container, styles.center)}>
           <ActivityIndicator size="large" color="#9E9E9E" />
         </View>
       );
@@ -149,6 +150,13 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
+  center: {
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   image: {
     width: 200,
