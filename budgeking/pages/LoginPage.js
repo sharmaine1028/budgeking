@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   View,
@@ -6,7 +6,7 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-import { auth } from "../config/firebase";
+import { auth, db } from "../config/firebase";
 import { BlackButton, BrownTextInput } from "../config/reusableButton";
 import { Footer } from "../config/reusableText";
 
@@ -60,11 +60,12 @@ export default class LoginPage extends React.Component {
           if (error.code === "auth/wrong-password") {
             alert("Wrong password");
           }
-          // this.setState({
-          //   isLoading: false,
-          //   email: "",
-          //   password: "",
-          // });
+
+          this.setState({
+            isLoading: false,
+            email: "",
+            password: "",
+          });
 
           console.log(error.message);
           this.setState({ isLoading: false });
@@ -77,7 +78,7 @@ export default class LoginPage extends React.Component {
     if (this.state.isLoading) {
       return (
         <View style={styles.container}>
-          <ActivityIndicator size="large" color="#9E9E9E" />
+          <ActivityIndicator size="large" color="#9E9E9E" alignItems="center" />
         </View>
       );
     }
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     flex: 1,
     alignItems: "center",
-    justifyContent: "center, ",
+    justifyContent: "center",
   },
   logo: {
     bottom: 20,
