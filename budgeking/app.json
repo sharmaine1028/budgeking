@@ -14,9 +14,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -29,6 +27,9 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "description": "Budgeting app with simple and clean user interface"
+    "description": "Budgeting app with simple and clean user interface",
+    "packagerOpts": {
+      "sourceExts": ["cjs"]
+    }
   }
 }
