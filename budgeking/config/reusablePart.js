@@ -6,5 +6,12 @@ function reusablePart(props) {
   return <div></div>;
 }
 export default function RedLine() {
-  return <Divider orientation="horizontal" color={colours.tomato} />;
+  return (
+    <Divider
+      orientation="horizontal"
+      color={colours.red}
+      width={3}
+      style={{ padding: 1 }}
+    />
+  );
 }

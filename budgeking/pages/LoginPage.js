@@ -7,8 +7,8 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { auth, db } from "../config/firebase";
-import { BlackButton, BrownTextInput } from "../config/reusableButton";
-import { Footer } from "../config/reusableText";
+import { BlackButton } from "../config/reusableButton";
+import { Footer, BrownTextInput } from "../config/reusableText";
 
 export default class LoginPage extends React.Component {
   constructor() {
@@ -20,11 +20,11 @@ export default class LoginPage extends React.Component {
     };
   }
 
-  updateInputVal = (val, prop) => {
+  updateInputVal(val, prop) {
     const state = this.state;
     state[prop] = val;
     this.setState(state);
-  };
+  }
 
   onFooterLinkPress = () => {
     this.props.navigation.navigate("Signup");
@@ -46,7 +46,7 @@ export default class LoginPage extends React.Component {
             email: "",
             password: "",
           });
-          this.props.navigation.navigate("Home");
+          this.props.navigation.navigate("HomePage");
         })
         .catch((error) => {
           if (error.code === "auth/invalid-email") {
