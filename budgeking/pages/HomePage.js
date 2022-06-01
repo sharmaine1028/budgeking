@@ -1,50 +1,56 @@
-import React from "react";
-import { Text, StyleSheet, View, Button } from "react-native";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import colours from "../config/colours";
-import { auth, firebase } from "../config/firebase";
-import { BlackButton } from "../config/reusableButton";
+import { auth } from "../config/firebase";
+import RedLine from "../config/reusablePart";
+import { Header, Title } from "../config/reusableText";
 
-export default class Home extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      uid: "",
-    };
-  }
+const wait = (timeout) => {
+  return new Promise((resolve) => setTimeout(resolve, timeout));
+};
 
-  signOut = () => {
-    auth
-      .signOut()
-      .then(() => {
-        this.props.navigation.navigate("Login");
-      })
-      .catch((error) => this.setState({ errorMessage: error.message }));
-  };
+function HomePage() {
+  const [displayName, setDisplayName] = useState(auth.currentUser.displayName);
 
-  render() {
-    this.state = {
-      username: firebase.auth().currentUser.displayName,
-      uid: auth.currentUser.uid,
-    };
-    return (
-      <View style={styles.container}>
-        <Text style={styles.textStyle}>Hello, {this.state.username}</Text>
-        <BlackButton text={"Logout"} onPress={this.signOut} />
-      </View>
-    );
-  }
+  // TODO: Scroll down to refresh
+  // setDisplayName{auth.currentUser.displayName}
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setDisplayName(auth.currentUser.displayName);
+    wait(500).then(() => setRefreshing(false));
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <Title text={`Welcome, ${displayName}`}></Title>
+        <Header text={`${"\n"}Your weekly budget`} />
+        <RedLine />
+      </ScrollView>
+    </View>
+  );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 35,
+    paddingTop: 15,
+    paddingHorizontal: 30,
     backgroundColor: colours.white,
   },
-  textStyle: {
-    fontSize: 15,
-    marginBottom: 20,
-  },
 });
+
+export default HomePage;

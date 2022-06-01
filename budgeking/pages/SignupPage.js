@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   ImageBackground,
@@ -8,12 +8,8 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import colours from "../config/colours";
-import {
-  BlackButton,
-  BrownTextInput,
-  AddButton,
-} from "../config/reusableButton";
-import { Footer } from "../config/reusableText";
+import { BlackButton, AddButton } from "../config/reusableButton";
+import { Footer, BrownTextInput } from "../config/reusableText";
 import { auth } from "../config/firebase";
 
 export default class SignupPage extends React.Component {
@@ -102,7 +98,7 @@ export default class SignupPage extends React.Component {
           source={require("../assets/loginsignup/profile.png")}
         >
           <View style={styles.button}></View>
-          <AddButton moreStyle={styles.addButton} />
+          <AddButton style={styles.addButton} />
         </ImageBackground>
 
         <BrownTextInput

@@ -14,26 +14,26 @@ function reusableButton(props) {
   return <div></div>;
 }
 
-export function AddButton({ moreStyle }) {
+export function AddButton({ style }) {
   return (
     <TouchableOpacity onPress={() => alert("Add a profile picture")}>
       <Image
         source={require("../assets/loginsignup/add.png")}
-        style={[moreStyle, styles.addButton]}
+        style={[style, styles.addButton]}
       />
     </TouchableOpacity>
   );
 }
 
-export function BlackButton({ text, onPress, moreStyle }) {
+export function BlackButton({ text, onPress, style, textStyle }) {
   return (
     <>
       <TouchableOpacity
         activeOpacity={0.7}
-        style={[{ moreStyle }, styles.blackButton]}
+        style={[styles.blackButton, style]}
         onPress={onPress}
       >
-        <Text style={styles.text}>{text}</Text>
+        <Text style={[styles.text, textStyle]}>{text}</Text>
       </TouchableOpacity>
     </>
   );
@@ -70,29 +70,19 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   blackButton: {
-    width: Dimensions.get("window").width * 0.4,
-    height: Dimensions.get("window").height * 0.07,
+    width: 130,
+    height: 50,
     borderRadius: 999,
-    padding: 10,
     margin: 10,
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colours.black,
   },
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-    backgroundColor: colours.lightBrown,
-    borderRadius: 25,
-    width: 320,
-    height: 46,
-    fontFamily: fonts.field,
-  },
+
   text: {
     color: colours.white,
+    margin: 1,
   },
 });
 

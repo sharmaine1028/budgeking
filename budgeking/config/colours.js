@@ -1,8 +1,9 @@
 export default {
-  lightBrown: "#e3dad5",
-  white: "#e8e0ce",
-  orange: "#f7d8b5",
-  tomato: "#fb8875",
   black: "#413E3E",
+  lightBrown: "#e3dad5",
+  orange: "#f7d8b5",
+  red: "#F4CDC2",
+  tomato: "#fb8875",
   white: "#F5F5F5",
+  whiteRock: "#e8e0ce",
 };
