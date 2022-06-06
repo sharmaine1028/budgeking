@@ -18,8 +18,7 @@ const wait = (timeout) => {
 function HomePage() {
   const [displayName, setDisplayName] = useState(auth.currentUser.displayName);
 
-  // TODO: Scroll down to refresh
-  // setDisplayName{auth.currentUser.displayName}
+  // Scroll from top to refresh changes
   const [refreshing, setRefreshing] = React.useState(false);
 
   const onRefresh = React.useCallback(() => {

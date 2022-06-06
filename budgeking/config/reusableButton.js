@@ -14,12 +14,12 @@ function reusableButton(props) {
   return <div></div>;
 }
 
-export function AddButton({ style }) {
+export function AddButton({ style, onPress }) {
   return (
-    <TouchableOpacity onPress={() => alert("Add a profile picture")}>
+    <TouchableOpacity onPress={onPress}>
       <Image
         source={require("../assets/loginsignup/add.png")}
-        style={[style, styles.addButton]}
+        style={[styles.addButton, style]}
       />
     </TouchableOpacity>
   );

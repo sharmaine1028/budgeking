@@ -5,12 +5,15 @@ import {
   StyleSheet,
   StatusBar,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import colours from "../config/colours";
 import { BlackButton, AddButton } from "../config/reusableButton";
 import { Footer, BrownTextInput } from "../config/reusableText";
-import { auth } from "../config/firebase";
+import { auth, db, storage } from "../config/firebase";
+import { ref } from "firebase/storage";
+import * as ImagePicker from "expo-image-picker";
 
 export default class SignupPage extends React.Component {
   constructor() {
@@ -19,61 +22,22 @@ export default class SignupPage extends React.Component {
       username: "",
       email: "",
       password: "",
-      confirmPassword: "",
+      imageSource: "",
+      uploading: false,
       isLoading: false,
+      cameraPermission: false,
     };
   }
 
-  updateInputVal = (val, prop) => {
-    const state = this.state;
-    state[prop] = val;
-    this.setState(state);
-  };
-
-  onFooterLinkPress = () => {
-    this.props.navigation.navigate("Login");
-  };
-
-  handleSignUp = () => {
-    if (
-      this.state.email === "" ||
-      this.state.password === "" ||
-      this.state.user === ""
-    ) {
-      alert("Enter details to sign up!");
-    } else {
-      this.setState({
-        isLoading: true,
-      });
-
-      auth
-        .createUserWithEmailAndPassword(this.state.email, this.state.password)
-        .then((res) => {
-          res.user.updateProfile({ displayName: this.state.username });
-          alert("Log in with your new account");
-          console.log("User registered successfully");
-          this.setState({
-            isLoading: false,
-            username: "",
-            email: "",
-            password: "",
-          });
-          this.props.navigation.navigate("Login");
-        })
-        .catch((error) => {
-          if (error.code === "auth/email-already-in-use") {
-            alert("That email address is already in use!");
-          } else if (error.code === "auth/invalid-email") {
-            alert("Invalid email");
-          } else {
-            alert(error.message);
-          }
-          console.log(error.message);
-          this.setState({ isLoading: false });
-          this.props.navigation.navigate("Signup");
-        });
-    }
-  };
+  // async componentDidMount() {
+  //   if (Platform.OS !== "web") {
+  //     const { status } = await ImagePicker.getMediaLibraryPermissionsAsync();
+  //     console.log(status);
+  //     if (status !== "granted") {
+  //       alert("Sorry, we need camera roll permissions to make this work!");
+  //     }
+  //   }
+  // }
 
   render() {
     if (this.state.isLoading) {
@@ -93,13 +57,12 @@ export default class SignupPage extends React.Component {
           flex: 1,
         }}
       >
-        <ImageBackground
-          style={styles.image}
-          source={require("../assets/loginsignup/profile.png")}
-        >
-          <View style={styles.button}></View>
-          <AddButton style={styles.addButton} />
-        </ImageBackground>
+        <View>
+          {this.maybeRenderImage()}
+          <View style={styles.button}>
+            <AddButton onPress={() => this.addImageButton()} />
+          </View>
+        </View>
 
         <BrownTextInput
           placeholder={"Email"}
@@ -107,8 +70,8 @@ export default class SignupPage extends React.Component {
           value={this.state.email}
         />
         <BrownTextInput
-          placeholder={"Username"}
-          onChangeText={(val) => this.updateInputVal(val, "username")}
+          placeholder={"First name"}
+          onChangeText={(val) => this.updateInputVal(val, "First name")}
           value={this.state.username}
         />
         <BrownTextInput
@@ -128,13 +91,103 @@ export default class SignupPage extends React.Component {
       </KeyboardAwareScrollView>
     );
   }
+
+  updateInputVal = (val, prop) => {
+    const state = this.state;
+    state[prop] = val;
+    this.setState(state);
+  };
+
+  onFooterLinkPress = () => {
+    this.props.navigation.navigate("Login");
+  };
+
+  maybeRenderImage = () => {
+    if (this.state.imageSource === "") {
+      return (
+        <Image
+          style={styles.image}
+          source={require("../assets/loginsignup/profile.png")}
+        />
+      );
+    }
+
+    return (
+      <Image style={styles.image} source={{ uri: this.state.imageSource }} />
+    );
+  };
+
+  addImageButton = async () => {
+    // if (this.state.cameraPermission) {
+    this.pickImage();
+    // } else {
+    //   const { status } =
+    //     await ImagePicker.requestMediaLibraryPermissionsAsync();
+    //   if (status !== "granted") {
+    //     alert("Sorry, we need camera roll permissions to make this work.");
+    //   } else {
+    //     this.setState({ cameraPermission: true });
+    //   }
+    // }
+  };
+
+  pickImage = async () => {
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+    }).catch((err) => console.log(error));
+
+    this.setState({ imageSource: pickerResult.uri });
+  };
+
+  handleSignUp = () => {
+    if (
+      this.state.email === "" ||
+      this.state.password === "" ||
+      this.state.user === ""
+    ) {
+      alert("Enter details to sign up!");
+    } else {
+      this.setState({
+        isLoading: true,
+      });
+
+      auth
+        .createUserWithEmailAndPassword(this.state.email, this.state.password)
+        .then((res) => {
+          db.collection("users").doc(res.user.uid).set({ income: 0 });
+          res.user.updateProfile({
+            displayName: this.state.username,
+            photoURL: this.state.imageSource,
+          });
+          alert("Log in with your new account");
+          console.log("User registered successfully");
+          this.setState({
+            isLoading: false,
+            username: "",
+            email: "",
+            password: "",
+          });
+
+          this.props.navigation.navigate("Login");
+        })
+        .catch((error) => {
+          if (error.code === "auth/email-already-in-use") {
+            alert("That email address is already in use!");
+          } else if (error.code === "auth/invalid-email") {
+            alert("Invalid email");
+          } else {
+            alert(error.message);
+          }
+          console.log(error.message);
+          this.setState({ isLoading: false });
+          this.props.navigation.navigate("Signup");
+        });
+    }
+  };
 }
 
 const styles = StyleSheet.create({
-  addButton: {
-    left: 160,
-    top: 160,
-  },
   button: {
     width: 30,
     height: 30,
@@ -157,6 +210,6 @@ const styles = StyleSheet.create({
   image: {
     width: 200,
     height: 200,
-    alignSelf: "center",
+    borderRadius: 999,
   },
 });

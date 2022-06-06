@@ -75,6 +75,45 @@ export function WhiteTextInput({
   );
 }
 
+export function NewGoalInput({
+  title,
+  maxLength,
+  onChangeText,
+  onChange,
+  value,
+}) {
+  return (
+    <View style={styles.newGoalInput}>
+      <Text style={styles.newGoalTitle}>{title}</Text>
+      <TextInput
+        placeholder="Type Here"
+        onChangeText={onChangeText}
+        onChange={onChange}
+        value={value}
+        autoCapitalize="none"
+        maxLength={maxLength}
+      />
+    </View>
+  );
+}
+
+export function YesOrNo({ title }) {
+  const data = [
+    {
+      label: "Yes",
+    },
+    {
+      label: "No",
+    },
+  ];
+  return (
+    <View style={styles.newGoalInput}>
+      <Text style={styles.newGoalTitle}>{title}</Text>
+      <RadioButtonRN data={data} />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   brownInput: {
     height: 40,
@@ -105,11 +144,22 @@ const styles = StyleSheet.create({
     lineHeight: 15,
     paddingVertical: 10,
   },
+  newGoalInput: {
+    backgroundColor: colours.lightBrown,
+    borderRadius: 15,
+    margin: 10,
+    padding: 10,
+  },
+  newGoalTitle: {
+    color: "#6C757D",
+    fontSize: 12,
+  },
   title: {
     fontWeight: "500",
     fontSize: 20,
     color: "#000",
     lineHeight: 20,
+    margin: 10,
   },
   whiteInput: {
     backgroundColor: "#fff",

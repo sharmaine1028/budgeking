@@ -7,18 +7,20 @@ import colours from "./config/colours";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/HomePage";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import SettingsPage from "./pages/SettingsPage";
 import GoalsPage from "./pages/GoalsPage";
 import BudgetPage from "./pages/BudgetPage";
 import ReportsPage from "./pages/ReportsPage";
+import NewGoal from "./pages/NewGoal";
+import GoalHistory from "./pages/GoalHistory";
 import { auth } from "./config/firebase";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // export default function App() {
-//   return <LoginPage />;
+//   return <GoalsPage />;
 // }
 
 function MyStack() {
@@ -30,6 +32,23 @@ function MyStack() {
       <Stack.Screen name="Login" component={LoginPage} />
       <Stack.Screen name="Signup" component={SignupPage} />
       <Stack.Screen name="HomePage" component={MyTabs} />
+    </Stack.Navigator>
+  );
+}
+
+function Goals() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colours.whiteRock,
+        },
+        animation: "slide_from_right",
+      }}
+    >
+      <Stack.Screen name="Goals" component={GoalsPage} />
+      <Stack.Screen name="NewGoal" component={NewGoal} />
+      <Stack.Screen name="GoalHistory" component={GoalHistory} />
     </Stack.Navigator>
   );
 }
@@ -56,11 +75,10 @@ function MyTabs() {
             />
           ),
         }}
-        initialParams={{ displayName: auth.currentUser.displayName }}
       />
       <Tab.Screen
         name="Goals"
-        component={GoalsPage}
+        component={Goals}
         options={{
           tabBarIcon: () => (
             <Image
@@ -68,6 +86,7 @@ function MyTabs() {
               source={require("./assets/icons/goals.png")}
             />
           ),
+          headerShown: false,
         }}
       />
       <Tab.Screen
@@ -111,22 +130,6 @@ function MyTabs() {
 }
 
 export default function App() {
-  // const [initializing, setInitializing] = useState(true);
-  // const [user, setUser] = useState();
-
-  // function onAuthStateChanged(user) {
-  //   setUser(user);
-  //   if (initializing) setInitializing(false);
-  // }
-
-  // useEffect(() => {
-  //   const subscriber = auth.onAuthStateChanged(onAuthStateChanged);
-  //   return subscriber; // unsubscribe on unmount
-  // }, []);
-
-  // if (initializing) return null;
-
-  // if (!user) {
   return (
     <NavigationContainer>
       <MyStack />
