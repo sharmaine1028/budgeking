@@ -5,17 +5,17 @@ import { Title } from "../config/reusableText";
 
 function GoalsPage({ navigation }) {
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.buttonContainer}>
         <BlackButton
           text={"Add new goals"}
           style={styles.button}
-          onPress={() => navigation.navigate("NewGoal")}
+          onPress={() => navigation.navigate("New Goal")}
         />
         <BlackButton
           text={"Show goal history"}
           style={styles.button}
-          onPress={() => navigation.navigate("GoalHistory")}
+          onPress={() => navigation.navigate("Goal History")}
         />
       </View>
       <Title text={"Short-term goals"} />
@@ -31,12 +31,13 @@ function GoalsPage({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  button: {
-    width: Dimensions.get("window").width * 0.4,
-  },
+  button: { flexGrow: 0.5, height: 40 },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
+  },
+  container: {
+    margin: 10,
   },
 });
 

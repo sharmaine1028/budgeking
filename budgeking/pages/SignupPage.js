@@ -19,7 +19,7 @@ export default class SignupPage extends React.Component {
   constructor() {
     super();
     this.state = {
-      username: "",
+      firstName: "",
       email: "",
       password: "",
       imageSource: "",
@@ -71,7 +71,7 @@ export default class SignupPage extends React.Component {
         />
         <BrownTextInput
           placeholder={"First name"}
-          onChangeText={(val) => this.updateInputVal(val, "First name")}
+          onChangeText={(val) => this.updateInputVal(val, "firstName")}
           value={this.state.username}
         />
         <BrownTextInput
@@ -137,14 +137,16 @@ export default class SignupPage extends React.Component {
       aspect: [1, 1],
     }).catch((err) => console.log(error));
 
-    this.setState({ imageSource: pickerResult.uri });
+    if (!pickerResult.cancelled) {
+      this.setState({ imageSource: pickerResult.uri });
+    }
   };
 
   handleSignUp = () => {
     if (
       this.state.email === "" ||
       this.state.password === "" ||
-      this.state.user === ""
+      this.state.firstName === ""
     ) {
       alert("Enter details to sign up!");
     } else {
@@ -157,7 +159,7 @@ export default class SignupPage extends React.Component {
         .then((res) => {
           db.collection("users").doc(res.user.uid).set({ income: 0 });
           res.user.updateProfile({
-            displayName: this.state.username,
+            displayName: this.state.firstName,
             photoURL: this.state.imageSource,
           });
           alert("Log in with your new account");

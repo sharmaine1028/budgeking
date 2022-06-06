@@ -1,7 +1,6 @@
-import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { registerRootComponent } from "expo";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createStackNavigator } from "@react-navigation/stack";
 import { Platform, StyleSheet, StatusBar, Image } from "react-native";
 import colours from "./config/colours";
 import LoginPage from "./pages/LoginPage";
@@ -13,10 +12,9 @@ import BudgetPage from "./pages/BudgetPage";
 import ReportsPage from "./pages/ReportsPage";
 import NewGoal from "./pages/NewGoal";
 import GoalHistory from "./pages/GoalHistory";
-import { auth } from "./config/firebase";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // export default function App() {
@@ -36,19 +34,24 @@ function MyStack() {
   );
 }
 
-function Goals() {
+function GoalsAll() {
   return (
     <Stack.Navigator
+      initialRouteName="Goals"
       screenOptions={{
         headerStyle: {
           backgroundColor: colours.whiteRock,
         },
-        animation: "slide_from_right",
+        cardStyle: { backgroundColor: colours.white },
       }}
     >
-      <Stack.Screen name="Goals" component={GoalsPage} />
-      <Stack.Screen name="NewGoal" component={NewGoal} />
-      <Stack.Screen name="GoalHistory" component={GoalHistory} />
+      <Stack.Screen
+        name="Goals"
+        component={GoalsPage}
+        options={{ headerLeft: false }}
+      />
+      <Stack.Screen name="New Goal" component={NewGoal} />
+      <Stack.Screen name="Goal History" component={GoalHistory} />
     </Stack.Navigator>
   );
 }
@@ -60,9 +63,17 @@ function MyTabs() {
         headerStyle: {
           backgroundColor: colours.whiteRock,
         },
+        unmountOnBlur: true,
         tabBarActiveTintColor: colours.tomato,
-        tabBarStyle: { backgroundColor: colours.whiteRock },
+        tabBarStyle: {
+          backgroundColor: colours.whiteRock,
+          height: 60,
+          paddingBottom: 2,
+        },
+
+        tabBarHideOnKeyboard: true,
       }}
+      sceneContainerStyle={{ backgroundColor: colours.white }}
     >
       <Tab.Screen
         name="Home"
@@ -78,7 +89,7 @@ function MyTabs() {
       />
       <Tab.Screen
         name="Goals"
-        component={Goals}
+        component={GoalsAll}
         options={{
           tabBarIcon: () => (
             <Image
@@ -86,6 +97,7 @@ function MyTabs() {
               source={require("./assets/icons/goals.png")}
             />
           ),
+          tabBarHideOnKeyboard: true,
           headerShown: false,
         }}
       />
@@ -131,7 +143,7 @@ function MyTabs() {
 
 export default function App() {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={{ colors: colours.black }}>
       <MyStack />
     </NavigationContainer>
   );
@@ -139,9 +151,10 @@ export default function App() {
 
 const styles = StyleSheet.create({
   bottomTabIcon: {
-    width: 20,
-    height: 20,
-    padding: 2,
+    width: 30,
+    height: 30,
+    overflow: "visible",
+    resizeMode: "contain",
   },
   container: {
     flex: 1,
@@ -151,5 +164,3 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
 });
-
-registerRootComponent(App);

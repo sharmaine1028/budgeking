@@ -4,16 +4,18 @@ import { auth } from "../config/firebase";
 import { Header, Title, WhiteTextInput } from "../config/reusableText";
 import RedLine from "../config/reusablePart";
 import { StyleSheet, View, Image } from "react-native";
-import { updateProfile, updatePassword } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
 import { AddButton } from "../config/reusableButton";
 import colours from "../config/colours";
 import * as ImagePicker from "expo-image-picker";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 class SettingsPage extends React.Component {
   constructor() {
     super();
     this.state = {
-      displayName: auth.currentUser.displayName,
+      currDisplayName: auth.currentUser.displayName,
+      displayName: "",
       password: "",
       uri: auth.currentUser.photoURL,
     };
@@ -26,19 +28,19 @@ class SettingsPage extends React.Component {
         <RedLine />
         <View style={styles.beside}>
           <Header text={"Change profile picture"} />
-          <View>
+          <TouchableOpacity onPress={() => this.pickImage()}>
             {this.maybeRenderImage()}
             <View style={styles.button}>
               <AddButton
-                onPress={() => this.pickImage()}
+                // onPress={() => this.pickImage()}
                 style={styles.addButton}
               />
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
         <Header text={"Change username"} />
         <WhiteTextInput
-          placeholder={this.state.displayName}
+          placeholder={this.state.currDisplayName}
           value={this.state.displayName}
           onChangeText={(val) => {
             this.updateInputVal(val, "displayName");
@@ -83,24 +85,30 @@ class SettingsPage extends React.Component {
   }
 
   updateUserDisplayName = (props) => {
-    updateProfile(auth.currentUser, {
-      displayName: `${this.state.displayName}`,
-    })
-      .then((res) => {
-        alert("Profile updated!");
-        this.props.home;
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
+    try {
+      auth.currentUser
+        .updateProfile({
+          displayName: `${this.state.displayName}`,
+        })
+        .then((res) => {
+          this.setState({ currDisplayName: this.state.displayName });
+          this.setState({ displayName: "" });
+          alert("Profile updated!");
+        });
+    } catch (error) {
+      alert(error.message);
+      console.log(error.message);
+    }
   };
 
   updateUserPassword = (props) => {
-    updatePassword(auth.currentUser, `${this.state.password}`)
-      .then((res) => {
+    try {
+      auth.currentUser.updatePassword(`${this.state.password}`).then((res) => {
         alert("Password updated!");
-      })
-      .catch((error) => alert(error.message));
+      });
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   signOut = () => {
@@ -126,13 +134,17 @@ class SettingsPage extends React.Component {
   };
 
   pickImage = async () => {
-    let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-    }).catch((err) => console.log(error));
+    try {
+      let pickerResult = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+      });
 
-    this.setState({ uri: pickerResult.uri });
-    auth.updateProfile(auth.currentUser, { photoURL: this.state.uri });
+      this.setState({ uri: pickerResult.uri });
+      auth.updateProfile(auth.currentUser, { photoURL: this.state.uri });
+    } catch (err) {
+      console.log(err);
+    }
   };
 }
 
@@ -157,7 +169,7 @@ const styles = StyleSheet.create({
     top: 50,
   },
   container: {
-    margin: 30,
+    marginHorizontal: 20,
   },
   smallButton: {
     width: 130,
