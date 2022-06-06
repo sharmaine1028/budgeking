@@ -3,69 +3,47 @@ import { BlackButton } from "../config/reusableButton";
 import { auth } from "../config/firebase";
 import { Header, Title, WhiteTextInput } from "../config/reusableText";
 import RedLine from "../config/reusablePart";
-import { StyleSheet, View } from "react-native";
-import { updateProfile, updatePassword } from "firebase/auth";
+import { StyleSheet, View, Image } from "react-native";
+import { updateProfile } from "firebase/auth";
+import { AddButton } from "../config/reusableButton";
+import colours from "../config/colours";
+import * as ImagePicker from "expo-image-picker";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 class SettingsPage extends React.Component {
   constructor() {
     super();
     this.state = {
-      displayName: auth.currentUser.displayName,
+      currDisplayName: auth.currentUser.displayName,
+      displayName: "",
       password: "",
+      uri: auth.currentUser.photoURL,
     };
   }
-
-  updateInputVal(val, prop) {
-    const state = this.state;
-    state[prop] = val;
-    this.setState(state);
-  }
-
-  updateUserDisplayName = (props) => {
-    updateProfile(auth.currentUser, {
-      displayName: `${this.state.displayName}`,
-    })
-      .then((res) => {
-        alert("Profile updated!");
-        this.props.home;
-        console.log(auth.currentUser.displayname);
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
-  };
-
-  updateUserPassword = (props) => {
-    updatePassword(auth.currentUser, `${this.state.password}`)
-      .then((res) => {
-        alert("Password updated!");
-      })
-      .catch((error) => alert(error.message));
-  };
-
-  signOut = () => {
-    auth
-      .signOut()
-      .then(() => {
-        this.props.navigation.navigate("Login");
-      })
-      .catch((error) => alert(error.message));
-  };
 
   render() {
     return (
       <View style={styles.container}>
         <Title text={"Profile"} />
         <RedLine />
-        <Header text={"Change profile picture"} />
-
+        <View style={styles.beside}>
+          <Header text={"Change profile picture"} />
+          <TouchableOpacity onPress={() => this.pickImage()}>
+            {this.maybeRenderImage()}
+            <View style={styles.button}>
+              <AddButton
+                // onPress={() => this.pickImage()}
+                style={styles.addButton}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
         <Header text={"Change username"} />
         <WhiteTextInput
-          placeholder={this.state.displayName}
+          placeholder={this.state.currDisplayName}
           value={this.state.displayName}
           onChangeText={(val) => {
             this.updateInputVal(val, "displayName");
-            console.log(this.state.displayName);
           }}
         />
         <BlackButton
@@ -99,11 +77,99 @@ class SettingsPage extends React.Component {
       </View>
     );
   }
+
+  updateInputVal(val, prop) {
+    const state = this.state;
+    state[prop] = val;
+    this.setState(state);
+  }
+
+  updateUserDisplayName = (props) => {
+    try {
+      auth.currentUser
+        .updateProfile({
+          displayName: `${this.state.displayName}`,
+        })
+        .then((res) => {
+          this.setState({ currDisplayName: this.state.displayName });
+          this.setState({ displayName: "" });
+          alert("Profile updated!");
+        });
+    } catch (error) {
+      alert(error.message);
+      console.log(error.message);
+    }
+  };
+
+  updateUserPassword = (props) => {
+    try {
+      auth.currentUser.updatePassword(`${this.state.password}`).then((res) => {
+        alert("Password updated!");
+      });
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  signOut = () => {
+    auth
+      .signOut()
+      .then(() => {
+        this.props.navigation.navigate("Login");
+      })
+      .catch((error) => alert(error.message));
+  };
+
+  maybeRenderImage = () => {
+    if (!this.state.uri) {
+      return (
+        <Image
+          style={styles.image}
+          source={require("../assets/loginsignup/profile.png")}
+        />
+      );
+    }
+
+    return <Image style={styles.image} source={{ uri: this.state.uri }} />;
+  };
+
+  pickImage = async () => {
+    try {
+      let pickerResult = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+      });
+
+      this.setState({ uri: pickerResult.uri });
+      auth.updateProfile(auth.currentUser, { photoURL: this.state.uri });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 }
 
 const styles = StyleSheet.create({
+  addButton: {
+    width: 20,
+    height: 20,
+  },
+  beside: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    top: 10,
+  },
+  button: {
+    width: 20,
+    height: 20,
+    borderRadius: 999,
+    backgroundColor: colours.lightBrown,
+    alignSelf: "flex-end",
+    position: "absolute",
+    top: 50,
+  },
   container: {
-    margin: 20,
+    marginHorizontal: 20,
   },
   smallButton: {
     width: 130,
@@ -115,6 +181,12 @@ const styles = StyleSheet.create({
   },
   logout: {
     width: 180,
+  },
+  image: {
+    width: 70,
+    height: 70,
+    borderRadius: 999,
+    justifyContent: "flex-end",
   },
 });
 

@@ -18,8 +18,7 @@ const wait = (timeout) => {
 function HomePage() {
   const [displayName, setDisplayName] = useState(auth.currentUser.displayName);
 
-  // TODO: Scroll down to refresh
-  // setDisplayName{auth.currentUser.displayName}
+  // Scroll from top to refresh changes
   const [refreshing, setRefreshing] = React.useState(false);
 
   const onRefresh = React.useCallback(() => {
@@ -47,8 +46,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     display: "flex",
-    paddingTop: 15,
-    paddingHorizontal: 30,
+    marginHorizontal: 20,
     backgroundColor: colours.white,
   },
 });

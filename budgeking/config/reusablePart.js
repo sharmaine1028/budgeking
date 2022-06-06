@@ -11,7 +11,7 @@ export default function RedLine() {
       orientation="horizontal"
       color={colours.red}
       width={3}
-      style={{ padding: 1 }}
+      style={{ marginVertical: 5 }}
     />
   );
 }

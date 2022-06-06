@@ -14,12 +14,12 @@ function reusableButton(props) {
   return <div></div>;
 }
 
-export function AddButton({ style }) {
+export function AddButton({ style, onPress }) {
   return (
-    <TouchableOpacity onPress={() => alert("Add a profile picture")}>
+    <TouchableOpacity onPress={onPress}>
       <Image
         source={require("../assets/loginsignup/add.png")}
-        style={[style, styles.addButton]}
+        style={[styles.addButton, style]}
       />
     </TouchableOpacity>
   );
@@ -71,9 +71,9 @@ const styles = StyleSheet.create({
   },
   blackButton: {
     width: 130,
-    height: 50,
+    height: 40,
     borderRadius: 999,
-    margin: 10,
+    margin: 2,
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",

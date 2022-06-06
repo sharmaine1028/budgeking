@@ -1,24 +1,24 @@
-import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { registerRootComponent } from "expo";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createStackNavigator } from "@react-navigation/stack";
 import { Platform, StyleSheet, StatusBar, Image } from "react-native";
 import colours from "./config/colours";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/HomePage";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import SettingsPage from "./pages/SettingsPage";
 import GoalsPage from "./pages/GoalsPage";
 import BudgetPage from "./pages/BudgetPage";
 import ReportsPage from "./pages/ReportsPage";
-import { auth } from "./config/firebase";
+import NewGoal from "./pages/NewGoal";
+import GoalHistory from "./pages/GoalHistory";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // export default function App() {
-//   return <LoginPage />;
+//   return <GoalsPage />;
 // }
 
 function MyStack() {
@@ -34,6 +34,28 @@ function MyStack() {
   );
 }
 
+function GoalsAll() {
+  return (
+    <Stack.Navigator
+      initialRouteName="Goals"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colours.whiteRock,
+        },
+        cardStyle: { backgroundColor: colours.white },
+      }}
+    >
+      <Stack.Screen
+        name="Goals"
+        component={GoalsPage}
+        options={{ headerLeft: false }}
+      />
+      <Stack.Screen name="New Goal" component={NewGoal} />
+      <Stack.Screen name="Goal History" component={GoalHistory} />
+    </Stack.Navigator>
+  );
+}
+
 function MyTabs() {
   return (
     <Tab.Navigator
@@ -41,9 +63,17 @@ function MyTabs() {
         headerStyle: {
           backgroundColor: colours.whiteRock,
         },
+        unmountOnBlur: true,
         tabBarActiveTintColor: colours.tomato,
-        tabBarStyle: { backgroundColor: colours.whiteRock },
+        tabBarStyle: {
+          backgroundColor: colours.whiteRock,
+          height: 60,
+          paddingBottom: 2,
+        },
+
+        tabBarHideOnKeyboard: true,
       }}
+      sceneContainerStyle={{ backgroundColor: colours.white }}
     >
       <Tab.Screen
         name="Home"
@@ -56,11 +86,10 @@ function MyTabs() {
             />
           ),
         }}
-        initialParams={{ displayName: auth.currentUser.displayName }}
       />
       <Tab.Screen
         name="Goals"
-        component={GoalsPage}
+        component={GoalsAll}
         options={{
           tabBarIcon: () => (
             <Image
@@ -68,6 +97,8 @@ function MyTabs() {
               source={require("./assets/icons/goals.png")}
             />
           ),
+          tabBarHideOnKeyboard: true,
+          headerShown: false,
         }}
       />
       <Tab.Screen
@@ -111,24 +142,8 @@ function MyTabs() {
 }
 
 export default function App() {
-  // const [initializing, setInitializing] = useState(true);
-  // const [user, setUser] = useState();
-
-  // function onAuthStateChanged(user) {
-  //   setUser(user);
-  //   if (initializing) setInitializing(false);
-  // }
-
-  // useEffect(() => {
-  //   const subscriber = auth.onAuthStateChanged(onAuthStateChanged);
-  //   return subscriber; // unsubscribe on unmount
-  // }, []);
-
-  // if (initializing) return null;
-
-  // if (!user) {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={{ colors: colours.black }}>
       <MyStack />
     </NavigationContainer>
   );
@@ -136,9 +151,10 @@ export default function App() {
 
 const styles = StyleSheet.create({
   bottomTabIcon: {
-    width: 20,
-    height: 20,
-    padding: 2,
+    width: 30,
+    height: 30,
+    overflow: "visible",
+    resizeMode: "contain",
   },
   container: {
     flex: 1,
@@ -148,5 +164,3 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
 });
-
-registerRootComponent(App);
