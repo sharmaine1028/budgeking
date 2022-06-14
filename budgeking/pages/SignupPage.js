@@ -1,7 +1,6 @@
 import React from "react";
 import {
   View,
-  ImageBackground,
   StyleSheet,
   StatusBar,
   ActivityIndicator,
@@ -11,8 +10,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import colours from "../config/colours";
 import { BlackButton, AddButton } from "../config/reusableButton";
 import { Footer, BrownTextInput } from "../config/reusableText";
-import { auth, db, storage } from "../config/firebase";
-import { ref } from "firebase/storage";
+import { auth, db } from "../config/firebase";
 import * as ImagePicker from "expo-image-picker";
 
 export default class SignupPage extends React.Component {
@@ -78,7 +76,7 @@ export default class SignupPage extends React.Component {
           placeholder={"Password"}
           onChangeText={(val) => this.updateInputVal(val, "password")}
           value={this.state.password}
-          maxLength={15}
+          // maxLength={15}
           secureTextEntry={true}
         />
 

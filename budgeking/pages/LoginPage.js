@@ -20,6 +20,45 @@ export default class LoginPage extends React.Component {
     };
   }
 
+  render() {
+    if (this.state.isLoading) {
+      return (
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color="#9E9E9E" alignItems="center" />
+        </View>
+      );
+    }
+    return (
+      <View style={styles.container}>
+        <Image
+          style={styles.logo}
+          source={require("../assets/crown.png")}
+          resizeMethod={"resize"}
+        />
+        <View style={styles.buttonContainer}>
+          <BrownTextInput
+            placeholder={"Email"}
+            onChangeText={(val) => this.updateInputVal(val, "email")}
+            value={this.state.email}
+          />
+          <BrownTextInput
+            placeholder={"Password"}
+            onChangeText={(val) => this.updateInputVal(val, "password")}
+            value={this.state.password}
+            maxLength={15}
+            secureTextEntry={true}
+          />
+          <BlackButton text="Login" onPress={this.handleLogin} />
+          <Footer
+            desc={"Don't have an account yet?"}
+            text={"Sign up"}
+            onPress={this.onFooterLinkPress}
+          />
+        </View>
+      </View>
+    );
+  }
+
   updateInputVal(val, prop) {
     const state = this.state;
     state[prop] = val;
@@ -73,45 +112,6 @@ export default class LoginPage extends React.Component {
         });
     }
   };
-
-  render() {
-    if (this.state.isLoading) {
-      return (
-        <View style={styles.container}>
-          <ActivityIndicator size="large" color="#9E9E9E" alignItems="center" />
-        </View>
-      );
-    }
-    return (
-      <View style={styles.container}>
-        <Image
-          style={styles.logo}
-          source={require("../assets/crown.png")}
-          resizeMethod={"resize"}
-        />
-        <View style={styles.buttonContainer}>
-          <BrownTextInput
-            placeholder={"Email"}
-            onChangeText={(val) => this.updateInputVal(val, "email")}
-            value={this.state.email}
-          />
-          <BrownTextInput
-            placeholder={"Password"}
-            onChangeText={(val) => this.updateInputVal(val, "password")}
-            value={this.state.password}
-            maxLength={15}
-            secureTextEntry={true}
-          />
-          <BlackButton text="Login" onPress={this.handleLogin} />
-          <Footer
-            desc={"Don't have an account yet?"}
-            text={"Sign up"}
-            onPress={this.onFooterLinkPress}
-          />
-        </View>
-      </View>
-    );
-  }
 }
 
 const styles = StyleSheet.create({

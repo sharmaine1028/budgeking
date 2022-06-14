@@ -4,7 +4,6 @@ import { auth } from "../config/firebase";
 import { Header, Title, WhiteTextInput } from "../config/reusableText";
 import RedLine from "../config/reusablePart";
 import { StyleSheet, View, Image } from "react-native";
-import { updateProfile } from "firebase/auth";
 import { AddButton } from "../config/reusableButton";
 import colours from "../config/colours";
 import * as ImagePicker from "expo-image-picker";
@@ -141,7 +140,7 @@ class SettingsPage extends React.Component {
       });
 
       this.setState({ uri: pickerResult.uri });
-      auth.updateProfile(auth.currentUser, { photoURL: this.state.uri });
+      auth.currentUser.updateProfile({ photoURL: this.state.uri });
     } catch (err) {
       console.log(err);
     }

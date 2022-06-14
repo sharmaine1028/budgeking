@@ -2,13 +2,11 @@ import React from "react";
 import {
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
   Text,
   TextInput,
   Image,
 } from "react-native";
 import colours from "./colours";
-import fonts from "./fonts";
 
 function reusableButton(props) {
   return <div></div>;

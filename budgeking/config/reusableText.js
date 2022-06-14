@@ -1,5 +1,12 @@
 import React from "react";
-import { StyleSheet, View, Text, TextInput, Dimensions } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import colours from "./colours";
 import RadioButtonRN from "radio-buttons-react-native";
 
@@ -20,12 +27,12 @@ export function Footer({ onPress, text, desc }) {
   );
 }
 
-export function Title({ text }) {
-  return <Text style={styles.title}>{text}</Text>;
+export function Title({ text, style }) {
+  return <Text style={[styles.title, style]}>{text}</Text>;
 }
 
-export function Header({ text }) {
-  return <Text style={styles.header}>{text}</Text>;
+export function Header({ text, style }) {
+  return <Text style={[styles.header, style]}>{text}</Text>;
 }
 
 export function BrownTextInput({
@@ -52,6 +59,34 @@ export function BrownTextInput({
   );
 }
 
+export function ImageTextInput({ value, onPress, source, placeholder }) {
+  return (
+    <View
+      style={[
+        styles.whiteInput,
+        { flexDirection: "row", justifyContent: "space-between" },
+      ]}
+    >
+      <TextInput
+        placeholder={placeholder}
+        style={{ flex: 1 }}
+        value={value}
+        editable={false}
+      />
+      <TouchableOpacity onPress={onPress} style={{ justifyContent: "center" }}>
+        <Image
+          source={source}
+          style={{
+            width: 22,
+            height: 22,
+            alignSelf: "center",
+          }}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 export function WhiteTextInput({
   placeholder,
   onChangeText,
@@ -59,6 +94,8 @@ export function WhiteTextInput({
   value,
   maxLength,
   secureTextEntry,
+  keyboardType,
+  onPressIn,
 }) {
   return (
     <>
@@ -71,6 +108,8 @@ export function WhiteTextInput({
         autoCapitalize="none"
         maxLength={maxLength}
         secureTextEntry={secureTextEntry}
+        keyboardType={keyboardType}
+        onPressIn={onPressIn}
       />
     </>
   );
@@ -93,6 +132,29 @@ export function NewGoalInput({
         value={value}
         autoCapitalize="none"
         maxLength={maxLength}
+      />
+    </View>
+  );
+}
+
+export function BudgetInput({
+  text,
+  placeholder,
+  style,
+  keyboardType,
+  onPressIn,
+  value,
+  onChangeText,
+}) {
+  return (
+    <View style={[{ flexDirection: "column" }, style]}>
+      <Header text={text} />
+      <WhiteTextInput
+        placeholder={placeholder}
+        keyboardType={keyboardType}
+        onPressIn={onPressIn}
+        value={value}
+        onChangeText={onChangeText}
       />
     </View>
   );
@@ -142,6 +204,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontSize: 15,
     lineHeight: 15,
+    marginVertical: 5,
   },
   newGoalInput: {
     backgroundColor: colours.lightBrown,
@@ -162,11 +225,11 @@ const styles = StyleSheet.create({
   },
   whiteInput: {
     backgroundColor: "#fff",
-    borderWidth: 0.3,
+    borderWidth: 0.8,
     borderColor: "#251F47",
     borderRadius: 5,
     shadowColor: "#000",
-    marginVertical: 2,
+    marginVertical: 5,
     shadowOpacity: 0,
     shadowRadius: 1,
     elevation: 8,

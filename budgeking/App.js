@@ -1,5 +1,4 @@
 import { NavigationContainer } from "@react-navigation/native";
-import { registerRootComponent } from "expo";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Platform, StyleSheet, StatusBar, Image } from "react-native";
 import colours from "./config/colours";
@@ -10,16 +9,22 @@ import SettingsPage from "./pages/SettingsPage";
 import GoalsPage from "./pages/GoalsPage";
 import BudgetPage from "./pages/BudgetPage";
 import ReportsPage from "./pages/ReportsPage";
+import LocationSearch from "./pages/LocationSearch";
 import NewGoal from "./pages/NewGoal";
 import GoalHistory from "./pages/GoalHistory";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// export default function App() {
-//   return <GoalsPage />;
-// }
+export default function App() {
+  return (
+    <NavigationContainer>
+      <BudgetAll />
+    </NavigationContainer>
+  );
+}
 
 function MyStack() {
   return (
@@ -56,10 +61,49 @@ function GoalsAll() {
   );
 }
 
+function BudgetAll() {
+  return (
+    <Stack.Navigator initialRouteName="Budget">
+      <Stack.Screen
+        name="BudgetPage"
+        component={BudgetPage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="Location Search" component={LocationSearch} />
+    </Stack.Navigator>
+  );
+}
+
+const screenOptions = (route, color) => {
+  let iconName;
+  switch (route.name) {
+    case "Home":
+      iconName = "home";
+
+      break;
+    case "Goal":
+      iconName = "piggy-bank-outline";
+      break;
+
+    case "Budget":
+      iconName = "plus-circle";
+      break;
+
+    case "Report":
+      iconName = "file-document-outline";
+      break;
+    case "Settings":
+      iconName = "cog";
+      break;
+    default:
+      break;
+  }
+  return <MaterialCommunityIcons name={iconName} color={color} size={28} />;
+};
 function MyTabs() {
   return (
     <Tab.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerStyle: {
           backgroundColor: colours.whiteRock,
         },
@@ -70,84 +114,34 @@ function MyTabs() {
           height: 60,
           paddingBottom: 2,
         },
-
         tabBarHideOnKeyboard: true,
-      }}
+        tabBarIcon: ({ color }) => screenOptions(route, color),
+      })}
       sceneContainerStyle={{ backgroundColor: colours.white }}
     >
+      <Tab.Screen name="Home" component={HomePage} />
       <Tab.Screen
-        name="Home"
-        component={HomePage}
-        options={{
-          tabBarIcon: () => (
-            <Image
-              style={styles.bottomTabIcon}
-              source={require("./assets/icons/home.png")}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Goals"
+        name="Goal"
         component={GoalsAll}
         options={{
-          tabBarIcon: () => (
-            <Image
-              style={styles.bottomTabIcon}
-              source={require("./assets/icons/goals.png")}
-            />
-          ),
           tabBarHideOnKeyboard: true,
           headerShown: false,
         }}
       />
-      <Tab.Screen
-        name="Budget"
-        component={BudgetPage}
-        options={{
-          tabBarIcon: () => (
-            <Image
-              style={styles.bottomTabIcon}
-              source={require("./assets/icons/add.png")}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Report"
-        component={ReportsPage}
-        options={{
-          tabBarIcon: () => (
-            <Image
-              style={styles.bottomTabIcon}
-              source={require("./assets/icons/report.png")}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Settings"
-        component={SettingsPage}
-        options={{
-          tabBarIcon: () => (
-            <Image
-              style={styles.bottomTabIcon}
-              source={require("./assets/icons/settings.png")}
-            />
-          ),
-        }}
-      />
+      <Tab.Screen name="Budget" component={BudgetAll} />
+      <Tab.Screen name="Report" component={ReportsPage} />
+      <Tab.Screen name="Settings" component={SettingsPage} />
     </Tab.Navigator>
   );
 }
 
-export default function App() {
-  return (
-    <NavigationContainer theme={{ colors: colours.black }}>
-      <MyStack />
-    </NavigationContainer>
-  );
-}
+// export default function App() {
+//   return (
+//     <NavigationContainer theme={{ colors: colours.black }}>
+//       <MyStack />
+//     </NavigationContainer>
+//   );
+// }
 
 const styles = StyleSheet.create({
   bottomTabIcon: {
