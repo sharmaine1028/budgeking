@@ -23,13 +23,14 @@ export function AddButton({ style, onPress }) {
   );
 }
 
-export function BlackButton({ text, onPress, style, textStyle }) {
+export function BlackButton({ text, onPress, style, textStyle, onFocus }) {
   return (
     <>
       <TouchableOpacity
         activeOpacity={0.7}
         style={[styles.blackButton, style]}
         onPress={onPress}
+        onFocus={onFocus}
       >
         <Text style={[styles.text, textStyle]}>{text}</Text>
       </TouchableOpacity>

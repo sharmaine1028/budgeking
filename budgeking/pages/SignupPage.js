@@ -155,7 +155,10 @@ export default class SignupPage extends React.Component {
       auth
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then((res) => {
-          db.collection("users").doc(res.user.uid).set({ income: 0 });
+          db.collection("users").doc(res.user.uid).set({
+            name: this.state.firstName,
+            email: this.state.email,
+          });
           res.user.updateProfile({
             displayName: this.state.firstName,
             photoURL: this.state.imageSource,

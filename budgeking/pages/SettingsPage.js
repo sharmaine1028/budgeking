@@ -1,7 +1,12 @@
 import React from "react";
 import { BlackButton } from "../config/reusableButton";
 import { auth } from "../config/firebase";
-import { Header, Title, WhiteTextInput } from "../config/reusableText";
+import {
+  Header,
+  ImageTextInput,
+  Title,
+  WhiteTextInput,
+} from "../config/reusableText";
 import RedLine from "../config/reusablePart";
 import { StyleSheet, View, Image } from "react-native";
 import { AddButton } from "../config/reusableButton";
@@ -17,6 +22,8 @@ class SettingsPage extends React.Component {
       displayName: "",
       password: "",
       uri: auth.currentUser.photoURL,
+      displayNameEditable: false,
+      passwordEditable: false,
     };
   }
 
@@ -38,13 +45,15 @@ class SettingsPage extends React.Component {
           </TouchableOpacity>
         </View>
         <Header text={"Change username"} />
-        <WhiteTextInput
+        <ImageTextInput
           placeholder={this.state.currDisplayName}
+          source={require("../assets/edit.jpg")}
+          onPress={() => this.editDisplayName()}
           value={this.state.displayName}
-          onChangeText={(val) => {
-            this.updateInputVal(val, "displayName");
-          }}
+          onChangeText={(val) => this.updateInputVal(val, "displayName")}
+          editable={this.state.displayNameEditable}
         />
+
         <BlackButton
           text={"Change"}
           style={styles.smallButton}
@@ -53,11 +62,15 @@ class SettingsPage extends React.Component {
         />
 
         <Header text={"Change password"} />
-        <WhiteTextInput
+        <ImageTextInput
           placeholder={"At least 6 characters"}
+          source={require("../assets/edit.jpg")}
+          onPress={() => this.editPassword()}
           value={this.state.password}
           onChangeText={(val) => this.updateInputVal(val, "password")}
+          editable={this.state.passwordEditable}
         />
+
         <BlackButton
           text={"Change"}
           style={styles.smallButton}
@@ -83,6 +96,10 @@ class SettingsPage extends React.Component {
     this.setState(state);
   }
 
+  editDisplayName = () => {
+    this.setState({ displayNameEditable: true });
+  };
+
   updateUserDisplayName = (props) => {
     try {
       auth.currentUser
@@ -91,7 +108,7 @@ class SettingsPage extends React.Component {
         })
         .then((res) => {
           this.setState({ currDisplayName: this.state.displayName });
-          this.setState({ displayName: "" });
+          this.setState({ displayName: "", displayNameEditable: false });
           alert("Profile updated!");
         });
     } catch (error) {
@@ -100,9 +117,14 @@ class SettingsPage extends React.Component {
     }
   };
 
+  editPassword = () => {
+    this.setState({ passwordEditable: true });
+  };
+
   updateUserPassword = (props) => {
     try {
       auth.currentUser.updatePassword(`${this.state.password}`).then((res) => {
+        this.setState({ passwordEditable: false });
         alert("Password updated!");
       });
     } catch (error) {
