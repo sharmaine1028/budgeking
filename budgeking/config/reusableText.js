@@ -59,7 +59,14 @@ export function BrownTextInput({
   );
 }
 
-export function ImageTextInput({ value, onPress, source, placeholder }) {
+export function ImageTextInput({
+  value,
+  onPress,
+  source,
+  placeholder,
+  editable,
+  onChangeText,
+}) {
   return (
     <View
       style={[
@@ -71,14 +78,15 @@ export function ImageTextInput({ value, onPress, source, placeholder }) {
         placeholder={placeholder}
         style={{ flex: 1 }}
         value={value}
-        editable={false}
+        editable={editable}
+        onChangeText={onChangeText}
       />
       <TouchableOpacity onPress={onPress} style={{ justifyContent: "center" }}>
         <Image
           source={source}
           style={{
-            width: 22,
-            height: 22,
+            width: 20,
+            height: 20,
             alignSelf: "center",
           }}
         />
@@ -176,7 +184,7 @@ export function YesOrNo({ title }) {
   );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   brownInput: {
     height: 40,
     margin: 12,

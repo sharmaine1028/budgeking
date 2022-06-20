@@ -6,9 +6,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colours from "../config/colours";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
-import Geolocation, {
-  getCurrentPosition,
-} from "react-native-geolocation-service";
 
 const latitudeDelta = 0.01;
 const longitudeDelta = 0.01;
@@ -63,12 +60,16 @@ export class LocationSearch extends React.Component {
           onPress={(data, details = null) => {
             // 'details' is provided when fetchDetails = true
             this.setState({
-              address: data.structured_formatting.main_text,
+              address: details.name,
               region: {
                 latitude: details.geometry.location.lat,
                 longitude: details.geometry.location.lng,
                 latitudeDelta: latitudeDelta,
                 longitudeDelta: longitudeDelta,
+              },
+              location: {
+                latitude: details.geometry.location.lat,
+                longitude: details.geometry.location.lng,
               },
             });
           }}
@@ -84,7 +85,6 @@ export class LocationSearch extends React.Component {
               flex: 0,
             },
           }}
-          ref={getCurrentPosition}
           currentLocation={true}
           currentLocationLabel="Current location"
           nearbyPlacesAPI="GooglePlacesSearch"
@@ -125,7 +125,10 @@ export class LocationSearch extends React.Component {
     } else {
       this.props.navigation.navigate({
         name: "BudgetPage",
-        params: { address: this.state.address },
+        params: {
+          address: this.state.address,
+          location: this.state.location,
+        },
         merge: true,
       });
     }

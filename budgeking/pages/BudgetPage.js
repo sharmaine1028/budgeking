@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { createRef } from "react";
 import {
   Image,
   View,
@@ -16,10 +16,11 @@ import {
   ImageTextInput,
 } from "../config/reusableText";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import { MaskedTextInput } from "react-native-mask-text";
 import * as ImagePicker from "expo-image-picker";
-import * as Location from "expo-location";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { auth, db } from "../config/firebase";
+import { Picker } from "@react-native-picker/picker";
+import CurrencyInput from "react-native-currency-input";
 
 class BudgetPage extends React.Component {
   constructor() {
@@ -31,7 +32,7 @@ class BudgetPage extends React.Component {
       timePicker: false,
       date: new Date(),
       time: new Date(Date.now()),
-      value: "",
+      value: "0.00",
       category: "",
       notes: "",
       photoURI: "",
@@ -42,24 +43,10 @@ class BudgetPage extends React.Component {
   }
 
   render() {
-    const address = this.props.route.params?.address;
     return (
       <KeyboardAwareScrollView>
         <View style={styles.container}>
-          <View style={styles.tabContainer}>
-            <BlackButton
-              text={"Expense"}
-              style={styles.expenseButton}
-              textStyle={{ color: colours.black }}
-              onPress={() => this.setState({ budget: "Expense" })}
-            />
-            <BlackButton
-              text={"Income"}
-              style={styles.incomeButton}
-              textStyle={{ color: colours.black }}
-              onPress={() => this.setState({ budget: "Income" })}
-            />
-          </View>
+          {this.budgetButtons()}
 
           <Title text={this.state.budget} style={{ marginVertical: 5 }} />
 
@@ -72,19 +59,19 @@ class BudgetPage extends React.Component {
           >
             <View style={{ flex: 0.3 }}>
               <Header text={"Value"} />
-              <MaskedTextInput
-                type="currency"
-                options={{
-                  prefix: "$",
-                  decimalSeparator: ".",
-                  groupSeparator: ",",
-                  precision: 2,
-                }}
-                onChangeText={(text, rawText) => {
-                  this.setState({ value: text });
-                }}
-                style={styles.value}
+              <CurrencyInput
+                style={styles.whiteInput}
                 keyboardType="numeric"
+                value={this.state.value}
+                prefix="$"
+                unit="$"
+                delimiter=","
+                separator="."
+                precision={2}
+                onChangeValue={(val) => this.updateInputVal(val, "value")}
+                // onChangeText={(formattedValue) => {
+                //   this.updateInputVal(formattedValue, "value");
+                // }}
               />
             </View>
 
@@ -94,6 +81,7 @@ class BudgetPage extends React.Component {
                 source={require("../assets/calendar.png")}
                 onPress={() => this.showDatePicker()}
                 value={this.dateFormat()}
+                editable={false}
               />
             </View>
 
@@ -103,6 +91,7 @@ class BudgetPage extends React.Component {
                 source={require("../assets/clock.png")}
                 onPress={() => this.showTimePicker()}
                 value={this.timeFormat()}
+                editable={false}
               />
             </View>
           </View>
@@ -127,10 +116,12 @@ class BudgetPage extends React.Component {
             />
           )}
 
-          <BudgetInput text={"Category"} />
+          <Header text={"Category"} />
+          <View style={styles.whiteInput}>{this.maybeCategories()}</View>
           <BudgetInput
             text={"Notes"}
             onChangeText={(val) => this.updateInputVal(val, "notes")}
+            value={this.state.notes}
           />
 
           <View style={styles.withImage}>
@@ -151,7 +142,8 @@ class BudgetPage extends React.Component {
           <View style={styles.withImage}>
             <View>
               <Header text="Add location" />
-              {address ? this.maybeLocation(address) : null}
+              {this.maybeLocation()}
+              <Text style={{ fontSize: 10 }}>{this.state.address}</Text>
             </View>
             <TouchableOpacity onPress={() => this.showLocationPicker()}>
               <Image
@@ -169,7 +161,11 @@ class BudgetPage extends React.Component {
               style={{ flexGrow: 0.5 }}
               onPress={() => this.addToGoals()}
             />
-            <BlackButton text={"Cancel"} style={{ flexGrow: 0.5 }} />
+            <BlackButton
+              text={"Cancel"}
+              style={{ flexGrow: 0.5 }}
+              onPress={() => this.reset()}
+            />
           </View>
         </View>
       </KeyboardAwareScrollView>
@@ -181,6 +177,27 @@ class BudgetPage extends React.Component {
     state[prop] = val;
     this.setState(state);
   }
+
+  budgetButtons = () => {
+    return (
+      <View style={styles.tabContainer}>
+        <BlackButton
+          text={"Expense"}
+          style={styles.expenseButton}
+          textStyle={{ color: colours.black }}
+          onPress={() => {
+            this.setState({ budget: "Expense" });
+          }}
+        />
+        <BlackButton
+          text={"Income"}
+          style={styles.incomeButton}
+          textStyle={{ color: colours.black }}
+          onPress={() => this.setState({ budget: "Income" })}
+        />
+      </View>
+    );
+  };
 
   showDatePicker = () => {
     this.setState({ datePicker: true });
@@ -257,16 +274,107 @@ class BudgetPage extends React.Component {
     }
   };
 
-  maybeLocation = (address) => {
+  maybeLocation = () => {
+    const address = this.props.route.params?.address;
+    const location = this.props.route.params?.location;
     if (this.state.address !== address) {
-      this.setState({ address: address });
+      this.setState({ address: address, location: location });
     }
-    return <Text style={{ fontSize: 10 }}>{this.state.address}</Text>;
+  };
+
+  maybeCategories = () => {
+    if (this.state.budget === "Expense") {
+      return (
+        <Picker
+          selectedValue={this.state.category}
+          onValueChange={(itemValue, itemIndex) => {
+            this.updateInputVal(itemValue, "category");
+          }}
+          mode="dropdown"
+        >
+          <Picker.Item label="Please select a category" enabled={false} />
+          <Picker.Item label="Food and drinks" value="food and drinks" />
+          <Picker.Item label="Transportation" value="transportation" />
+          <Picker.Item label="Housing" value="housing" />
+          <Picker.Item label="Shopping" value="shopping" />
+          <Picker.Item label="Health" value="health" />
+          <Picker.Item label="Education" value="education" />
+          <Picker.Item label="Others" value="others" />
+        </Picker>
+      );
+    } else {
+      return (
+        <Picker
+          selectedValue={this.state.category}
+          onValueChange={(itemValue, itemIndex) => {
+            if (!itemValue) {
+              this.updateInputVal("salary", "category");
+            }
+            this.updateInputVal(itemValue, "category");
+          }}
+        >
+          <Picker.Item label="Please select a category" enabled={false} />
+          <Picker.Item label="Salary" value="salary" />
+          <Picker.Item label="Investment" value="investment" />
+          <Picker.Item label="Rental income" value="rental income" />
+          <Picker.Item label="Others" value="others" />
+        </Picker>
+      );
+    }
   };
 
   addToGoals = () => {
     // TODO
-    console.log(this.state);
+    if (this.state.value === "0.00" || this.state.category === "") {
+      alert("Please enter both value and category");
+      return;
+    }
+    let currDb = db;
+    if (this.state.budget === "Expense") {
+      currDb = db
+        .collection("users")
+        .doc(auth.currentUser.uid)
+        .collection("expense")
+        .doc();
+    } else {
+      currDb = db
+        .collection("users")
+        .doc(auth.currentUser.uid)
+        .collection("income")
+        .doc();
+    }
+    currDb.set({
+      date: this.state.date,
+      time: this.state.time,
+      notes: this.state.notes,
+      value: this.state.value,
+      photo: this.state.photoURI,
+      address: this.state.address,
+      location: this.state.location,
+      category: this.state.category,
+    });
+    alert("Budget updated");
+    this.reset();
+  };
+
+  reset = () => {
+    let budget = this.state.budget;
+    this.setState({ budget: budget });
+    this.setState({
+      datePicker: false,
+      timePicker: false,
+      date: new Date(),
+      time: new Date(Date.now()),
+      value: "0.00",
+      category: "",
+      notes: "",
+      photoURI: "",
+      location: null,
+      locationPicker: false,
+      locationRegion: null,
+    });
+    this.props.navigation.setParams({ address: "", location: null });
+    // console.log(this.state);
   };
 }
 
@@ -275,7 +383,7 @@ const styles = StyleSheet.create({
     margin: 20,
   },
   expenseButton: {
-    backgroundColor: "#FFB8AC",
+    backgroundColor: "#ffb8ac",
     flexGrow: 0.5,
   },
   image: {
@@ -303,7 +411,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     alignItems: "center",
   },
-  value: {
+  whiteInput: {
     backgroundColor: "#fff",
     borderWidth: 0.8,
     borderColor: "#251F47",
