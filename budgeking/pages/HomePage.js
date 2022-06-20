@@ -37,6 +37,7 @@ function HomePage() {
         <Title text={`Welcome, ${displayName}`}></Title>
         <Header text={`${"\n"}Your weekly budget`} />
         <RedLine />
+        <Text>Test</Text>
       </ScrollView>
     </View>
   );
