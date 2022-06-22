@@ -96,10 +96,19 @@ export default class SignupPage extends React.Component {
     this.setState(state);
   };
 
+  /**
+   * Navigate to Login page
+   */
   onFooterLinkPress = () => {
     this.props.navigation.navigate("Login");
   };
 
+  /**
+   * Renders profile picture depending on whether user added one.
+   * Otherwise, add default profile picture.
+   *
+   * @returns profile picture that users add, default picture otherwise
+   */
   maybeRenderImage = () => {
     if (this.state.imageSource === "") {
       return (
@@ -115,20 +124,16 @@ export default class SignupPage extends React.Component {
     );
   };
 
+  /**
+   * Calls pick Image function
+   */
   addImageButton = async () => {
-    // if (this.state.cameraPermission) {
     this.pickImage();
-    // } else {
-    //   const { status } =
-    //     await ImagePicker.requestMediaLibraryPermissionsAsync();
-    //   if (status !== "granted") {
-    //     alert("Sorry, we need camera roll permissions to make this work.");
-    //   } else {
-    //     this.setState({ cameraPermission: true });
-    //   }
-    // }
   };
 
+  /**
+   * Allows user to pick image from gallery and updates state accordingly
+   */
   pickImage = async () => {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -140,7 +145,12 @@ export default class SignupPage extends React.Component {
     }
   };
 
+  /**
+   * Handles errors in filling up of fields.
+   * Handles logic of updating firebase authentication and details in firestore
+   */
   handleSignUp = () => {
+    // If any of the necessary fields are empty, alert user
     if (
       this.state.email === "" ||
       this.state.password === "" ||
@@ -152,19 +162,31 @@ export default class SignupPage extends React.Component {
         isLoading: true,
       });
 
+      // Create new account for user
       auth
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then((res) => {
+          // Add in user details in firestore
           db.collection("users").doc(res.user.uid).set({
             name: this.state.firstName,
             email: this.state.email,
           });
+
+          email = this.state.email;
+          db.doc("userLookup").set({
+            email: res.user.uid,
+          });
+
+          // Update details in firebase authentication
           res.user.updateProfile({
             displayName: this.state.firstName,
             photoURL: this.state.imageSource,
           });
+
+          // Alerts user to log in with new account
           alert("Log in with your new account");
-          console.log("User registered successfully");
+
+          // Reset state on sign up page
           this.setState({
             isLoading: false,
             username: "",
@@ -172,6 +194,7 @@ export default class SignupPage extends React.Component {
             password: "",
           });
 
+          // Navigates to login page for user to log in with new account
           this.props.navigation.navigate("Login");
         })
         .catch((error) => {
