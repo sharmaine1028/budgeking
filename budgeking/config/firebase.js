@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import firebase from "firebase/app";
 import "firebase/app";
-import "firebase/firestore";
+import firestore from "firebase/firestore";
 import "firebase/auth";
 
 // TODO: Add SDKs for Firebase products that you want to use
