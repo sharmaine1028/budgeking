@@ -38,6 +38,21 @@ export function BlackButton({ text, onPress, style, textStyle, onFocus }) {
   );
 }
 
+export function SmallBlackButton({ text, onPress, style, textStyle, onFocus }) {
+  return (
+    <>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        style={[styles.smallBlackButton, style]}
+        onPress={onPress}
+        onFocus={onFocus}
+      >
+        <Text style={{fontSize: 10, color: colours.white}}>{text}</Text>
+      </TouchableOpacity>
+    </>
+  );
+}
+
 export function BrownTextInput({
   placeholder,
   onChangeText,
@@ -78,7 +93,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: colours.black,
   },
-
+  smallBlackButton: {
+    width: 30,
+    height: 20,
+    borderRadius: 999,
+    margin: 2,
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colours.black,
+  },
   text: {
     color: colours.white,
     margin: 1,
