@@ -19,14 +19,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-export default function App() {
-  return (
-    <NavigationContainer>
-      <GoalsAll />
-    </NavigationContainer>
-  );
-}
-
 function MyStack() {
   return (
     <Stack.Navigator
@@ -135,13 +127,13 @@ function MyTabs() {
   );
 }
 
-// export default function App() {
-//   return (
-//     <NavigationContainer theme={{ colors: colours.black }}>
-//       <MyStack />
-//     </NavigationContainer>
-//   );
-// }
+export default function App() {
+  return (
+    <NavigationContainer theme={{ colors: colours.black }}>
+      <MyStack />
+    </NavigationContainer>
+  );
+}
 
 const styles = StyleSheet.create({
   bottomTabIcon: {

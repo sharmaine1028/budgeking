@@ -386,10 +386,10 @@ class HomePage extends React.Component {
           <View style={styles.progressArea}>
 
             <View style={styles.progressBar}>
-              <Animated.View style = {StyleSheet.absoluteFill, 
+              <Animated.View style = {[StyleSheet.absoluteFill, 
                 {backgroundColor: "#96D3FF", 
                 width: `${this.percentExpenseOutOfBudget()}%`, 
-                borderRadius: 5}} />
+                borderRadius: 5}]} />
             </View>
 
             {/* <Text style={styles.whiteInput}>  Left: </Text> */}
@@ -470,8 +470,6 @@ class HomePage extends React.Component {
           <View>
             
           </View>
-
-          <Text style={{fontSize: 20}}>Test</Text>
 
         {/* </ScrollView> */}
 
