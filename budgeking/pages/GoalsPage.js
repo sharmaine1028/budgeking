@@ -12,6 +12,7 @@ function GoalsPage({ navigation }) {
           style={styles.button}
           onPress={() => navigation.navigate("New Goal")}
         />
+
         <BlackButton
           text={"Show goal history"}
           style={styles.button}
