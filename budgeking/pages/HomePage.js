@@ -7,7 +7,8 @@ import {
   Image,
   RefreshControl,
   Animated,
-  ActivityIndicator
+  ActivityIndicator,
+  Dimensions
 } from "react-native";
 import colours from "../config/colours";
 import { auth, db } from "../config/firebase";
@@ -298,6 +299,11 @@ class HomePage extends React.Component {
     return dayText;
   }
 
+  leftAmount() {
+    const diff = this.state.budgetValue - this.addExpenses()
+    return diff.toFixed(2);
+  }
+
   render() {
 
     const pieData = this.putInTextToPie();
@@ -380,7 +386,7 @@ class HomePage extends React.Component {
                 source = {require("../assets/home/walking.png")}
                 resizeMethod={"resize"}
             />
-            <Text style = {styles.leftText}>{`${this.textBesideWalking()}: $${this.state.budgetValue - this.addExpenses()}`}</Text>
+            <Text style = {styles.leftText}>{`${this.textBesideWalking()}: $${this.leftAmount()}`}</Text>
           </View>
 
           <View style={styles.progressArea}>
@@ -435,10 +441,10 @@ class HomePage extends React.Component {
             <PieChart
               style = {styles.pie}
               donut
-              innerRadius = {80}
+              innerRadius = {Dimensions.get("window").width * 0.2}
               showText
               textColor = "black"
-              radius = {170}
+              radius = {Dimensions.get("window").width * 0.4}
               textSize = {15}
               // showTextBackground
               // textBackgroundRadius = {26}
