@@ -37,24 +37,6 @@ class HomePage extends React.Component {
       //   {value: 40, color: '#79D2DE', text: '30%'},
       //   {value: 20, color: '#ED6665', text: '26%'},
       // ],
-      // pieData: [
-      //   {category: "food and drinks", value: 0, color: '#177AD5'},
-      //   {category: "transportation", value: 0, color: '#79D2DE'},
-      //   {category: "housing", value: 0, color: '#F7D8B5'},
-      //   {category: "shopping", value: 0, color: '#8F80E4'},
-      //   {category: "health", value: 0, color: '#FB8875'},
-      //   {category: "education", value: 0, color: '#FDE74C'},
-      //   {category: "others", value: 0, color: '#E8E0CE'},
-      // ],
-      pieData: {
-        "food and drinks": 0,
-        "transportation": 0,
-        "housing": 0,
-        "shopping": 0,
-        "health": 0,
-        "education": 0,
-        "others": 0,
-      },
       value: "00.00",
       expenseArr: [],
       isLoading: true,
@@ -88,11 +70,11 @@ class HomePage extends React.Component {
     });
     this.setState( {
       expenseArr: expenseArrPush,
-      // pieData: pieDataPush,
       isLoading: false,
     });
     console.log(this.state.expenseArr)
-    console.log("piepushed =>", this.state.pieData)
+    console.log("piepushed =>", this.updatePieData())
+    console.log(auth.currentUser.displayName)
     // console.log(auth.currentUser.uid)
     // console.log(this.fireStoreRef)
   }
@@ -125,40 +107,72 @@ class HomePage extends React.Component {
     return (this.addExpenses() / this.state.value) * 100;
   }
 
-  //add color, text + setState limite exceeded render error
+  //add color, text + setState limite exceeded render error 
+  // render error props.data.foreach is not a function
   updatePieData() {
-    const pieDataPush = {
-      "food and drinks": 0,
-      "transportation": 0,
-      "housing": 0,
-      "shopping": 0,
-      "health": 0,
-      "education": 0,
-      "others": 0,
-    };
+    var pieDataPush = [
+      {category: "food and drinks", value: 0, color: '#177AD5'},
+      {category: "transportation", value: 0, color: '#79D2DE'},
+      {category: "housing", value: 0, color: '#F7D8B5'},
+      {category: "shopping", value: 0, color: '#8F80E4'},
+      {category: "health", value: 0, color: '#FB8875'},
+      {category: "education", value: 0, color: '#FDE74C'},
+      {category: "others", value: 0, color: '#E8E0CE'},
+    ];
     this.state.expenseArr.map((item, i) => {
       if (item.category == "food and drinks") {
-        pieDataPush["food and drinks"] += item.value;
+        const placeholder = pieDataPush[0] 
+        placeholder["value"] += item.value;
       } else if (item.category == "transportation") {
-        pieDataPush["transportation"] += item.value;
+        const placeholder = pieDataPush[1] 
+        placeholder["value"] += item.value;
       } else if (item.category == "housing") {
-        pieDataPush["housing"] += item.value;
+        const placeholder = pieDataPush[2] 
+        placeholder["value"] += item.value;
       } else if (item.category == "shopping") {
-        pieDataPush["shopping"] += item.value;
+        const placeholder = pieDataPush[3] 
+        placeholder["value"] += item.value;
       } else if (item.category == "health") {
-        pieDataPush["health"] += item.value;
+        const placeholder = pieDataPush[4] 
+        placeholder["value"] += item.value;
       } else if (item.category == "education") {
-        pieDataPush["education"] += item.value;
+        const placeholder = pieDataPush[5] 
+        placeholder["value"] += item.value;
       } else {
-        pieDataPush["others"] += item.value;
+        const placeholder = pieDataPush[6] 
+        placeholder["value"] += item.value;
       }
     });
-    this.setState( {
-      pieData: pieDataPush,
-    });
+    return pieDataPush;
+  }
+
+  putInTextToPie() {
+    const pieData = this.updatePieData();
+    // pieData.map((item, i)) => {
+
+    // }
   }
 
   render() {
+
+    const pieData = this.updatePieData();
+
+    const renderLegend = (text, color) => {
+      return (
+        <View style={{flexDirection: 'row', marginBottom: 12}}>
+          <View
+            style={{
+              height: 18,
+              width: 18,
+              marginRight: 10,
+              borderRadius: 4,
+              backgroundColor: color || 'white',
+            }}
+          />
+          <Text style={{color: '#444444', fontSize: 16}}>{text || ''}</Text>
+        </View>
+      );
+    };
 
     if(this.state.isLoading){
       return(
@@ -173,9 +187,8 @@ class HomePage extends React.Component {
 
         <View style={styles.container}>
 
-          <Text>{this.addExpenses()}</Text>
-          <Text>{this.percentExpenseOutOfBudget()}</Text>
-          {/* <Text>{this.updatePieData()}</Text> */}
+          {/* <Text>{this.addExpenses()}</Text>
+          <Text>{this.percentExpenseOutOfBudget()}</Text> */}
 
         {/* <ScrollView
           refreshControl = {
@@ -258,11 +271,27 @@ class HomePage extends React.Component {
               textSize = {20}
               // showTextBackground
               // textBackgroundRadius = {26}
-              data = {this.state.expenseArr} //change to pieData
+              data = {pieData}
               centerLabelComponent = {() => {
-                return <Text style = {{fontSize: 30}}>70%</Text>;
+                return <Title text={`$${this.addExpenses()}`}>
+                  </Title>;
               }}
             />
+            <View
+              style = {{
+                width: "100%",
+                justifyContent: 'space-evenly',
+                marginTop: 20,
+              }}
+            >
+              {renderLegend('food and drinks', '#177AD5')}
+              {renderLegend('transportation', '#79D2DE')}
+              {renderLegend('housing', '#F7D8B5')}
+              {renderLegend('shopping', '#8F80E4')}
+              {renderLegend('health', '#FB8875')}
+              {renderLegend('education', '#FDE74C')}
+              {renderLegend('others', '#E8E0CE')}
+            </View>
           </View>
 
           <Text style={{fontSize: 20}}>Test</Text>
@@ -356,8 +385,9 @@ const styles = StyleSheet.create({
     //borderWidth: 4
   },
   reportPieChart: {
-    borderWidth: 4,
-    paddingLeft: 20
+    borderWidth: 2,
+    paddingLeft: 20,
+    borderColor: colours.red,
   },
   whiteInput: {
     backgroundColor: "#fff",
