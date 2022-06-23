@@ -66,12 +66,14 @@ export function ImageTextInput({
   placeholder,
   editable,
   onChangeText,
+  style,
 }) {
   return (
     <View
       style={[
         styles.whiteInput,
         { flexDirection: "row", justifyContent: "space-between" },
+        style,
       ]}
     >
       <TextInput
@@ -164,6 +166,7 @@ export function NewGoalInput({
   onChangeText,
   onChange,
   value,
+  keyboardType,
 }) {
   return (
     <View style={styles.newGoalInput}>
@@ -175,6 +178,7 @@ export function NewGoalInput({
         value={value}
         autoCapitalize="none"
         maxLength={maxLength}
+        keyboardType={keyboardType}
       />
     </View>
   );
@@ -203,7 +207,7 @@ export function BudgetInput({
   );
 }
 
-export function YesOrNo({ title }) {
+export function YesOrNo({ title, selectedBtn }) {
   const data = [{ label: "Yes" }, { label: "No" }];
   return (
     <View style={styles.newGoalInput}>
@@ -214,6 +218,7 @@ export function YesOrNo({ title }) {
         circleSize={10}
         deactiveColor={colours.white}
         initial={2}
+        selectedBtn={selectedBtn}
       />
     </View>
   );

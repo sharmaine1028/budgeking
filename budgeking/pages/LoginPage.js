@@ -69,25 +69,34 @@ export default class LoginPage extends React.Component {
     this.props.navigation.navigate("Signup");
   };
 
+  /**
+   * Handles login  with firebase authentication
+   */
   handleLogin = () => {
+    // If necessary fields are empty, alert users
     if (this.state.email === "" || this.state.password === "") {
       alert("Enter details to log in!");
     } else {
       this.setState({
         isLoading: true,
       });
+
+      // Handle log in with firebase authentication
       auth
         .signInWithEmailAndPassword(this.state.email, this.state.password)
         .then((res) => {
-          console.log("User logged in successfully!");
+          // Reset state
           this.setState({
             isLoading: false,
             email: "",
             password: "",
           });
+
+          // Navigate to homepage with successful login
           this.props.navigation.navigate("HomePage");
         })
         .catch((error) => {
+          // Error handling
           if (error.code === "auth/invalid-email") {
             alert("Invalid email");
           }
@@ -100,14 +109,16 @@ export default class LoginPage extends React.Component {
             alert("Wrong password");
           }
 
+          // Reset state
           this.setState({
             isLoading: false,
             email: "",
             password: "",
           });
 
-          console.log(error.message);
           this.setState({ isLoading: false });
+
+          // Navigate to page again for user to reenter details
           this.props.navigation.navigate("Login");
         });
     }
