@@ -158,6 +158,7 @@ export default class SignupPage extends React.Component {
           db.collection("users").doc(res.user.uid).set({
             name: this.state.firstName,
             email: this.state.email,
+            budgetValue: 0.00,
           });
           res.user.updateProfile({
             displayName: this.state.firstName,

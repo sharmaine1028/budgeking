@@ -12,13 +12,16 @@ import {
 import colours from "../config/colours";
 import { auth, db } from "../config/firebase";
 import RedLine from "../config/reusablePart";
-import { Header, Title } from "../config/reusableText";
+import { Header, Title, SmallTextInput } from "../config/reusableText";
 import SelectDropdown from 'react-native-select-dropdown';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { PieChart } from "react-native-gifted-charts";
 import CurrencyInput from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { ListItem } from "react-native-elements";
+import { SmallBlackButton } from "../config/reusableButton";
+import Icon from 'react-native-vector-icons/AntDesign'
+import { color } from "react-native-elements/dist/helpers";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
@@ -30,16 +33,16 @@ class HomePage extends React.Component {
     super();
     this.fireStoreRef = db.collection('users').doc(auth.currentUser.uid).collection("expense");
     this.state = {
-      displayName: auth.currentUser.displayName,
-      timePeriod: ["Your weekly budget", "Your daily budget"],
-      // pieData: [
-      //   {value: 54, color: '#177AD5', text: '54%'},
-      //   {value: 40, color: '#79D2DE', text: '30%'},
-      //   {value: 20, color: '#ED6665', text: '26%'},
-      // ],
-      value: "00.00",
+      name: auth.currentUser.displayName,
+      email: auth.currentUser.email,
+      timePeriod: ["Your monthly budget", "Your daily budget"],
+      timeUserWants: "monthly",
+      budgetEditable: false,
+      budgetValue: 0.00,
       expenseArr: [],
       isLoading: true,
+      monthNames: ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"],
     };
   }
 
@@ -49,8 +52,21 @@ class HomePage extends React.Component {
     this.setState(state);
   }
 
+  // editBudget = () => {
+  //   this.setState({ budgetEditable: true });
+  // };
+
+  // calling budgetValue from firestore
   componentDidMount() {
     this.unsubscribe = this.fireStoreRef.onSnapshot(this.getCollection);
+    this.callBudgetValue();
+  }
+
+  callBudgetValue() {
+    db.collection("users").doc(auth.currentUser.uid).get().then((doc)=> {
+      const {budgetValue} = doc.data()
+      this.setState({budgetValue: budgetValue})
+    })
   }
 
   componentWillUnmount() {
@@ -60,11 +76,12 @@ class HomePage extends React.Component {
   getCollection = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const {value, category} = res.data();
+      const {value, category, date} = res.data();
       expenseArrPush.push( {
         key: res.id,
         value,
-        category
+        category,
+        date
       });
       // console.log(expenseArr, "+>", res.id, "=>", res.data());
     });
@@ -72,11 +89,26 @@ class HomePage extends React.Component {
       expenseArr: expenseArrPush,
       isLoading: false,
     });
-    console.log(this.state.expenseArr)
-    console.log("piepushed =>", this.updatePieData())
-    console.log(auth.currentUser.displayName)
+
+    // console.log("time", this.getMonthlyData())
+    // console.log("piepushed =>", this.updatePieData())
+    // console.log(auth.currentUser.displayName)
+    // console.log(new Date().toLocaleDateString())
+    // console.log(this.state.budgetValue)
+    // console.log(new Date().toLocaleDateString('en-us', {  weekday: 'short' }))
+    // console.log(this.putInTextToPie())
     // console.log(auth.currentUser.uid)
-    // console.log(this.fireStoreRef)
+  }
+
+  // budgetValue changing immediately when updateInputVal() without invoking tick
+  inputBudgetFireStore = () => {
+    // console.log(this.state.budgetValue)
+    db
+      .collection("users")
+      .doc(auth.currentUser.uid)
+      .update({
+        budgetValue: this.state.budgetValue
+      });
   }
 
 
@@ -90,26 +122,57 @@ class HomePage extends React.Component {
   // }, []);
 
   addExpenses() {
+    if (this.state.timeUserWants === "monthly") {
+      return this.addExpensesMonthly();
+    } else {
+      return this.addExpensesDaily();
+    }  
+  }
+
+  addExpensesMonthly() {
     let sum = 0;
-    this.state.expenseArr.map((item, i) => {
+    this.getMonthlyData().map((item, i) => {
       sum += item.value;
-      // console.log(sum)
     })
-    return sum; //32.12
+    return sum; //255.78
+  }
+
+  addExpensesDaily() {
+    let sum = 0;
+    this.getDailyData().map((item, i) => {
+      sum += item.value;
+    })
+    return sum; //12
   }
 
   percentExpenseOutOfBudget() {
-    if (this.state.value == 0.00) {
+    if (this.addExpenses() == 0.00) {
       return 0;
-    } else if (this.state.value <= this.addExpenses()) {
+    } else if (this.state.budgetValue <= this.addExpenses()) {
       return 100;
     }
-    return (this.addExpenses() / this.state.value) * 100;
+    return (this.addExpenses() / this.state.budgetValue) * 100;
   }
 
-  //add color, text + setState limite exceeded render error 
-  // render error props.data.foreach is not a function
+  textBesideWalking() {
+    var leftExceeded = "";
+    if (this.state.budgetValue <= this.addExpenses()) {
+      leftExceeded += "Exceeded";
+    } else {
+      leftExceeded += "Left";
+    }
+    return leftExceeded;
+  }
+
   updatePieData() {
+    if (this.state.timeUserWants === "monthly") {
+      return this.updatePieDataMonthly();
+    } else {
+      return this.updatePieDataDaily();
+    }
+  }
+
+  updatePieDataMonthly() {
     var pieDataPush = [
       {category: "food and drinks", value: 0, color: '#177AD5'},
       {category: "transportation", value: 0, color: '#79D2DE'},
@@ -119,43 +182,127 @@ class HomePage extends React.Component {
       {category: "education", value: 0, color: '#FDE74C'},
       {category: "others", value: 0, color: '#E8E0CE'},
     ];
-    this.state.expenseArr.map((item, i) => {
+    this.getMonthlyData().map((item, i) => {
       if (item.category == "food and drinks") {
-        const placeholder = pieDataPush[0] 
-        placeholder["value"] += item.value;
+        pieDataPush[0]["value"] += item.value;
       } else if (item.category == "transportation") {
-        const placeholder = pieDataPush[1] 
-        placeholder["value"] += item.value;
+        pieDataPush[1]["value"] += item.value;
       } else if (item.category == "housing") {
-        const placeholder = pieDataPush[2] 
-        placeholder["value"] += item.value;
+        pieDataPush[2]["value"] += item.value;
       } else if (item.category == "shopping") {
-        const placeholder = pieDataPush[3] 
-        placeholder["value"] += item.value;
+        pieDataPush[3]["value"] += item.value;
       } else if (item.category == "health") {
-        const placeholder = pieDataPush[4] 
-        placeholder["value"] += item.value;
+        pieDataPush[4]["value"] += item.value;
       } else if (item.category == "education") {
-        const placeholder = pieDataPush[5] 
-        placeholder["value"] += item.value;
+        pieDataPush[5]["value"] += item.value;
       } else {
-        const placeholder = pieDataPush[6] 
-        placeholder["value"] += item.value;
+        pieDataPush[6]["value"] += item.value;
+      }
+    });
+    return pieDataPush;
+  }
+
+  updatePieDataDaily() {
+    var pieDataPush = [
+      {category: "food and drinks", value: 0, color: '#177AD5'},
+      {category: "transportation", value: 0, color: '#79D2DE'},
+      {category: "housing", value: 0, color: '#F7D8B5'},
+      {category: "shopping", value: 0, color: '#8F80E4'},
+      {category: "health", value: 0, color: '#FB8875'},
+      {category: "education", value: 0, color: '#FDE74C'},
+      {category: "others", value: 0, color: '#E8E0CE'},
+    ];
+    this.getDailyData().map((item, i) => {
+      if (item.category == "food and drinks") {
+        pieDataPush[0]["value"] += item.value;
+      } else if (item.category == "transportation") {
+        pieDataPush[1]["value"] += item.value;
+      } else if (item.category == "housing") {
+        pieDataPush[2]["value"] += item.value;
+      } else if (item.category == "shopping") {
+        pieDataPush[3]["value"] += item.value;
+      } else if (item.category == "health") {
+        pieDataPush[4]["value"] += item.value;
+      } else if (item.category == "education") {
+        pieDataPush[5]["value"] += item.value;
+      } else {
+        pieDataPush[6]["value"] += item.value;
       }
     });
     return pieDataPush;
   }
 
   putInTextToPie() {
-    const pieData = this.updatePieData();
-    // pieData.map((item, i)) => {
+    var pieData = this.updatePieData();
+    this.updatePieData().map((item, i) => {
+      pieData[i]["text"] = "$";
+      pieData[i]["text"] += pieData[i]["value"];
+    });
+    return pieData;
+  }
 
-    // }
+  // convertTimeStamp() {
+  //   var expenseArrTime = this.state.expenseArr;
+  //   this.state.expenseArr.map((item, i) => {
+  //     // var dateFirestore = expenseArrTime[i]["date"];
+  //     console.log("datefirestore", expenseArrTime[i]["date"].toDate())
+  //     // expenseArrTime[i]["date"] = expenseArrTime[i]["date"].toDate();
+  //   });
+  //   return expenseArrTime;
+  // }
+
+  getMonthlyData() {
+    const currMonth = new Date().getMonth();
+    // console.log("currmonth", currMonth)
+    const expenseArrayTimeConverted = this.state.expenseArr;
+    const monthlyExpenseArray = [];
+    expenseArrayTimeConverted.map((item, i) => {
+      const dateItem = expenseArrayTimeConverted[i]["date"];
+      // console.log("dateitem", dateItem)
+      if (dateItem.toDate().getMonth() == currMonth) {
+        monthlyExpenseArray.push(expenseArrayTimeConverted[i])
+      };
+    });
+    return monthlyExpenseArray;
+  }
+
+  getDailyData() {
+    const currDate = new Date().toLocaleDateString();
+    const expenseArrayTimeConverted = this.state.expenseArr;
+    const dailyExpenseArray = [];
+    expenseArrayTimeConverted.map((item, i) => {
+      const dateItem = expenseArrayTimeConverted[i]["date"];
+      // console.log("dateitem", dateItem)
+      if (dateItem.toDate().toLocaleDateString() == currDate) {
+        dailyExpenseArray.push(expenseArrayTimeConverted[i])
+      };
+    });
+    return dailyExpenseArray;
+  }
+
+  toggleMonthlyDaily = (val) => {
+    if (val === 0) {
+      this.setState({timeUserWants: "monthly" });
+    } else {
+      this.setState({timeUserWants: "daily" });
+    }
+  }
+
+  textBesideCategories() {
+    var dayText = "";
+    if (this.state.timeUserWants == "monthly") {
+      dayText += this.state.monthNames[new Date().getMonth()];
+    } else {
+      dayText += new Date().toLocaleDateString();
+    }
+    return dayText;
   }
 
   render() {
 
-    const pieData = this.updatePieData();
+    const pieData = this.putInTextToPie();
+
+
 
     const renderLegend = (text, color) => {
       return (
@@ -196,16 +343,16 @@ class HomePage extends React.Component {
           }
         > */}
 
-          <Title text={`Welcome, ${this.state.displayName}!`}></Title>
+          <Title text={`Welcome, ${this.state.name}!`}></Title>
 
           <View style={styles.weeklyBudgetTab}>
             {/* <Header text={`${"\n"}Your weekly budget`} style={styles.changeLineHeightWeeklyBudget} /> */}
             <SelectDropdown
               data = {this.state.timePeriod}
-              onSelect = {(selectedTime, index) => {
-                console.log()
+              onSelect = {(selectedItem, index) => {
+                return this.toggleMonthlyDaily(index);
               }}
-              defaultButtonText={'Select time period for your budget'}
+              defaultButtonText={'Your monthly budget'}
               buttonTextAfterSelection = {(selectedTime, index) => {
                 return selectedTime;
               }}
@@ -227,40 +374,64 @@ class HomePage extends React.Component {
 
           <RedLine />
 
-          <Image
-              style = {styles.logo}
-              source = {require("../assets/home/walking.png")}
-              resizeMethod={"resize"}
-          />
+          <View style = {{flexDirection: 'row'}}>
+            <Image
+                style = {styles.logo}
+                source = {require("../assets/home/walking.png")}
+                resizeMethod={"resize"}
+            />
+            <Text style = {styles.leftText}>{`${this.textBesideWalking()}: $${this.state.budgetValue - this.addExpenses()}`}</Text>
+          </View>
 
           <View style={styles.progressArea}>
+
             <View style={styles.progressBar}>
-              <Animated.View style={StyleSheet.absoluteFill, 
+              <Animated.View style = {StyleSheet.absoluteFill, 
                 {backgroundColor: "#96D3FF", 
                 width: `${this.percentExpenseOutOfBudget()}%`, 
                 borderRadius: 5}} />
             </View>
+
             {/* <Text style={styles.whiteInput}>  Left: </Text> */}
             <CurrencyInput
               style={styles.whiteInput}
               keyboardType="numeric"
-              value={this.state.value}
+              value={this.state.budgetValue}
               prefix="$"
               unit="$"
               delimiter=","
               separator="."
               precision={2}
-              onChangeValue={(val) => this.updateInputVal(val, "value")}
+              onChangeValue={(val) => this.updateInputVal(val, "budgetValue")}
             />
-            <Image
+            <TouchableOpacity onPress={this.inputBudgetFireStore()}>
+              <Icon.Button
+                name = "checkcircleo"
+                color = {colours.black}
+                backgroundColor = {"transparent"}
+                iconStyle = {{marginRight: 0}}
+              />
+            </TouchableOpacity>
+
+            {/* <SmallBlackButton
+              text="Done"
+              style={styles.smallBlackButton}
+              textStyle={styles.buttonTextStyle}
+              onPress={() => this.inputBudgetFireStore()}
+            /> */}
+
+            {/* <Image
               style = {styles.logo}
               source = {require("../assets/home/rip.png")}
               resizeMethod={"resize"}
-            />
+            /> */}
+
           </View>
           
           <View style={styles.reportPieChart}>
-            <Header text={`${"\n"}  Categories (This Week: ...)`} />
+
+            <Header text={`${"\n"} Categories (${this.textBesideCategories()} ${this.state.timeUserWants} expenses)\n\n`} />
+
             <PieChart
               style = {styles.pie}
               donut
@@ -268,15 +439,16 @@ class HomePage extends React.Component {
               showText
               textColor = "black"
               radius = {170}
-              textSize = {20}
+              textSize = {15}
               // showTextBackground
               // textBackgroundRadius = {26}
               data = {pieData}
+              focusOnPress
               centerLabelComponent = {() => {
-                return <Title text={`$${this.addExpenses()}`}>
-                  </Title>;
+                return <Text style = {styles.totalSpentText}>{`Total Spent\n$${this.addExpenses()}`}</Text>
               }}
             />
+
             <View
               style = {{
                 width: "100%",
@@ -292,6 +464,11 @@ class HomePage extends React.Component {
               {renderLegend('education', '#FDE74C')}
               {renderLegend('others', '#E8E0CE')}
             </View>
+
+          </View>
+
+          <View>
+            
           </View>
 
           <Text style={{fontSize: 20}}>Test</Text>
@@ -317,6 +494,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 10,
     paddingBottom: 5
+  },
+  leftText: {
+    // marginVertical: 10,
+    marginTop: 20,
+    color: "#000",
+    fontWeight: "200",
+  },
+  totalSpentText: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "300",
   },
   // changeLineHeightWeeklyBudget: {
   //   lineHeight: 10,
@@ -364,7 +552,7 @@ const styles = StyleSheet.create({
   progressArea: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     //paddingTop: 10,
   },
   progressBar: {
@@ -374,7 +562,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#3F4243',
     borderColor: '#3F4243',
-    borderRadius: 5
+    borderRadius: 5,
   },
   logo: {
     bottom: 0,
