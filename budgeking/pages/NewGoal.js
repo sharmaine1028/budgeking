@@ -359,6 +359,7 @@ class NewGoal extends React.Component {
           isSharing: this.state.isSharing,
           sharingEmails: this.state.sharingEmails,
           sharingUIDs: this.state.sharingUIDs,
+          currSavingsAmt: 0,
         })
         .catch((err) => console.log(err));
 

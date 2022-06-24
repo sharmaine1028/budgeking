@@ -10,5 +10,7 @@ export default {
   red: "#F4CDC2",
   tomato: "#fb8875",
   white: "#F5F5F5",
+  grey: "#E0E0E0",
+  darkgrey: "#6C757D",
   whiteRock: "#e8e0ce",
 };
