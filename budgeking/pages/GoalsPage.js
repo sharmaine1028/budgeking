@@ -11,14 +11,27 @@ import { GreyLine } from "../config/reusablePart";
 class GoalsPage extends React.Component {
   constructor() {
     super();
-    this.shortTermRef = db
+    this.shortTermOri = db
       .collection("goals")
       .doc("short term")
-      .collection("active");
-    this.longTermRef = db
+      .collection("active")
+      .where("createdBy", "==", auth.currentUser.uid);
+    // .orderBy("deadline");
+    this.shorttermShared = db
+      .collection("goals")
+      .doc("short term")
+      .collection("active")
+      .where("sharingEmails", "array-contains", auth.currentUser.email);
+    this.longTermOri = db
       .collection("goals")
       .doc("long term")
-      .collection("active");
+      .collection("active")
+      .where("createdBy", "==", auth.currentUser.uid);
+    this.longTermShared = db
+      .collection("goals")
+      .doc("long term")
+      .collection("active")
+      .where("sharingEmails", "array-contains", auth.currentUser.email);
     this.state = {
       shortTermGoals: [],
       longTermGoals: [],
@@ -26,11 +39,26 @@ class GoalsPage extends React.Component {
   }
 
   componentDidMount() {
-    this.maybeShortGoals();
-    this.maybeLongGoals();
+    this.unsubscribeShortTermOri = this.shortTermOri.onSnapshot(
+      (querySnapshot) => this.getGoals(querySnapshot, "short")
+    );
+    this.unsubscribeShortTermShared = this.shorttermShared.onSnapshot(
+      (querySnapshot) => this.getGoals(querySnapshot, "short")
+    );
+    this.unsubscribeLongTermOri = this.longTermOri.onSnapshot((querySnapshot) =>
+      this.getGoals(querySnapshot, "long")
+    );
+    this.unsubscribeLongTermShared = this.longTermShared.onSnapshot(
+      (querySnapshot) => this.getGoals(querySnapshot, "long")
+    );
   }
 
-  componentWillUnmount() {}
+  componentWillUnmount() {
+    this.unsubscribeShortTermOri();
+    this.unsubscribeShortTermShared();
+    this.unsubscribeLongTermOri();
+    this.unsubscribeLongTermShared();
+  }
 
   render() {
     return (
@@ -49,129 +77,33 @@ class GoalsPage extends React.Component {
           />
         </View>
         <Title text={"Short-term goals"} />
-        {this.state.shortTermGoals.map((doc) => (
-          <View key={doc.id} style={styles.goal}>
-            <Header
-              text={`Save for ${doc.goalDescription}`}
-              style={{ fontWeight: "bold" }}
-            />
-            <Text style={styles.goalTagline}>
-              Save ${doc.freqAmount} {doc.frequency}
-            </Text>
-            <View style={styles.goalLine}>
-              <MaterialCommunityIcons
-                name="bullseye-arrow"
-                size={24}
-                color="black"
-                style={{ flex: 0.1 }}
-              />
-              <View style={{ paddingLeft: 30, flex: 0.8 }}>
-                <View style={[styles.progressBar]}>
-                  <Animated.View
-                    style={[
-                      StyleSheet.absoluteFill,
-                      {
-                        backgroundColor: "#96D3FF",
-                        width: doc.currSavingsAmt / doc.target + "%",
-                        borderRadius: 5,
-                      },
-                    ]}
-                  ></Animated.View>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={styles.goalTagline}>${doc.currSavingsAmt}</Text>
-                  <Text style={styles.goalTagline}>${doc.target}</Text>
-                </View>
-              </View>
-            </View>
-            <GreyLine />
-            <View style={[styles.goalLine, { marginTop: 5 }]}>
-              <MaterialCommunityIcons
-                name="clock-outline"
-                size={24}
-                color="black"
-                style={{ flex: 0.1 }}
-              />
-              <Text style={{ flex: 0.3, paddingLeft: 30 }}> Deadline </Text>
-              <Text style={{ flex: 0.5, paddingLeft: 30 }}>
-                {this.dateFormat(doc.deadline.seconds)}
-              </Text>
-            </View>
-
-            {/* {this.generateGoal(doc)} */}
-          </View>
-        ))}
+        {this.state.shortTermGoals.map((doc) => this.generateGoals(doc))}
 
         <Title text={"Long-term goals"} />
-        {this.state.longTermGoals.map((doc) => (
-          <Text key={doc.id}>{doc.goalDescription}</Text>
-        ))}
+        {this.state.longTermGoals.map((doc) => this.generateGoals(doc))}
       </KeyboardAwareScrollView>
     );
   }
 
-  // TODO: merge functionality of maybeShortGoals and maybeLongGoals
-  // TODO: check if any goals change to short term
-  maybeShortGoals = async () => {
+  getGoals = (querySnapshot, timePeriod) => {
     try {
-      const shortTermGoals = [];
+      const activeGoals = [];
 
-      await this.shortTermRef
-        .where("createdBy", "==", auth.currentUser.uid)
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            shortTermGoals.push({ ...doc.data(), id: doc.id });
-          });
-        })
-        .catch((err) => console.log(err));
+      querySnapshot.forEach((doc) => {
+        activeGoals.push({ ...doc.data(), id: doc.id });
+      });
 
-      await this.shortTermRef
-        .where("sharingEmails", "==", auth.currentUser.email)
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            shortTermGoals.push({ ...doc.data() });
-          });
-        })
-        .catch((err) => console.log(err));
+      if (timePeriod === "short") {
+        this.setState({
+          shortTermGoals: [...this.state.shortTermGoals, ...activeGoals],
+        });
+      }
 
-      this.setState({ shortTermGoals: shortTermGoals });
-    } catch {
-      (err) => console.log(err);
-    }
-  };
-
-  maybeLongGoals = async () => {
-    try {
-      const longTermGoals = [];
-
-      await this.longTermRef
-        .where("createdBy", "==", auth.currentUser.uid)
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            longTermGoals.push({ ...doc.data(), id: doc.id });
-          });
-        })
-        .catch((err) => console.log(err));
-
-      await this.longTermRef
-        .where("sharingEmails", "==", auth.currentUser.email)
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            longTermGoals.push({ ...doc.data(), id: doc.id });
-          });
-        })
-        .catch((err) => console.log(err));
-
-      this.setState({ longTermGoals: longTermGoals });
+      if (timePeriod === "long") {
+        this.setState({
+          longTermGoals: [...this.state.longTermGoals, ...activeGoals],
+        });
+      }
     } catch {
       (err) => console.log(err);
     }
@@ -202,13 +134,67 @@ class GoalsPage extends React.Component {
 
     return day.toString() + " " + months[month] + " " + year.toString();
   };
-}
 
-// generateGoal = (doc) => {
-//   <>
-//     <Header text={doc.goalDescription} />
-//   </>;
-// };
+  generateGoals = (doc) => {
+    return (
+      <View key={doc.id} style={styles.goal}>
+        <Header
+          text={`Save for ${doc.goalDescription}`}
+          style={{ fontWeight: "bold" }}
+        />
+        <Text style={styles.goalTagline}>
+          Save ${doc.freqAmount} {doc.frequency}
+        </Text>
+        <View style={styles.goalLine}>
+          <MaterialCommunityIcons
+            name="bullseye-arrow"
+            size={24}
+            color="black"
+            style={{ flex: 0.1 }}
+          />
+          <View style={{ paddingLeft: 30, flex: 0.8 }}>
+            <View style={[styles.progressBar]}>
+              <Animated.View
+                style={[
+                  StyleSheet.absoluteFill,
+                  {
+                    backgroundColor: "#96D3FF",
+                    width: doc.currSavingsAmt / doc.target + "%",
+                    borderRadius: 5,
+                  },
+                ]}
+              ></Animated.View>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={styles.goalTagline}>${doc.currSavingsAmt}</Text>
+              <Text style={styles.goalTagline}>${doc.target}</Text>
+            </View>
+          </View>
+        </View>
+        <GreyLine />
+        <View style={[styles.goalLine, { marginTop: 5 }]}>
+          <MaterialCommunityIcons
+            name="clock-outline"
+            size={24}
+            color="black"
+            style={{ flex: 0.1 }}
+          />
+          <Text style={{ flex: 0.3, paddingLeft: 30 }}> Deadline </Text>
+          <Text style={{ flex: 0.5, paddingLeft: 30 }}>
+            {this.dateFormat(doc.deadline.seconds)}
+          </Text>
+        </View>
+
+        {/* {this.generateGoal(doc)} */}
+      </View>
+    );
+  };
+}
 
 const styles = StyleSheet.create({
   button: { flexGrow: 0.5, height: 40 },
