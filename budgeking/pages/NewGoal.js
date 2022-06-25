@@ -1,7 +1,7 @@
 import React from "react";
 import { BlackButton } from "../config/reusableButton";
 import { ImageTextInput, NewGoalInput, YesOrNo } from "../config/reusableText";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, Button, TouchableOpacity } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import colours from "../config/colours";
@@ -9,6 +9,7 @@ import { Picker } from "@react-native-picker/picker";
 import { TextInput } from "react-native-gesture-handler";
 import CurrencyInput from "react-native-currency-input";
 import { auth, db } from "../config/firebase";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 class NewGoal extends React.Component {
   constructor() {
@@ -22,7 +23,9 @@ class NewGoal extends React.Component {
       deadline: new Date(),
       notes: "",
       isSharing: false,
-      sharingUserEmail: "",
+      email: "",
+      sharingEmails: [],
+      sharingUIDs: [],
     };
   }
   render() {
@@ -101,20 +104,49 @@ class NewGoal extends React.Component {
           title={"Notes"}
           onChangeText={(val) => this.updateInputVal(val, "notes")}
           value={this.state.notes}
+          maxLength={50}
         />
         <YesOrNo
           title={"Would you like to share the goal with someone else?"}
           selectedBtn={(choice) => this.share(choice)}
         />
 
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          {this.state.sharingEmails.map((email) => (
+            <View key={email} style={styles.emailsContainer}>
+              <Text key={email} style={styles.emails}>
+                {email}
+              </Text>
+              <TouchableOpacity
+                style={{ justifyContent: "center" }}
+                onPress={() => this.deleteEmail(email)}
+              >
+                <MaterialCommunityIcons
+                  name="close-box"
+                  color={colours.black}
+                  size={20}
+                />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+
         {this.state.isSharing && (
           <NewGoalInput
             title={"Add user's email to share the goal with"}
-            onChangeText={(val) => this.updateInputVal(val, "sharingUserEmail")}
-            value={this.state.sharingUserEmail}
+            onChangeText={(val) => {
+              this.updateInputVal(val, "email");
+            }}
+            value={this.state.email}
+            onKeyPress={this.checkEmail}
           />
         )}
-
         <View style={styles.beside}>
           <BlackButton
             text={"Add"}
@@ -229,42 +261,113 @@ class NewGoal extends React.Component {
     if (choice.label === "Yes") {
       this.setState({ isSharing: true });
     } else {
-      this.setState({ isSharing: false });
+      this.setState({ isSharing: false, sharingUserEmail: "" });
     }
   };
 
-  addNewGoal = () => {
-    let timePeriod;
+  checkEmail = async (e) => {
+    var key = e.nativeEvent.key;
+    if (key === "Enter" || key === " ") {
+      const email = this.state.email.trim();
 
-    if (this.state.deadline.getFullYear() - new Date().getFullYear() < 5) {
-      timePeriod = "short term";
-    } else {
-      timePeriod = "long term";
+      if (email) {
+        if (email === auth.currentUser.email) {
+          alert("You can't add yourself!");
+          this.setState({ email: "" });
+          return;
+        }
+
+        if (this.state.sharingEmails.includes(email)) {
+          alert("This email has already been added");
+          this.setState({ email: "" });
+          return;
+        }
+
+        const sharingUID = await db
+          .collection("userLookup")
+          .doc(email)
+          .get()
+          .then((data) => {
+            if (data.exists) {
+              this.setState({
+                sharingEmails: [...this.state.sharingEmails, email],
+                email: "",
+              });
+              this.setState({
+                sharingUIDs: [...this.state.sharingUIDs, data.data().uid],
+              });
+              return data.data().uid;
+            } else {
+              alert("User does not exist");
+              this.setState({ email: "" });
+              return null;
+            }
+          })
+          .catch((err) => console.log(err));
+      }
     }
+  };
 
-    if (this.state.isSharing) {
-      admin
-        .auth()
-        .getUserByEmail(this.state.sharingUserEmail)
-        .then((val) => console.log(val))
+  deleteEmail = (tobeRemoved) => {
+    this.setState({
+      sharingEmails: this.state.sharingEmails.filter(
+        (email) => email != tobeRemoved
+      ),
+    });
+  };
+
+  addNewGoal = async () => {
+    try {
+      let timePeriod;
+
+      if (this.state.deadline.getFullYear() - new Date().getFullYear() < 5) {
+        timePeriod = "short term";
+      } else {
+        timePeriod = "long term";
+      }
+
+      if (this.state.isSharing) {
+        if (this.state.sharingEmails.length === 0) {
+          alert("Please enter user email to share with");
+          return;
+        }
+      }
+
+      if (
+        !this.state.goalDescription ||
+        !this.state.target ||
+        !this.state.frequency
+      ) {
+        alert(
+          "Please fill in goal description, target amount to save and freqency"
+        );
+        return;
+      }
+
+      db.collection("goals")
+        .doc(timePeriod)
+        .collection("active")
+        .doc()
+        .set({
+          createdBy: auth.currentUser.uid,
+          goalDescription: this.state.goalDescription,
+          target: this.state.target,
+          frequency: this.state.frequency,
+          freqAmount: this.state.freqAmount,
+          deadline: this.state.deadline,
+          notes: this.state.notes,
+          isSharing: this.state.isSharing,
+          sharingEmails: this.state.sharingEmails,
+          sharingUIDs: this.state.sharingUIDs,
+          currSavingsAmt: 0,
+        })
         .catch((err) => console.log(err));
-    }
 
-    db.collection("users")
-      .doc(auth.currentUser.uid)
-      .collection("goals")
-      .collection(timePeriod)
-      .doc()
-      .set({
-        goalDescription: this.state.goalDescription,
-        target: this.state.target,
-        frequency: this.state.frequency,
-        freqAmount: this.state.freqAmount,
-        deadline: this.state.deadline,
-        notes: this.state.notes,
-        isSharing: this.state.isSharing,
-        sharingUserEmail: this.state.sharingUserEmail,
-      });
+      alert("Goal updated");
+      this.props.navigation.navigate("Goals");
+    } catch {
+      (err) => console.log(err);
+    }
   };
 }
 
@@ -276,6 +379,22 @@ const styles = StyleSheet.create({
   buttons: {
     flexGrow: 1,
     height: 40,
+  },
+  emailsContainer: {
+    flexDirection: "row",
+    backgroundColor: colours.lightBrown,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "space-between",
+    margin: 2,
+    marginLeft: 3,
+    padding: 5,
+  },
+  emails: {
+    borderRadius: 30,
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
   },
   frequencyDropdown: {
     flex: 0.4,

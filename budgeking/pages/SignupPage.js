@@ -173,9 +173,8 @@ export default class SignupPage extends React.Component {
             budgetValue: 0.00,
           });
 
-          email = this.state.email;
-          db.doc("userLookup").set({
-            email: res.user.uid,
+          db.collection("userLookup").doc(this.state.email).set({
+            uid: res.user.uid,
           });
 
           // Update details in firebase authentication
@@ -206,7 +205,6 @@ export default class SignupPage extends React.Component {
           } else {
             alert(error.message);
           }
-          console.log(error.message);
           this.setState({ isLoading: false });
           this.props.navigation.navigate("Signup");
         });
