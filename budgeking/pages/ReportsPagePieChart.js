@@ -16,6 +16,7 @@ import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 // **************getYearlyData() wrong => add key to list??
+// **************custom date choosing - chart only changes after refreshing (idk how to refresh)
 
 class ReportsPagePieChart extends React.Component {
   constructor() {
