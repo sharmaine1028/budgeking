@@ -1,14 +1,18 @@
 import React from "react";
-import { BlackButton } from "../config/reusableButton";
-import { ImageTextInput, NewGoalInput, YesOrNo } from "../config/reusableText";
-import { View, StyleSheet, Text, Button, TouchableOpacity } from "react-native";
+import { BlackButton } from "../../config/reusableButton";
+import {
+  ImageTextInput,
+  NewGoalInput,
+  YesOrNo,
+} from "../../config/reusableText";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import colours from "../config/colours";
+import colours from "../../config/colours";
 import { Picker } from "@react-native-picker/picker";
 import { TextInput } from "react-native-gesture-handler";
 import CurrencyInput from "react-native-currency-input";
-import { auth, db } from "../config/firebase";
+import { auth, db } from "../../config/firebase";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 class NewGoal extends React.Component {
@@ -80,7 +84,7 @@ class NewGoal extends React.Component {
         <View style={styles.newGoalInput}>
           <Text style={styles.newGoalTitle}>Deadline</Text>
           <ImageTextInput
-            source={require("../assets/calendar.png")}
+            source={require("../../assets/calendar.png")}
             onPress={() => this.showDatePicker()}
             d
             value={this.dateFormat()}

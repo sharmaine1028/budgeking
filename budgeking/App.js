@@ -6,12 +6,14 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/HomePage";
 import SettingsPage from "./pages/SettingsPage";
-import GoalsPage from "./pages/GoalsPage";
-import BudgetPage from "./pages/BudgetPage";
+import GoalsPage from "./pages/Goal/GoalsPage";
+import BudgetPage from "./pages/Budget/BudgetPage";
 import ReportsPage from "./pages/ReportsPage";
-import LocationSearch from "./pages/LocationSearch";
-import NewGoal from "./pages/NewGoal";
-import GoalHistory from "./pages/GoalHistory";
+import LocationSearch from "./pages/Budget/LocationSearch";
+import NewGoal from "./pages/Goal/NewGoal";
+import SaveToGoal from "./pages/Goal/SaveToGoal";
+import EditGoal from "./pages/Goal/EditGoal";
+import GoalHistory from "./pages/Goal/GoalHistory";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -49,6 +51,8 @@ function GoalsAll() {
       />
       <Stack.Screen name="New Goal" component={NewGoal} />
       <Stack.Screen name="Goal History" component={GoalHistory} />
+      <Stack.Screen name="Edit Goal" component={EditGoal} />
+      <Stack.Screen name="Save to Goal" component={SaveToGoal} />
     </Stack.Navigator>
   );
 }
@@ -133,6 +137,14 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+// export default function App() {
+//   return (
+//     <NavigationContainer theme={{ colors: colours.black }}>
+//       <GoalsAll />
+//     </NavigationContainer>
+//   );
+// }
 
 const styles = StyleSheet.create({
   bottomTabIcon: {

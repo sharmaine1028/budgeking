@@ -1,12 +1,14 @@
 import React from "react";
-import { ScrollView, View, StyleSheet, Text, Animated } from "react-native";
-import { BlackButton } from "../config/reusableButton";
-import { Header, Title } from "../config/reusableText";
-import { auth, db } from "../config/firebase";
-import colours from "../config/colours";
+import { View, StyleSheet, Text, Animated, Modal } from "react-native";
+import { BlackButton } from "../../config/reusableButton";
+import { Header, Title } from "../../config/reusableText";
+import { auth, db } from "../../config/firebase";
+import colours from "../../config/colours";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { GreyLine } from "../config/reusablePart";
+import { GreyLine } from "../../config/reusablePart";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Menu, MenuItem } from "react-native-material-menu";
 
 class GoalsPage extends React.Component {
   constructor() {
@@ -35,6 +37,7 @@ class GoalsPage extends React.Component {
     this.state = {
       shortTermGoals: [],
       longTermGoals: [],
+      showMenu: [],
     };
   }
 
@@ -77,10 +80,14 @@ class GoalsPage extends React.Component {
           />
         </View>
         <Title text={"Short-term goals"} />
-        {this.state.shortTermGoals.map((doc) => this.generateGoals(doc))}
+        {this.state.shortTermGoals.length !== 0
+          ? this.state.shortTermGoals.map((doc) => this.generateGoals(doc))
+          : this.renderNoGoals()}
 
         <Title text={"Long-term goals"} />
-        {this.state.longTermGoals.map((doc) => this.generateGoals(doc))}
+        {this.state.longTermGoals.length !== 0
+          ? this.state.longTermGoals.map((doc) => this.generateGoals(doc))
+          : this.renderNoGoals()}
       </KeyboardAwareScrollView>
     );
   }
@@ -88,20 +95,24 @@ class GoalsPage extends React.Component {
   getGoals = (querySnapshot, timePeriod) => {
     try {
       const activeGoals = [];
+      const showMenu = [];
 
       querySnapshot.forEach((doc) => {
         activeGoals.push({ ...doc.data(), id: doc.id });
+        showMenu.push({ id: doc.id, show: false });
       });
 
       if (timePeriod === "short") {
         this.setState({
           shortTermGoals: [...this.state.shortTermGoals, ...activeGoals],
+          showMenu: [...this.state.showMenu, ...showMenu],
         });
       }
 
       if (timePeriod === "long") {
         this.setState({
           longTermGoals: [...this.state.longTermGoals, ...activeGoals],
+          showMenu: [...this.state.showMenu, ...showMenu],
         });
       }
     } catch {
@@ -136,12 +147,59 @@ class GoalsPage extends React.Component {
   };
 
   generateGoals = (doc) => {
+    const id = doc.id;
+
+    const getVisibleState = () => {
+      let item = this.state.showMenu.find((x) => x.id === id);
+      let visible;
+      if (item) {
+        visible = item.show;
+      } else {
+        visible = true;
+      }
+      return visible;
+    };
+
     return (
       <View key={doc.id} style={styles.goal}>
-        <Header
-          text={`Save for ${doc.goalDescription}`}
-          style={{ fontWeight: "bold" }}
-        />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Header
+            text={`Save for ${doc.goalDescription}`}
+            style={{ fontWeight: "bold" }}
+          />
+
+          <Menu
+            visible={getVisibleState()}
+            anchor={
+              <TouchableOpacity onPress={() => this.showMenu(doc.id)}>
+                <MaterialCommunityIcons
+                  name="more"
+                  size={24}
+                  color={colours.black}
+                />
+              </TouchableOpacity>
+            }
+            onRequestClose={() => this.hideMenu(doc.id)}
+          >
+            <MenuItem
+              onPress={() => this.props.navigation.navigate("Edit Goal")}
+            >
+              Edit
+            </MenuItem>
+            <MenuItem onPress={() => this.deleteGoal(doc.id)}>Delete</MenuItem>
+            <MenuItem
+              onPress={() => this.props.navigation.navigate("Save to Goal")}
+            >
+              Save
+            </MenuItem>
+          </Menu>
+        </View>
+
         <Text style={styles.goalTagline}>
           Save ${doc.freqAmount} {doc.frequency}
         </Text>
@@ -189,10 +247,34 @@ class GoalsPage extends React.Component {
             {this.dateFormat(doc.deadline.seconds)}
           </Text>
         </View>
-
-        {/* {this.generateGoal(doc)} */}
       </View>
     );
+  };
+
+  renderNoGoals = () => {
+    return (
+      <Text
+        style={[styles.goalTagline, { alignSelf: "center", marginTop: 20 }]}
+      >
+        No Goals yet
+      </Text>
+    );
+  };
+
+  showMenu = (id) => {
+    this.setState({
+      showMenu: this.state.showMenu.map((x) =>
+        x.id === id ? (x.show = true) : x
+      ),
+    });
+  };
+
+  hideMenu = (id) => {
+    this.setState({
+      showMenu: this.state.showMenu.map((x) =>
+        x.id === id ? (x.show = false) : x
+      ),
+    });
   };
 }
 
