@@ -28,6 +28,8 @@ const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
 };
 
+// getmonthlydata 2 healths
+
 class HomePage extends React.Component {
   constructor() {
     super();
@@ -267,13 +269,16 @@ class HomePage extends React.Component {
 
   getMonthlyData() {
     const currMonth = new Date().getMonth();
-    // console.log("currmonth", currMonth)
+    const currYear = new Date().getFullYear();
     const expenseArrayTimeConverted = this.state.expenseArr;
     const monthlyExpenseArray = [];
     expenseArrayTimeConverted.map((item, i) => {
       const dateItem = expenseArrayTimeConverted[i]["date"];
       // console.log("dateitem", dateItem)
-      if (dateItem.toDate().getMonth() == currMonth) {
+      if (
+        dateItem.toDate().getMonth() == currMonth &&
+        dateItem.toDate().getFullYear() == currYear
+      ) {
         monthlyExpenseArray.push(expenseArrayTimeConverted[i]);
       }
     });

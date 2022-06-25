@@ -5,6 +5,8 @@ import {
   View,
   ActivityIndicator,
   Dimensions,
+  RefreshControl,
+  ScrollView,
 } from "react-native";
 import colours from "../config/colours";
 import { auth, db } from "../config/firebase";
@@ -15,8 +17,12 @@ import { BlackButton } from "../config/reusableButton";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-// **************getYearlyData() wrong => add key to list??
+// **************getMonthlyData, getYearlyData() wrong => add key to list??
 // **************custom date choosing - chart only changes after refreshing (idk how to refresh)
+
+const wait = (timeout) => {
+  return new Promise((resolve) => setTimeout(resolve, timeout));
+};
 
 class ReportsPagePieChart extends React.Component {
   constructor() {
@@ -46,6 +52,8 @@ class ReportsPagePieChart extends React.Component {
       ],
       dateTo: new Date(),
       dateFrom: new Date(),
+      refreshing: false,
+      setRefreshing: false,
     };
   }
 
@@ -54,6 +62,11 @@ class ReportsPagePieChart extends React.Component {
     state[prop] = val;
     this.setState(state);
   }
+
+  // onRefresh = () => {
+  //   this.setState({ setRefreshing: true });
+  //   wait(2000).then(() => this.setState({ setRefreshing: false }));
+  // };
 
   // calling budgetValue from firestore
   componentDidMount() {
@@ -297,13 +310,17 @@ class ReportsPagePieChart extends React.Component {
 
   getMonthlyData() {
     const currMonth = new Date().getMonth();
+    const currYear = new Date().getFullYear();
     // console.log("currmonth", currMonth)
     const expenseArrayTimeConverted = this.state.expenseArr;
     const monthlyExpenseArray = [];
     expenseArrayTimeConverted.map((item, i) => {
       const dateItem = expenseArrayTimeConverted[i]["date"];
       // console.log("dateitem", dateItem)
-      if (dateItem.toDate().getMonth() == currMonth) {
+      if (
+        dateItem.toDate().getMonth() == currMonth &&
+        dateItem.toDate().getFullYear() == currYear
+      ) {
         monthlyExpenseArray.push(expenseArrayTimeConverted[i]);
       }
     });
@@ -428,6 +445,14 @@ class ReportsPagePieChart extends React.Component {
     return (
       <KeyboardAwareScrollView>
         <View style={styles.container}>
+          {/* <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={this.onRefresh()}
+              />
+            }
+          > */}
           <View style={styles.reportPieChart}>
             <Header
               text={`${"\n"}Categories (${this.textBesideCategories()} ${
@@ -508,6 +533,7 @@ class ReportsPagePieChart extends React.Component {
               }}
             />
           </View>
+          {/* </ScrollView> */}
         </View>
       </KeyboardAwareScrollView>
     );
