@@ -8,19 +8,19 @@ import {
   RefreshControl,
   Animated,
   ActivityIndicator,
-  Dimensions
+  Dimensions,
 } from "react-native";
 import colours from "../config/colours";
 import { auth, db } from "../config/firebase";
 import RedLine from "../config/reusablePart";
 import { Header, Title, SmallTextInput } from "../config/reusableText";
-import SelectDropdown from 'react-native-select-dropdown';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import SelectDropdown from "react-native-select-dropdown";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { PieChart } from "react-native-gifted-charts";
 import CurrencyInput from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SmallBlackButton } from "../config/reusableButton";
-import Icon from 'react-native-vector-icons/AntDesign'
+import Icon from "react-native-vector-icons/AntDesign";
 import { color } from "react-native-elements/dist/helpers";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
@@ -28,22 +28,38 @@ const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
 };
 
-class HomePage extends React.Component {
+// getmonthlydata 2 healths
 
+class HomePage extends React.Component {
   constructor() {
     super();
-    this.fireStoreRef = db.collection('users').doc(auth.currentUser.uid).collection("expense");
+    this.fireStoreRef = db
+      .collection("users")
+      .doc(auth.currentUser.uid)
+      .collection("expense");
     this.state = {
       name: auth.currentUser.displayName,
       email: auth.currentUser.email,
       timePeriod: ["Your monthly budget", "Your daily budget"],
       timeUserWants: "monthly",
       budgetEditable: false,
-      budgetValue: 0.00,
+      budgetValue: 0.0,
       expenseArr: [],
       isLoading: true,
-      monthNames: ["January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"],
+      monthNames: [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ],
     };
   }
 
@@ -64,10 +80,13 @@ class HomePage extends React.Component {
   }
 
   callBudgetValue() {
-    db.collection("users").doc(auth.currentUser.uid).get().then((doc)=> {
-      const {budgetValue} = doc.data()
-      this.setState({budgetValue: budgetValue})
-    })
+    db.collection("users")
+      .doc(auth.currentUser.uid)
+      .get()
+      .then((doc) => {
+        const { budgetValue } = doc.data();
+        this.setState({ budgetValue: budgetValue });
+      });
   }
 
   componentWillUnmount() {
@@ -77,16 +96,16 @@ class HomePage extends React.Component {
   getCollection = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const {value, category, date} = res.data();
-      expenseArrPush.push( {
+      const { value, category, date } = res.data();
+      expenseArrPush.push({
         key: res.id,
         value,
         category,
-        date
+        date,
       });
       // console.log(expenseArr, "+>", res.id, "=>", res.data());
     });
-    this.setState( {
+    this.setState({
       expenseArr: expenseArrPush,
       isLoading: false,
     });
@@ -99,19 +118,15 @@ class HomePage extends React.Component {
     // console.log(new Date().toLocaleDateString('en-us', {  weekday: 'short' }))
     // console.log(this.putInTextToPie())
     // console.log(auth.currentUser.uid)
-  }
+  };
 
   // budgetValue changing immediately when updateInputVal() without invoking tick
   inputBudgetFireStore = () => {
     // console.log(this.state.budgetValue)
-    db
-      .collection("users")
-      .doc(auth.currentUser.uid)
-      .update({
-        budgetValue: this.state.budgetValue
-      });
-  }
-
+    db.collection("users").doc(auth.currentUser.uid).update({
+      budgetValue: this.state.budgetValue,
+    });
+  };
 
   // Scroll from top to refresh changes
   // const [refreshing, setRefreshing] = React.useState(false);
@@ -127,14 +142,14 @@ class HomePage extends React.Component {
       return this.addExpensesMonthly();
     } else {
       return this.addExpensesDaily();
-    }  
+    }
   }
 
   addExpensesMonthly() {
     let sum = 0;
     this.getMonthlyData().map((item, i) => {
       sum += item.value;
-    })
+    });
     return sum; //255.78
   }
 
@@ -142,12 +157,12 @@ class HomePage extends React.Component {
     let sum = 0;
     this.getDailyData().map((item, i) => {
       sum += item.value;
-    })
+    });
     return sum; //12
   }
 
   percentExpenseOutOfBudget() {
-    if (this.addExpenses() == 0.00) {
+    if (this.addExpenses() == 0.0) {
       return 0;
     } else if (this.state.budgetValue <= this.addExpenses()) {
       return 100;
@@ -175,13 +190,13 @@ class HomePage extends React.Component {
 
   updatePieDataMonthly() {
     var pieDataPush = [
-      {category: "food and drinks", value: 0, color: '#177AD5'},
-      {category: "transportation", value: 0, color: '#79D2DE'},
-      {category: "housing", value: 0, color: '#F7D8B5'},
-      {category: "shopping", value: 0, color: '#8F80E4'},
-      {category: "health", value: 0, color: '#FB8875'},
-      {category: "education", value: 0, color: '#FDE74C'},
-      {category: "others", value: 0, color: '#E8E0CE'},
+      { category: "food and drinks", value: 0, color: "#177AD5" },
+      { category: "transportation", value: 0, color: "#79D2DE" },
+      { category: "housing", value: 0, color: "#F7D8B5" },
+      { category: "shopping", value: 0, color: "#8F80E4" },
+      { category: "health", value: 0, color: "#FB8875" },
+      { category: "education", value: 0, color: "#FDE74C" },
+      { category: "others", value: 0, color: "#E8E0CE" },
     ];
     this.getMonthlyData().map((item, i) => {
       if (item.category == "food and drinks") {
@@ -205,13 +220,13 @@ class HomePage extends React.Component {
 
   updatePieDataDaily() {
     var pieDataPush = [
-      {category: "food and drinks", value: 0, color: '#177AD5'},
-      {category: "transportation", value: 0, color: '#79D2DE'},
-      {category: "housing", value: 0, color: '#F7D8B5'},
-      {category: "shopping", value: 0, color: '#8F80E4'},
-      {category: "health", value: 0, color: '#FB8875'},
-      {category: "education", value: 0, color: '#FDE74C'},
-      {category: "others", value: 0, color: '#E8E0CE'},
+      { category: "food and drinks", value: 0, color: "#177AD5" },
+      { category: "transportation", value: 0, color: "#79D2DE" },
+      { category: "housing", value: 0, color: "#F7D8B5" },
+      { category: "shopping", value: 0, color: "#8F80E4" },
+      { category: "health", value: 0, color: "#FB8875" },
+      { category: "education", value: 0, color: "#FDE74C" },
+      { category: "others", value: 0, color: "#E8E0CE" },
     ];
     this.getDailyData().map((item, i) => {
       if (item.category == "food and drinks") {
@@ -254,15 +269,18 @@ class HomePage extends React.Component {
 
   getMonthlyData() {
     const currMonth = new Date().getMonth();
-    // console.log("currmonth", currMonth)
+    const currYear = new Date().getFullYear();
     const expenseArrayTimeConverted = this.state.expenseArr;
     const monthlyExpenseArray = [];
     expenseArrayTimeConverted.map((item, i) => {
       const dateItem = expenseArrayTimeConverted[i]["date"];
       // console.log("dateitem", dateItem)
-      if (dateItem.toDate().getMonth() == currMonth) {
-        monthlyExpenseArray.push(expenseArrayTimeConverted[i])
-      };
+      if (
+        dateItem.toDate().getMonth() == currMonth &&
+        dateItem.toDate().getFullYear() == currYear
+      ) {
+        monthlyExpenseArray.push(expenseArrayTimeConverted[i]);
+      }
     });
     return monthlyExpenseArray;
   }
@@ -275,19 +293,19 @@ class HomePage extends React.Component {
       const dateItem = expenseArrayTimeConverted[i]["date"];
       // console.log("dateitem", dateItem)
       if (dateItem.toDate().toLocaleDateString() == currDate) {
-        dailyExpenseArray.push(expenseArrayTimeConverted[i])
-      };
+        dailyExpenseArray.push(expenseArrayTimeConverted[i]);
+      }
     });
     return dailyExpenseArray;
   }
 
   toggleMonthlyDaily = (val) => {
     if (val === 0) {
-      this.setState({timeUserWants: "monthly" });
+      this.setState({ timeUserWants: "monthly" });
     } else {
-      this.setState({timeUserWants: "daily" });
+      this.setState({ timeUserWants: "daily" });
     }
-  }
+  };
 
   textBesideCategories() {
     var dayText = "";
@@ -300,50 +318,45 @@ class HomePage extends React.Component {
   }
 
   leftAmount() {
-    const diff = this.state.budgetValue - this.addExpenses()
+    const diff = this.state.budgetValue - this.addExpenses();
     return diff.toFixed(2);
   }
 
   render() {
-
     const pieData = this.putInTextToPie();
-
-
 
     const renderLegend = (text, color) => {
       return (
-        <View style={{flexDirection: 'row', marginBottom: 12}}>
+        <View style={{ flexDirection: "row", marginBottom: 12 }}>
           <View
             style={{
               height: 18,
               width: 18,
               marginRight: 10,
               borderRadius: 4,
-              backgroundColor: color || 'white',
+              backgroundColor: color || "white",
             }}
           />
-          <Text style={{color: '#444444', fontSize: 16}}>{text || ''}</Text>
+          <Text style={{ color: "#444444", fontSize: 16 }}>{text || ""}</Text>
         </View>
       );
     };
 
-    if(this.state.isLoading){
-      return(
+    if (this.state.isLoading) {
+      return (
         <View style={styles.preloader}>
-          <ActivityIndicator size="large" color="#9E9E9E"/>
+          <ActivityIndicator size="large" color="#9E9E9E" />
         </View>
-      )
+      );
     }
 
     return (
       <KeyboardAwareScrollView>
-
         <View style={styles.container}>
-
           {/* <Text>{this.addExpenses()}</Text>
           <Text>{this.percentExpenseOutOfBudget()}</Text> */}
 
-        {/* <ScrollView
+          {/* <ScrollView
           refreshControl = {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -354,25 +367,31 @@ class HomePage extends React.Component {
           <View style={styles.weeklyBudgetTab}>
             {/* <Header text={`${"\n"}Your weekly budget`} style={styles.changeLineHeightWeeklyBudget} /> */}
             <SelectDropdown
-              data = {this.state.timePeriod}
-              onSelect = {(selectedItem, index) => {
+              data={this.state.timePeriod}
+              onSelect={(selectedItem, index) => {
                 return this.toggleMonthlyDaily(index);
               }}
-              defaultButtonText={'Your monthly budget'}
-              buttonTextAfterSelection = {(selectedTime, index) => {
+              defaultButtonText={"Your monthly budget"}
+              buttonTextAfterSelection={(selectedTime, index) => {
                 return selectedTime;
               }}
-              rowTextForSelection = {(time, index) => {
+              rowTextForSelection={(time, index) => {
                 return time;
               }}
               buttonStyle={styles.dropdownStyle}
               buttonTextStyle={styles.dropdownTxtStyle}
-              dropdownIconPosition={'right'}
+              dropdownIconPosition={"right"}
               dropdownStyle={styles.dropdownDropdownStyle}
               rowStyle={styles.dropdownRowStyle}
               rowTextStyle={styles.dropdownRowTxtStyle}
-              renderDropdownIcon={isOpened => {
-                return <FontAwesome name={isOpened ? 'chevron-up' : 'chevron-down'} color={colours.red} size={18} />;
+              renderDropdownIcon={(isOpened) => {
+                return (
+                  <FontAwesome
+                    name={isOpened ? "chevron-up" : "chevron-down"}
+                    color={colours.red}
+                    size={18}
+                  />
+                );
               }}
             />
             {/* <View style={styles.dropdownTriangle} /> */}
@@ -380,25 +399,35 @@ class HomePage extends React.Component {
 
           <RedLine />
 
-          <View style = {{flexDirection: 'row'}}>
+          <View
+            style={{
+              flexDirection: "row",
+            }}
+          >
             <Image
-                style = {styles.logo}
-                source = {require("../assets/home/walking.png")}
-                resizeMethod={"resize"}
+              style={styles.logo}
+              source={require("../assets/home/walking.png")}
+              resizeMethod={"resize"}
             />
-            <Text style = {styles.leftText}>{`${this.textBesideWalking()}: $${this.leftAmount()}`}</Text>
+            <Text
+              style={styles.leftText}
+            >{`${this.textBesideWalking()}: $${this.leftAmount()}`}</Text>
           </View>
 
           <View style={styles.progressArea}>
-
             <View style={styles.progressBar}>
-              <Animated.View style = {[StyleSheet.absoluteFill, 
-                {backgroundColor: "#96D3FF", 
-                width: `${this.percentExpenseOutOfBudget()}%`, 
-                borderRadius: 5}]} />
+              <Animated.View
+                style={[
+                  StyleSheet.absoluteFill,
+                  {
+                    backgroundColor: "#96D3FF",
+                    width: `${this.percentExpenseOutOfBudget()}%`,
+                    borderRadius: 5,
+                  },
+                ]}
+              />
             </View>
 
-            {/* <Text style={styles.whiteInput}>  Left: </Text> */}
             <CurrencyInput
               style={styles.whiteInput}
               keyboardType="numeric"
@@ -412,10 +441,10 @@ class HomePage extends React.Component {
             />
             <TouchableOpacity onPress={this.inputBudgetFireStore()}>
               <Icon.Button
-                name = "checkcircleo"
-                color = {colours.black}
-                backgroundColor = {"transparent"}
-                iconStyle = {{marginRight: 0}}
+                name="checkcircleo"
+                color={colours.black}
+                backgroundColor={"transparent"}
+                iconStyle={{ marginRight: 0 }}
               />
             </TouchableOpacity>
 
@@ -431,56 +460,58 @@ class HomePage extends React.Component {
               source = {require("../assets/home/rip.png")}
               resizeMethod={"resize"}
             /> */}
-
           </View>
-          
-          <View style={styles.reportPieChart}>
 
-            <Header text={`${"\n"} Categories (${this.textBesideCategories()} ${this.state.timeUserWants} expenses)\n\n`} />
+          <View style={styles.reportPieChart}>
+            <Header
+              text={`${"\n"} Categories (${this.textBesideCategories()} ${
+                this.state.timeUserWants
+              } expenses)\n\n`}
+            />
 
             <PieChart
-              style = {styles.pie}
+              style={styles.pie}
               donut
-              innerRadius = {Dimensions.get("window").width * 0.2}
+              innerRadius={Dimensions.get("window").width * 0.2}
               showText
-              textColor = "black"
-              radius = {Dimensions.get("window").width * 0.4}
-              textSize = {15}
+              textColor="black"
+              radius={Dimensions.get("window").width * 0.4}
+              textSize={15}
               // showTextBackground
               // textBackgroundRadius = {26}
-              data = {pieData}
+              data={pieData}
               focusOnPress
-              centerLabelComponent = {() => {
-                return <Text style = {styles.totalSpentText}>{`Total Spent\n$${this.addExpenses()}`}</Text>
+              centerLabelComponent={() => {
+                return (
+                  <Text
+                    style={styles.totalSpentText}
+                  >{`Total Spent\n$${this.addExpenses()}`}</Text>
+                );
               }}
             />
 
             <View
-              style = {{
+              style={{
                 width: "100%",
-                justifyContent: 'space-evenly',
+                justifyContent: "space-evenly",
                 marginTop: 20,
               }}
             >
-              {renderLegend('food and drinks', '#177AD5')}
-              {renderLegend('transportation', '#79D2DE')}
-              {renderLegend('housing', '#F7D8B5')}
-              {renderLegend('shopping', '#8F80E4')}
-              {renderLegend('health', '#FB8875')}
-              {renderLegend('education', '#FDE74C')}
-              {renderLegend('others', '#E8E0CE')}
+              {renderLegend("food and drinks", "#177AD5")}
+              {renderLegend("transportation", "#79D2DE")}
+              {renderLegend("housing", "#F7D8B5")}
+              {renderLegend("shopping", "#8F80E4")}
+              {renderLegend("health", "#FB8875")}
+              {renderLegend("education", "#FDE74C")}
+              {renderLegend("others", "#E8E0CE")}
             </View>
-
           </View>
 
-          <View>
-            
-          </View>
+          <View></View>
 
-        {/* </ScrollView> */}
-
-      </View>
-    </KeyboardAwareScrollView>
+          {/* </ScrollView> */}
+        </View>
+      </KeyboardAwareScrollView>
     );
   }
 }
@@ -493,11 +524,11 @@ const styles = StyleSheet.create({
     backgroundColor: colours.white,
   },
   weeklyBudgetTab: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingTop: 10,
-    paddingBottom: 5
+    paddingBottom: 5,
   },
   leftText: {
     // marginVertical: 10,
@@ -528,44 +559,44 @@ const styles = StyleSheet.create({
   // },
 
   dropdownStyle: {
-    width: '100%',
+    width: "100%",
     height: 50,
-    backgroundColor: 'EFEFEF',
+    backgroundColor: "EFEFEF",
     borderRadius: 8,
     borderWidth: 3,
     borderColor: colours.red,
   },
   dropdownTxtStyle: {
-    color: '#444', 
-    textAlign: 'left', 
-    fontSize: 16
+    color: "#444",
+    textAlign: "left",
+    fontSize: 16,
   },
   dropdownDropdownStyle: {
-    backgroundColor: '#EFEFEF',
-    borderRadius: 10
+    backgroundColor: "#EFEFEF",
+    borderRadius: 10,
   },
   dropdownRowStyle: {
-    backgroundColor: '#EFEFEF', 
-    borderBottomColor: '#C5C5C5'
+    backgroundColor: "#EFEFEF",
+    borderBottomColor: "#C5C5C5",
   },
   dropdownRowTxtStyle: {
-    color: '#444', 
-    textAlign: 'left', 
-    fontSize: 16
+    color: "#444",
+    textAlign: "left",
+    fontSize: 16,
   },
   progressArea: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-evenly",
     //paddingTop: 10,
   },
   progressBar: {
     flex: 1,
     height: 15,
-    width: '80%',
-    flexDirection: 'row',
-    backgroundColor: '#3F4243',
-    borderColor: '#3F4243',
+    width: "80%",
+    flexDirection: "row",
+    backgroundColor: "#3F4243",
+    borderColor: "#3F4243",
     borderRadius: 5,
   },
   logo: {
@@ -597,7 +628,7 @@ const styles = StyleSheet.create({
   pie: {
     justifyContent: "center",
     alignItems: "center",
-  }
+  },
 });
 
 export default HomePage;
