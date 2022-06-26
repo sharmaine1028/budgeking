@@ -39,6 +39,7 @@ class NewGoal extends React.Component {
           title={"Goal Description"}
           onChangeText={(val) => this.updateInputVal(val, "goalDescription")}
           value={this.state.goalDescription}
+          maxLength={30}
         />
         <View style={styles.newGoalInput}>
           <Text style={styles.newGoalTitle}>Target Amount to Save</Text>

@@ -133,6 +133,7 @@ export function NewGoalInput({
   value,
   keyboardType,
   onKeyPress,
+  editable,
 }) {
   return (
     <View style={styles.newGoalInput}>
@@ -146,6 +147,7 @@ export function NewGoalInput({
         maxLength={maxLength}
         keyboardType={keyboardType}
         onKeyPress={onKeyPress}
+        editable={editable}
       />
     </View>
   );
