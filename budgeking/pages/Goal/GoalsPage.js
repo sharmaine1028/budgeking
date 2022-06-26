@@ -58,7 +58,10 @@ class GoalsPage extends React.Component {
 
   componentDidMount() {
     this.unsubscribeSavings = this.props.navigation.addListener("focus", () => {
-      alert("HI");
+      this.unsubscribeShortTermOri();
+      this.unsubscribeShortTermShared();
+      this.unsubscribeLongTermOri();
+      this.unsubscribeLongTermShared();
       this.setState({ shortTermGoals: [], longTermGoals: [] });
       this.unsubscribeShortTermOri;
       this.unsubscribeShortTermShared;
@@ -69,6 +72,8 @@ class GoalsPage extends React.Component {
         shortTermGoals: this.state.shortTermGoals,
         longTermGoals: this.state.longTermGoals,
       });
+
+      console.log(this.state.shortTermGoals);
     });
   }
 
