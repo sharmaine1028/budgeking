@@ -23,6 +23,8 @@ import { SmallBlackButton } from "../config/reusableButton";
 import Icon from "react-native-vector-icons/AntDesign";
 import { color } from "react-native-elements/dist/helpers";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { GreyLine } from "../config/reusablePart";
+import { BlackButton } from "../config/reusableButton";
 
 const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
@@ -114,7 +116,7 @@ class HomePage extends React.Component {
     // console.log("piepushed =>", this.updatePieData())
     // console.log(auth.currentUser.displayName)
     // console.log(new Date().toLocaleDateString())
-    // console.log(this.state.budgetValue)
+    // console.log(this.state.expenseArr);
     // console.log(new Date().toLocaleDateString('en-us', {  weekday: 'short' }))
     // console.log(this.putInTextToPie())
     // console.log(auth.currentUser.uid)
@@ -150,7 +152,7 @@ class HomePage extends React.Component {
     this.getMonthlyData().map((item, i) => {
       sum += item.value;
     });
-    return sum; //255.78
+    return sum.toFixed(2); //255.78
   }
 
   addExpensesDaily() {
@@ -158,7 +160,7 @@ class HomePage extends React.Component {
     this.getDailyData().map((item, i) => {
       sum += item.value;
     });
-    return sum; //12
+    return sum.toFixed(2); //12
   }
 
   percentExpenseOutOfBudget() {
@@ -322,7 +324,110 @@ class HomePage extends React.Component {
     return diff.toFixed(2);
   }
 
+  sortedArr(arr) {
+    const sortedArr = arr.sort((a, b) => b.date.seconds - a.date.seconds);
+    return sortedArr;
+  }
+
+  show3Expenses() {
+    var show3Ex = [];
+    const sortedEx = this.sortedArr(this.state.expenseArr);
+    for (let i = 0; i < 3; i++) {
+      show3Ex.push(sortedEx[i]);
+    }
+    return show3Ex;
+  }
+
+  // locale date string????
+  dateFormat = (seconds) => {
+    const date = new Date(seconds * 1000);
+    const [day, month, year] = [
+      date.getDate(),
+      date.getMonth(),
+      date.getFullYear(),
+    ];
+
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    return day.toString() + " " + months[month] + " " + year.toString();
+  };
+
+  categoryFormat(category) {
+    if (category == "food and drinks") {
+      return "Food & Drinks";
+    } else {
+      return category.charAt(0).toUpperCase() + category.slice(1);
+    }
+  }
+
+  // locale time string????
+  timeFormat(seconds) {
+    var t = new Date(seconds * 1000);
+    var hours = t.getHours();
+    var minutes = t.getMinutes();
+    var newFormat = t.getHours() > 12 ? "PM" : "AM";
+
+    hours = hours % 12;
+
+    hours = hours != 0 ? hours : 12;
+
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    var formatted = hours + ":" + minutes + " " + newFormat;
+    return formatted;
+  }
+
+  generate3ExpensesLR = (doc) => {
+    return (
+      <View key={doc.key} style={styles.row}>
+        <View style={styles.dateRow}>
+          <Icon.Button
+            name="arrowright"
+            size="20%"
+            color={colours.tomato}
+            backgroundColor={"transparent"}
+            iconStyle={{ marginLeft: 5, marginRight: 0 }}
+          />
+          <Header
+            text={`${this.dateFormat(doc.date.seconds)}`}
+            style={{ fontWeight: "bold", marginTop: 12 }}
+          />
+        </View>
+
+        <View style={styles.categoryRow}>
+          <Header
+            text={this.categoryFormat(doc.category)}
+            style={styles.expenseCategory}
+          />
+
+          <Text style={styles.valueText}>{`$${doc.value}`}</Text>
+        </View>
+
+        <View style={styles.notesRow}>
+          <Text style={styles.noteText}>{doc.notes}</Text>
+          <Text style={styles.timeText}>
+            {this.timeFormat(doc.date.seconds)}
+          </Text>
+        </View>
+        <GreyLine />
+      </View>
+    );
+  };
+
   render() {
+    const { navigation } = this.props;
     const pieData = this.putInTextToPie();
 
     const renderLegend = (text, color) => {
@@ -507,7 +612,16 @@ class HomePage extends React.Component {
             </View>
           </View>
 
-          <View></View>
+          <View style={styles.lastRecordTitle}>
+            <Header style={styles.lastRecordText} text={"Last records"} />
+            <RedLine />
+            {this.show3Expenses().map((doc) => this.generate3ExpensesLR(doc))}
+            <BlackButton
+              text={"Show more"}
+              style={{ flexGrow: 0.5, marginTop: 10, marginBottom: 10 }}
+              onPress={() => navigation.navigate("All Table View")}
+            />
+          </View>
 
           {/* </ScrollView> */}
         </View>
@@ -628,6 +742,53 @@ const styles = StyleSheet.create({
   pie: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  lastRecordTitle: {
+    marginTop: 20,
+    backgroundColor: "transparent",
+    borderWidth: 2,
+    borderColor: colours.red,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  lastRecordText: {
+    marginLeft: 10,
+  },
+  row: {
+    // backgroundColor: colours.beige,
+    // borderWidth: 2,
+    // borderColor: colours.lightBrown,
+    borderRadius: 10,
+  },
+  dateRow: {
+    flexDirection: "row",
+  },
+  categoryRow: {
+    flexDirection: "row",
+    alignContent: "flex-start",
+    justifyContent: "space-between",
+  },
+  notesRow: {
+    flexDirection: "row",
+    alignContent: "flex-end",
+    justifyContent: "space-between",
+  },
+  expenseCategory: { marginLeft: 10, marginTop: 1 },
+  valueText: {
+    marginRight: 10,
+    marginTop: 1,
+    color: colours.black,
+    textAlign: "right",
+  },
+  noteText: {
+    fontWeight: "200",
+    marginLeft: 10,
+    marginBottom: 10,
+  },
+  timeText: {
+    fontWeight: "200",
+    marginRight: 10,
+    marginBottom: 10,
   },
 });
 

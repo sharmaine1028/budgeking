@@ -14,6 +14,7 @@ import LocationSearch from "./pages/LocationSearch";
 import ReportsPagePieChart from "./pages/ReportsPagePieChart";
 import ReportsPageTable from "./pages/ReportsPageTable";
 import ChooseCustomDate from "./pages/ChooseCustomDate";
+import AllTableView from "./pages/AllTableView";
 import NewGoal from "./pages/NewGoal";
 import GoalHistory from "./pages/GoalHistory";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -93,6 +94,28 @@ function ReportsPageAll() {
   );
 }
 
+function HomePageAll() {
+  return (
+    <Stack.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colours.whiteRock,
+        },
+        cardStyle: { backgroundColor: colours.white },
+      }}
+    >
+      <Stack.Screen
+        name="Home"
+        component={HomePage}
+        options={{ headerLeft: false }}
+      />
+      <Stack.Screen name="HomePage" component={HomePage} />
+      <Stack.Screen name="All Table View" component={AllTableView} />
+    </Stack.Navigator>
+  );
+}
+
 const screenOptions = (route, color) => {
   let iconName;
   switch (route.name) {
@@ -139,7 +162,13 @@ function MyTabs() {
       })}
       sceneContainerStyle={{ backgroundColor: colours.white }}
     >
-      <Tab.Screen name="Home" component={HomePage} />
+      <Tab.Screen
+        name="Home"
+        component={HomePageAll}
+        options={{
+          headerShown: false,
+        }}
+      />
       <Tab.Screen
         name="Goal"
         component={GoalsAll}
