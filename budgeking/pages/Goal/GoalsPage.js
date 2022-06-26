@@ -1,9 +1,8 @@
 import React from "react";
-import { View, StyleSheet, Text, Animated, Modal } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { BlackButton } from "../../config/reusableButton";
-import { Header, Title } from "../../config/reusableText";
+import { Title } from "../../config/reusableText";
 import { auth, db } from "../../config/firebase";
-import colours from "../../config/colours";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import GenerateGoal from "./GenerateGoal";
 
@@ -86,7 +85,11 @@ class GoalsPage extends React.Component {
           <BlackButton
             text={"Add new goals"}
             style={styles.button}
-            onPress={() => this.props.navigation.navigate("New Goal")}
+            onPress={() =>
+              this.props.navigation.navigate("New Goal", {
+                addItem: this.addToGoal,
+              })
+            }
           />
 
           <BlackButton
@@ -146,6 +149,27 @@ class GoalsPage extends React.Component {
     } catch {
       (err) => console.log(err);
     }
+  };
+
+  addToGoal = (doc, time) => {
+    db.collection("goals")
+      .doc(time)
+      .collection("active")
+      .doc()
+      .set({
+        createdBy: auth.currentUser.uid,
+        goalDescription: doc.goalDescription,
+        target: doc.target,
+        frequency: doc.frequency,
+        freqAmount: doc.freqAmount,
+        deadline: doc.deadline,
+        notes: doc.notes,
+        isSharing: doc.isSharing,
+        sharingEmails: doc.sharingEmails,
+        sharingUIDs: doc.sharingUIDs,
+        currSavingsAmt: 0,
+      })
+      .catch((err) => console.log(err));
   };
 
   saveToGoal = (id, time, newAmt) => {

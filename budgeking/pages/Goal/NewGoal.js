@@ -347,28 +347,11 @@ class NewGoal extends React.Component {
           "Please fill in goal description, target amount to save and freqency"
         );
         return;
+      } else {
+        const addItem = this.props.route.params?.addItem;
+        addItem(doc, timePeriod);
+        this.props.navigation.navigate("Goals");
       }
-
-      db.collection("goals")
-        .doc(timePeriod)
-        .collection("active")
-        .doc()
-        .set({
-          createdBy: auth.currentUser.uid,
-          goalDescription: this.state.goalDescription,
-          target: this.state.target,
-          frequency: this.state.frequency,
-          freqAmount: this.state.freqAmount,
-          deadline: this.state.deadline,
-          notes: this.state.notes,
-          isSharing: this.state.isSharing,
-          sharingEmails: this.state.sharingEmails,
-          sharingUIDs: this.state.sharingUIDs,
-          currSavingsAmt: 0,
-        })
-        .catch((err) => console.log(err));
-
-      this.props.navigation.navigate("Goals");
     } catch {
       (err) => console.log(err);
     }
