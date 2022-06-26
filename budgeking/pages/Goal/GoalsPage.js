@@ -58,10 +58,6 @@ class GoalsPage extends React.Component {
 
   componentDidMount() {
     this.unsubscribeSavings = this.props.navigation.addListener("focus", () => {
-      this.unsubscribeShortTermOri();
-      this.unsubscribeShortTermShared();
-      this.unsubscribeLongTermOri();
-      this.unsubscribeLongTermShared();
       this.setState({ shortTermGoals: [], longTermGoals: [] });
       this.unsubscribeShortTermOri;
       this.unsubscribeShortTermShared;
@@ -72,8 +68,6 @@ class GoalsPage extends React.Component {
         shortTermGoals: this.state.shortTermGoals,
         longTermGoals: this.state.longTermGoals,
       });
-
-      console.log(this.state.shortTermGoals);
     });
   }
 
@@ -109,6 +103,7 @@ class GoalsPage extends React.Component {
                 doc={doc}
                 time={"short term"}
                 deleteItem={this.deleteGoal}
+                saveItem={this.saveToGoal}
               />
             ))
           : this.renderNoGoals()}
@@ -116,7 +111,13 @@ class GoalsPage extends React.Component {
         <Title text={"Long-term goals"} />
         {this.state.longTermGoals.length !== 0
           ? this.state.longTermGoals.map((doc) => (
-              <GenerateGoal key={doc.id} doc={doc} time={"long term"} />
+              <GenerateGoal
+                key={doc.id}
+                doc={doc}
+                time={"long term"}
+                deleteItem={this.deleteGoal}
+                saveItem={this.saveToGoal}
+              />
             ))
           : this.renderNoGoals()}
       </KeyboardAwareScrollView>
@@ -144,6 +145,20 @@ class GoalsPage extends React.Component {
       }
     } catch {
       (err) => console.log(err);
+    }
+  };
+
+  saveToGoal = (id, time, newAmt) => {
+    if (time === "short term") {
+      const newList = this.state.shortTermGoals.filter(
+        (item) => item.id !== id
+      );
+      this.setState({ shortTermGoals: newList });
+      this.shortTermRef.doc(id).update({ currSavingsAmt: newAmt });
+    } else {
+      const newList = this.state.longTermGoals.filter((item) => item.id !== id);
+      this.setState({ longTermGoals: newList });
+      this.longTermRef.doc(id).update({ currSavingsAmt: newAmt });
     }
   };
 

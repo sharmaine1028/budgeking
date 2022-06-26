@@ -368,7 +368,6 @@ class NewGoal extends React.Component {
         })
         .catch((err) => console.log(err));
 
-      alert("Goal updated");
       this.props.navigation.navigate("Goals");
     } catch {
       (err) => console.log(err);

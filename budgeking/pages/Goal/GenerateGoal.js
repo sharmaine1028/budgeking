@@ -15,7 +15,7 @@ import colours from "../../config/colours";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { db } from "../../config/firebase";
 
-function GenerateGoal({ doc, time, deleteItem }) {
+function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   const navigation = useNavigation();
   const [isMenu, setIsMenu] = useState(false);
   const [data, setData] = useState(doc);
@@ -142,6 +142,7 @@ function GenerateGoal({ doc, time, deleteItem }) {
               navigation.navigate("Save to Goal", {
                 doc: doc,
                 time: time,
+                saveItem: saveItem,
               });
             }}
           >
@@ -180,7 +181,9 @@ function GenerateGoal({ doc, time, deleteItem }) {
               justifyContent: "space-between",
             }}
           >
-            <Text style={styles.goalTagline}>${data.currSavingsAmt}</Text>
+            <Text style={styles.goalTagline}>
+              ${data.currSavingsAmt.toFixed(2)}
+            </Text>
             <Text style={styles.goalTagline}>${data.target}</Text>
           </View>
         </View>

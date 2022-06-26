@@ -12,11 +12,9 @@ LogBox.ignoreLogs([
 
 // Replace object
 function SaveToGoal({ route, navigation }) {
-  const { doc, time } = route.params;
+  const { doc, time, saveToGoal } = route.params;
   const [savingsAmt, setSavingsAmt] = useState("0");
-  const [currSavingsAmt, setCurrSavingsAmt] = useState(
-    String(doc.currSavingsAmt)
-  );
+  const [currSavingsAmt, setCurrSavingsAmt] = useState(doc.currSavingsAmt);
 
   const dataRef = db
     .collection("goals")
@@ -26,7 +24,7 @@ function SaveToGoal({ route, navigation }) {
 
   useEffect(() => {
     const unsubscribe = dataRef.onSnapshot((doc) => {
-      setCurrSavingsAmt(doc.data().currSavingsAmt);
+      setCurrSavingsAmt(doc.data().currSavingsAmt.toFixed(2));
     });
     return unsubscribe;
   }, [currSavingsAmt, setCurrSavingsAmt]);
@@ -37,7 +35,7 @@ function SaveToGoal({ route, navigation }) {
       return;
     }
     const newAmt = Number(currSavingsAmt) + Number(val);
-    dataRef.update({ currSavingsAmt: newAmt });
+    saveToGoal(doc.id, time, newAmt);
     navigation.navigate("Goals");
   };
 
@@ -49,7 +47,7 @@ function SaveToGoal({ route, navigation }) {
       />
       <NewGoalInput
         title={"Current Savings"}
-        value={String(currSavingsAmt)}
+        value={"$" + String(currSavingsAmt)}
         editable={false}
       />
       <View style={styles.newGoalInput}>
