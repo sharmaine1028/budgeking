@@ -7,18 +7,18 @@ import {
   Dimensions,
   Text,
 } from "react-native";
-import colours from "../config/colours";
-import { BlackButton } from "../config/reusableButton";
+import colours from "../../config/colours";
+import { BlackButton } from "../../config/reusableButton";
 import {
   BudgetInput,
   Title,
   Header,
   ImageTextInput,
-} from "../config/reusableText";
+} from "../../config/reusableText";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { auth, db } from "../config/firebase";
+import { auth, db } from "../../config/firebase";
 import { Picker } from "@react-native-picker/picker";
 import CurrencyInput from "react-native-currency-input";
 
@@ -78,7 +78,7 @@ class BudgetPage extends React.Component {
             <View style={{ flex: 0.4 }}>
               <Header text={"Date"} />
               <ImageTextInput
-                source={require("../assets/calendar.png")}
+                source={require("../../assets/calendar.png")}
                 onPress={() => this.showDatePicker()}
                 value={this.dateFormat()}
                 editable={false}
@@ -88,7 +88,7 @@ class BudgetPage extends React.Component {
             <View style={{ flex: 0.25 }}>
               <Header text={"Time"} />
               <ImageTextInput
-                source={require("../assets/clock.png")}
+                source={require("../../assets/clock.png")}
                 onPress={() => this.showTimePicker()}
                 value={this.timeFormat()}
                 editable={false}
@@ -133,7 +133,7 @@ class BudgetPage extends React.Component {
             </View>
             <TouchableOpacity onPress={() => this.pickImage()}>
               <Image
-                source={require("../assets/addphoto.png")}
+                source={require("../../assets/addphoto.png")}
                 style={styles.image}
               />
             </TouchableOpacity>
@@ -147,7 +147,7 @@ class BudgetPage extends React.Component {
             </View>
             <TouchableOpacity onPress={() => this.showLocationPicker()}>
               <Image
-                source={require("../assets/location.png")}
+                source={require("../../assets/location.png")}
                 style={styles.image}
               />
             </TouchableOpacity>

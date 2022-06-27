@@ -1,14 +1,18 @@
 import React from "react";
-import { BlackButton } from "../config/reusableButton";
-import { ImageTextInput, NewGoalInput, YesOrNo } from "../config/reusableText";
-import { View, StyleSheet, Text, Button, TouchableOpacity } from "react-native";
+import { BlackButton } from "../../config/reusableButton";
+import {
+  ImageTextInput,
+  NewGoalInput,
+  YesOrNo,
+} from "../../config/reusableText";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import colours from "../config/colours";
+import colours from "../../config/colours";
 import { Picker } from "@react-native-picker/picker";
 import { TextInput } from "react-native-gesture-handler";
 import CurrencyInput from "react-native-currency-input";
-import { auth, db } from "../config/firebase";
+import { auth, db } from "../../config/firebase";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 class NewGoal extends React.Component {
@@ -35,6 +39,7 @@ class NewGoal extends React.Component {
           title={"Goal Description"}
           onChangeText={(val) => this.updateInputVal(val, "goalDescription")}
           value={this.state.goalDescription}
+          maxLength={30}
         />
         <View style={styles.newGoalInput}>
           <Text style={styles.newGoalTitle}>Target Amount to Save</Text>
@@ -80,7 +85,7 @@ class NewGoal extends React.Component {
         <View style={styles.newGoalInput}>
           <Text style={styles.newGoalTitle}>Deadline</Text>
           <ImageTextInput
-            source={require("../assets/calendar.png")}
+            source={require("../../assets/calendar.png")}
             onPress={() => this.showDatePicker()}
             d
             value={this.dateFormat()}
@@ -342,29 +347,27 @@ class NewGoal extends React.Component {
           "Please fill in goal description, target amount to save and freqency"
         );
         return;
+      } else {
+        db.collection("goals")
+          .doc(timePeriod)
+          .collection("active")
+          .doc()
+          .set({
+            createdBy: auth.currentUser.uid,
+            goalDescription: this.state.goalDescription,
+            target: this.state.target,
+            frequency: this.state.frequency,
+            freqAmount: this.state.freqAmount,
+            deadline: this.state.deadline,
+            notes: this.state.notes,
+            isSharing: this.state.isSharing,
+            sharingEmails: this.state.sharingEmails,
+            sharingUIDs: this.state.sharingUIDs,
+            currSavingsAmt: 0,
+          })
+          .catch((err) => console.log(err));
+        this.props.navigation.navigate("Goals");
       }
-
-      db.collection("goals")
-        .doc(timePeriod)
-        .collection("active")
-        .doc()
-        .set({
-          createdBy: auth.currentUser.uid,
-          goalDescription: this.state.goalDescription,
-          target: this.state.target,
-          frequency: this.state.frequency,
-          freqAmount: this.state.freqAmount,
-          deadline: this.state.deadline,
-          notes: this.state.notes,
-          isSharing: this.state.isSharing,
-          sharingEmails: this.state.sharingEmails,
-          sharingUIDs: this.state.sharingUIDs,
-          currSavingsAmt: 0,
-        })
-        .catch((err) => console.log(err));
-
-      alert("Goal updated");
-      this.props.navigation.navigate("Goals");
     } catch {
       (err) => console.log(err);
     }

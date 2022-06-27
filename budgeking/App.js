@@ -7,16 +7,14 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/HomePage";
 import SettingsPage from "./pages/SettingsPage";
-import GoalsPage from "./pages/GoalsPage";
-import BudgetPage from "./pages/BudgetPage";
+import GoalsPage from "./pages/Goal/GoalsPage";
+import BudgetPage from "./pages/Budget/BudgetPage";
 import ReportsPage from "./pages/ReportsPage";
-import LocationSearch from "./pages/LocationSearch";
-import ReportsPagePieChart from "./pages/ReportsPagePieChart";
-import ReportsPageTable from "./pages/ReportsPageTable";
-import ChooseCustomDate from "./pages/ChooseCustomDate";
-import AllTableView from "./pages/AllTableView";
-import NewGoal from "./pages/NewGoal";
-import GoalHistory from "./pages/GoalHistory";
+import LocationSearch from "./pages/Budget/LocationSearch";
+import NewGoal from "./pages/Goal/NewGoal";
+import SaveToGoal from "./pages/Goal/SaveToGoal";
+import EditGoal from "./pages/Goal/EditGoal";
+import GoalHistory from "./pages/Goal/GoalHistory";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -54,6 +52,8 @@ function GoalsAll() {
       />
       <Stack.Screen name="New Goal" component={NewGoal} />
       <Stack.Screen name="Goal History" component={GoalHistory} />
+      <Stack.Screen name="Edit Goal" component={EditGoal} />
+      <Stack.Screen name="Save to Goal" component={SaveToGoal} />
     </Stack.Navigator>
   );
 }
@@ -62,9 +62,18 @@ function BudgetAll() {
   return (
     <Stack.Navigator
       initialRouteName="Budget"
-      screenOptions={{ headerShown: false }}
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colours.whiteRock,
+        },
+        cardStyle: { backgroundColor: colours.white },
+      }}
     >
-      <Stack.Screen name="BudgetPage" component={BudgetPage} />
+      <Stack.Screen
+        name="BudgetPage"
+        component={BudgetPage}
+        options={{ headerLeft: false }}
+      />
       <Stack.Screen name="Location Search" component={LocationSearch} />
     </Stack.Navigator>
   );
@@ -177,7 +186,15 @@ function MyTabs() {
           headerShown: false,
         }}
       />
-      <Tab.Screen name="Budget" component={BudgetAll} />
+
+      <Tab.Screen
+        name="Budget"
+        component={BudgetAll}
+        options={{
+          tabBarHideOnKeyboard: true,
+          headerShown: false,
+        }}
+
       <Tab.Screen
         name="Report"
         component={ReportsPageAll}
@@ -185,6 +202,7 @@ function MyTabs() {
           headerShown: false,
         }}
       />
+
       <Tab.Screen name="Settings" component={SettingsPage} />
     </Tab.Navigator>
   );
@@ -197,6 +215,14 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+// export default function App() {
+//   return (
+//     <NavigationContainer theme={{ colors: colours.black }}>
+//       <GoalsAll />
+//     </NavigationContainer>
+//   );
+// }
 
 const styles = StyleSheet.create({
   bottomTabIcon: {
