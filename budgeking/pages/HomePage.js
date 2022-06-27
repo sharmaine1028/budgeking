@@ -30,8 +30,6 @@ const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
 };
 
-// getmonthlydata 2 healths
-
 class HomePage extends React.Component {
   constructor() {
     super();
@@ -390,6 +388,7 @@ class HomePage extends React.Component {
   }
 
   generate3ExpensesLR = (doc) => {
+    console.log(doc);
     return (
       <View key={doc.key} style={styles.row}>
         <View style={styles.dateRow}>
