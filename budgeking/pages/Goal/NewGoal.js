@@ -92,7 +92,6 @@ class NewGoal extends React.Component {
                     />
                   );
                 }}
-                style
               />
             </View>
           </View>
@@ -365,7 +364,7 @@ class NewGoal extends React.Component {
         return;
       }
 
-      db.collection("goals").doc(time).collection("active").doc().set({
+      db.collection("goals").doc(timePeriod).collection("active").doc().set({
         createdBy: auth.currentUser.uid,
         goalDescription: this.state.goalDescription,
         target: this.state.target,

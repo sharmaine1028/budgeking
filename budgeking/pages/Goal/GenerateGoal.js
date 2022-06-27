@@ -48,6 +48,15 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
     return unsubscribe;
   });
 
+  const getPercent = () => {
+    const percent = (data.currSavingsAmt / data.target) * 100;
+    if (percent > 100) {
+      return "100%";
+    } else {
+      return (data.currSavingsAmt / data.target) * 100 + "%";
+    }
+  };
+
   const dateFormat = (seconds) => {
     const date = new Date(seconds * 1000);
     const [day, month, year] = [
@@ -169,7 +178,8 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
                 StyleSheet.absoluteFill,
                 {
                   backgroundColor: "#96D3FF",
-                  width: (data.currSavingsAmt / data.target) * 100 + "%",
+                  width: getPercent(),
+                  // width: (data.currSavingsAmt / data.target) * 100 + "%",
                   borderRadius: 5,
                 },
               ]}
