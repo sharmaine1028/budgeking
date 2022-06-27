@@ -285,6 +285,10 @@ class ReportsPageTable extends React.Component {
 
   whatBudget() {
     if (this.state.budget == "Expense" && this.state.expenseArr.length !== 0) {
+      const whichEx = this.whichExpense();
+      if (whichEx.length == 0) {
+        return this.noRecordsFound();
+      }
       return this.sortedArr(this.whichExpense()).map((doc) =>
         this.generateExpensesIncome(doc)
       );
@@ -292,6 +296,10 @@ class ReportsPageTable extends React.Component {
       this.state.budget == "Income" &&
       this.state.incomeArr.length !== 0
     ) {
+      const whichIn = this.whichIncome();
+      if (whichIn.length == 0) {
+        return this.noRecordsFound();
+      }
       return this.sortedArr(this.whichIncome()).map((doc) =>
         this.generateExpensesIncome(doc)
       );
@@ -303,6 +311,14 @@ class ReportsPageTable extends React.Component {
   renderNoRecords = () => {
     return (
       <Text style={{ alignSelf: "center", marginTop: 20 }}>No Records Yet</Text>
+    );
+  };
+
+  noRecordsFound = () => {
+    return (
+      <Text style={{ alignSelf: "center", marginTop: 20 }}>
+        No Records Found
+      </Text>
     );
   };
 

@@ -174,6 +174,7 @@ export default class SignupPage extends React.Component {
             dateTo: new Date(),
             dateFrom: new Date(),
             timeUserWants: "This Month",
+            customExpenseArr: [],
           });
 
           db.collection("userLookup").doc(this.state.email).set({
