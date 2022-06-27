@@ -596,7 +596,8 @@ class HomePage extends React.Component {
               // showTextBackground
               // textBackgroundRadius = {26}
               data={pieData}
-              focusOnPress
+              // focusOnPress={true}
+              // toggleFocusOnPress={true}
               centerLabelComponent={() => {
                 return (
                   <Text

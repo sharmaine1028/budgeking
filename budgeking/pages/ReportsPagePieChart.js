@@ -550,7 +550,7 @@ class ReportsPagePieChart extends React.Component {
               radius={Dimensions.get("window").width * 0.4}
               textSize={15}
               data={pieData}
-              focusOnPress
+              // focusOnPress
               centerLabelComponent={() => {
                 return (
                   <Text
