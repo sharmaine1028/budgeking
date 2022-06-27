@@ -17,7 +17,7 @@ import { Header, Title, SmallTextInput } from "../config/reusableText";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { PieChart } from "react-native-gifted-charts";
-import CurrencyInput from "react-native-currency-input";
+import CurrencyInput, { TextWithCursor } from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SmallBlackButton } from "../config/reusableButton";
 import Icon from "react-native-vector-icons/AntDesign";
@@ -330,8 +330,14 @@ class HomePage extends React.Component {
   show3Expenses() {
     var show3Ex = [];
     const sortedEx = this.sortedArr(this.state.expenseArr);
-    for (let i = 0; i < 3; i++) {
-      show3Ex.push(sortedEx[i]);
+    if (this.state.expenseArr.length <= 3) {
+      for (let i = 0; i < this.state.expenseArr.length; i++) {
+        show3Ex.push(sortedEx[i]);
+      }
+    } else {
+      for (let i = 0; i < 3; i++) {
+        show3Ex.push(sortedEx[i]);
+      }
     }
     return show3Ex;
   }
@@ -388,7 +394,7 @@ class HomePage extends React.Component {
   }
 
   generate3ExpensesLR = (doc) => {
-    console.log("doc", doc);
+    console.log("docs", doc);
     return (
       <View key={doc.key} style={styles.row}>
         <View style={styles.dateRow}>
