@@ -394,7 +394,7 @@ class HomePage extends React.Component {
   }
 
   generate3ExpensesLR = (doc) => {
-    console.log("docs", doc);
+    // console.log("docs", doc);
     return (
       <View key={doc.key} style={styles.row}>
         <View style={styles.dateRow}>
