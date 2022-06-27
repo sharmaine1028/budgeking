@@ -8,9 +8,7 @@ import { auth, db } from "../config/firebase";
 import { BlackButton } from "../config/reusableButton";
 import { GreyLine } from "../config/reusablePart";
 
-// dateFormat, timeFormat() to localdatestring() and localtimestring()
-
-class ReportsPageTable extends React.Component {
+class AllTableView extends React.Component {
   constructor() {
     super();
     this.ExpenseRef = db
@@ -25,9 +23,6 @@ class ReportsPageTable extends React.Component {
       expenseArr: [],
       incomeArr: [],
       budget: "Expense",
-      timeUserWants: "This Month",
-      dateTo: new Date(),
-      dateFrom: new Date(),
     };
   }
 
@@ -38,34 +33,11 @@ class ReportsPageTable extends React.Component {
     this.unsubscribeIncomeRef = this.IncomeRef.onSnapshot(
       this.getCollectionIncome
     );
-    this.callChooseTimeValue();
-    this.callDateValue();
   }
 
   componentWillUnmount() {
     this.unsubscribeExpenseRef();
     this.unsubscribeIncomeRef();
-  }
-
-  callChooseTimeValue() {
-    db.collection("users")
-      .doc(auth.currentUser.uid)
-      .get()
-      .then((doc) => {
-        const { timeUserWants } = doc.data();
-        this.setState({ timeUserWants: timeUserWants });
-      });
-  }
-
-  callDateValue() {
-    db.collection("users")
-      .doc(auth.currentUser.uid)
-      .get()
-      .then((doc) => {
-        const { dateTo, dateFrom } = doc.data();
-        // console.log("calldatetovalues", dateTo, dateFrom);
-        this.setState({ dateTo: dateTo, dateFrom: dateFrom });
-      });
   }
 
   getCollectionExpense = (querySnapshot) => {
@@ -101,68 +73,6 @@ class ReportsPageTable extends React.Component {
       incomeArr: incomeArrPush,
     });
   };
-
-  getMonthlyData(doc) {
-    const currMonth = new Date().getMonth();
-    const currYear = new Date().getFullYear();
-    // console.log("currmonth", currMonth)
-    const arrayTimeConverted = doc;
-    const monthlyArray = [];
-    arrayTimeConverted.map((item, i) => {
-      const dateItem = arrayTimeConverted[i]["date"];
-      // console.log("dateitem", dateItem)
-      if (
-        dateItem.toDate().getMonth() == currMonth &&
-        dateItem.toDate().getFullYear() == currYear
-      ) {
-        monthlyArray.push(arrayTimeConverted[i]);
-      }
-    });
-    return monthlyArray;
-  }
-
-  getDailyData(doc) {
-    const currDate = new Date().toLocaleDateString();
-    const arrayTimeConverted = doc;
-    const dailyArray = [];
-    arrayTimeConverted.map((item, i) => {
-      const dateItem = arrayTimeConverted[i]["date"];
-      if (dateItem.toDate().toLocaleDateString() == currDate) {
-        dailyArray.push(arrayTimeConverted[i]);
-      }
-    });
-    return dailyArray;
-  }
-
-  getYearlyData(doc) {
-    const currYear = new Date().getFullYear();
-    const arrayTimeConverted = doc;
-    const yearlyArray = [];
-    arrayTimeConverted.map((item, i) => {
-      const dateItem = arrayTimeConverted[i]["date"];
-      if (dateItem.toDate().getFullYear() == currYear) {
-        yearlyArray.push(arrayTimeConverted[i]);
-      }
-    });
-    return yearlyArray;
-  }
-
-  getCustomData(doc) {
-    // console.log("dateto", this.state.dateTo.seconds);
-    // console.log("datef", this.state.dateFrom.seconds);
-    let end = this.state.dateTo.seconds;
-    let start = this.state.dateFrom.seconds;
-    const arrayTimeConverted = doc;
-    const customArray = [];
-    arrayTimeConverted.map((item, i) => {
-      const dateItem = arrayTimeConverted[i]["date"];
-      // console.log(dateItem);
-      if (dateItem.seconds >= start && dateItem.seconds <= end) {
-        customArray.push(arrayTimeConverted[i]);
-      }
-    });
-    return customArray;
-  }
 
   // locale date string????
   dateFormat = (seconds) => {
@@ -259,37 +169,13 @@ class ReportsPageTable extends React.Component {
     );
   };
 
-  whichExpense() {
-    if (this.state.timeUserWants === "This Month") {
-      return this.getMonthlyData(this.state.expenseArr);
-    } else if (this.state.timeUserWants == "Today") {
-      return this.getDailyData(this.state.expenseArr);
-    } else if (this.state.timeUserWants == "This Year") {
-      return this.getYearlyData(this.state.expenseArr);
-    } else {
-      return this.getCustomData(this.state.expenseArr);
-    }
-  }
-
-  whichIncome() {
-    if (this.state.timeUserWants === "This Month") {
-      return this.getMonthlyData(this.state.incomeArr);
-    } else if (this.state.timeUserWants == "Today") {
-      return this.getDailyData(this.state.incomeArr);
-    } else if (this.state.timeUserWants == "This Year") {
-      return this.getYearlyData(this.state.incomeArr);
-    } else {
-      return this.getCustomData(this.state.incomeArr);
-    }
-  }
-
   whatBudget() {
     if (this.state.budget == "Expense") {
-      return this.sortedArr(this.whichExpense()).map((doc) =>
+      return this.sortedArr(this.state.expenseArr).map((doc) =>
         this.generateExpensesIncome(doc)
       );
     } else {
-      return this.sortedArr(this.whichIncome()).map((doc) =>
+      return this.sortedArr(this.state.incomeArr).map((doc) =>
         this.generateExpensesIncome(doc)
       );
     }
@@ -410,4 +296,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ReportsPageTable;
+export default AllTableView;

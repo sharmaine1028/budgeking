@@ -25,6 +25,17 @@ class ChooseCustomDate extends React.Component {
     };
   }
 
+  // update pie chart based on update on dateTo and dateFrom
+  // componentDidUpdate(prevProps) {
+  //   if (
+  //     this.props.dateFrom !== prevProps.dateFrom ||
+  //     this.props.dateTo !== prevProps.dateTo
+  //   ) {
+  //     this.fetchData(this.props.dateTo);
+  //     this.fetchData(this.props.dateFrom);
+  //   }
+  // }
+
   updateInputVal(val, prop1, prop2) {
     // console.log(this.state.dateFrom);
     // console.log(this.state.dateTo);
