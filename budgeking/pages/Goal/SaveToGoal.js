@@ -6,13 +6,9 @@ import CurrencyInput from "react-native-currency-input";
 import colours from "../../config/colours";
 import { db } from "../../config/firebase";
 
-LogBox.ignoreLogs([
-  "Non-serializable values were found in the navigation state",
-]);
-
 // Replace object
 function SaveToGoal({ route, navigation }) {
-  const { doc, time, saveToGoal } = route.params;
+  const { doc, time, saveItem } = route.params;
   const [savingsAmt, setSavingsAmt] = useState("0");
   const [currSavingsAmt, setCurrSavingsAmt] = useState(doc.currSavingsAmt);
 
@@ -35,7 +31,7 @@ function SaveToGoal({ route, navigation }) {
       return;
     }
     const newAmt = Number(currSavingsAmt) + Number(val);
-    saveToGoal(doc.id, time, newAmt);
+    saveItem(doc.id, time, newAmt);
     navigation.navigate("Goals");
   };
 

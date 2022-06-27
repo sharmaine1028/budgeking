@@ -37,6 +37,14 @@ class GoalsPage extends React.Component {
       "array-contains",
       auth.currentUser.email
     );
+
+    this.state = {
+      shortTermGoals: [],
+      longTermGoals: [],
+    };
+  }
+
+  componentDidMount() {
     this.unsubscribeShortTermOri = this.shortTermOri.onSnapshot(
       (querySnapshot) => this.getGoals(querySnapshot, "short")
     );
@@ -49,20 +57,12 @@ class GoalsPage extends React.Component {
     this.unsubscribeLongTermShared = this.longTermShared.onSnapshot(
       (querySnapshot) => this.getGoals(querySnapshot, "long")
     );
-    this.state = {
-      shortTermGoals: [],
-      longTermGoals: [],
-    };
-  }
-
-  componentDidMount() {
     this.unsubscribeSavings = this.props.navigation.addListener("focus", () => {
       this.setState({ shortTermGoals: [], longTermGoals: [] });
       this.unsubscribeShortTermOri;
       this.unsubscribeShortTermShared;
       this.unsubscribeLongTermOri;
       this.unsubscribeLongTermShared;
-
       this.setState({
         shortTermGoals: this.state.shortTermGoals,
         longTermGoals: this.state.longTermGoals,
@@ -85,11 +85,7 @@ class GoalsPage extends React.Component {
           <BlackButton
             text={"Add new goals"}
             style={styles.button}
-            onPress={() =>
-              this.props.navigation.navigate("New Goal", {
-                addItem: this.addToGoal,
-              })
-            }
+            onPress={() => this.props.navigation.navigate("New Goal")}
           />
 
           <BlackButton
@@ -151,25 +147,20 @@ class GoalsPage extends React.Component {
     }
   };
 
-  addToGoal = (doc, time) => {
-    db.collection("goals")
-      .doc(time)
-      .collection("active")
-      .doc()
-      .set({
-        createdBy: auth.currentUser.uid,
-        goalDescription: doc.goalDescription,
-        target: doc.target,
-        frequency: doc.frequency,
-        freqAmount: doc.freqAmount,
-        deadline: doc.deadline,
-        notes: doc.notes,
-        isSharing: doc.isSharing,
-        sharingEmails: doc.sharingEmails,
-        sharingUIDs: doc.sharingUIDs,
-        currSavingsAmt: 0,
-      })
-      .catch((err) => console.log(err));
+  editGoal = (id, time, data) => {
+    let ref;
+    if (time === "short term") {
+      const newList = this.state.shortTermGoals.filter(
+        (item) => item.id !== id
+      );
+      this.setState({ shortTermGoals: newList });
+      ref = this.shortTermRef;
+    } else {
+      const newList = this.state.longTermGoals.filter((item) => item.id !== id);
+      this.setState({ longTermGoals: newList });
+      ref = this.longTermRef;
+    }
+    ref.doc(id).update({ currSavingsAmt: newAmt });
   };
 
   saveToGoal = (id, time, newAmt) => {
