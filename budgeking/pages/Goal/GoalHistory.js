@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { BlackButton } from "../config/reusableButton";
-import { Title } from "../config/reusableText";
+import { BlackButton } from "../../config/reusableButton";
+import { Title } from "../../config/reusableText";
 
 function GoalHistory(props) {
   return (
