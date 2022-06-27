@@ -349,7 +349,6 @@ class NewGoal extends React.Component {
         return;
       }
 
-      console.log("hi");
       db.collection("goals").doc(time).collection("active").doc().set({
         createdBy: auth.currentUser.uid,
         goalDescription: this.state.goalDescription,

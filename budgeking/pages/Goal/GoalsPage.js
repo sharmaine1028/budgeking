@@ -77,7 +77,6 @@ class GoalsPage extends React.Component {
         shortTermGoals: this.state.shortTermGoals,
         longTermGoals: this.state.longTermGoals,
       });
-      console.log(this.state.shortTermGoals);
     });
   }
 
