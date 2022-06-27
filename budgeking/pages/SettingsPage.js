@@ -78,8 +78,8 @@ class SettingsPage extends React.Component {
           onPress={(val) => this.updateUserPassword(val)}
         />
 
-        <Title text={"Avatar"} />
-        <RedLine />
+        {/* <Title text={"Avatar"} />
+        <RedLine /> */}
 
         <BlackButton
           text={"Log out"}
