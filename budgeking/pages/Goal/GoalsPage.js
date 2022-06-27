@@ -1,10 +1,14 @@
 import React from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, LogBox } from "react-native";
 import { BlackButton } from "../../config/reusableButton";
 import { Title } from "../../config/reusableText";
 import { auth, db } from "../../config/firebase";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import GenerateGoal from "./GenerateGoal";
+
+LogBox.ignoreLogs([
+  "Non-serializable values were found in the navigation state",
+]);
 
 class GoalsPage extends React.Component {
   constructor() {
@@ -45,6 +49,7 @@ class GoalsPage extends React.Component {
   }
 
   componentDidMount() {
+    this.setState({ shortTermGoals: [], longTermGoals: [] });
     this.unsubscribeShortTermOri = this.shortTermOri.onSnapshot(
       (querySnapshot) => this.getGoals(querySnapshot, "short")
     );
@@ -57,6 +62,11 @@ class GoalsPage extends React.Component {
     this.unsubscribeLongTermShared = this.longTermShared.onSnapshot(
       (querySnapshot) => this.getGoals(querySnapshot, "long")
     );
+    this.setState({
+      shortTermGoals: this.state.shortTermGoals,
+      longTermGoals: this.state.longTermGoals,
+    });
+
     this.unsubscribeSavings = this.props.navigation.addListener("focus", () => {
       this.setState({ shortTermGoals: [], longTermGoals: [] });
       this.unsubscribeShortTermOri;
@@ -67,6 +77,7 @@ class GoalsPage extends React.Component {
         shortTermGoals: this.state.shortTermGoals,
         longTermGoals: this.state.longTermGoals,
       });
+      console.log(this.state.shortTermGoals);
     });
   }
 
@@ -123,12 +134,16 @@ class GoalsPage extends React.Component {
     );
   }
 
-  getGoals = async (querySnapshot, timePeriod) => {
+  getGoals = (querySnapshot, timePeriod) => {
     try {
       const activeGoals = [];
 
-      await querySnapshot.forEach((doc) => {
-        activeGoals.push({ ...doc.data(), id: doc.id });
+      querySnapshot.forEach((doc) => {
+        if (
+          this.state.shortTermGoals.some((x) => x.id === doc.id) ||
+          this.state.longTermGoals.some((x) => x.id === doc.id)
+        )
+          activeGoals.push({ ...doc.data(), id: doc.id });
       });
 
       if (timePeriod === "short") {
@@ -147,6 +162,8 @@ class GoalsPage extends React.Component {
     }
   };
 
+  addGoal = (doc, time) => {};
+
   editGoal = (id, time, data) => {
     let ref;
     if (time === "short term") {
@@ -160,7 +177,7 @@ class GoalsPage extends React.Component {
       this.setState({ longTermGoals: newList });
       ref = this.longTermRef;
     }
-    ref.doc(id).update({ currSavingsAmt: newAmt });
+    // ref.doc(id).update({ currSavingsAmt: newAmt });
   };
 
   saveToGoal = (id, time, newAmt) => {

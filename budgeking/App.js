@@ -62,9 +62,18 @@ function BudgetAll() {
   return (
     <Stack.Navigator
       initialRouteName="Budget"
-      screenOptions={{ headerShown: false }}
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colours.whiteRock,
+        },
+        cardStyle: { backgroundColor: colours.white },
+      }}
     >
-      <Stack.Screen name="BudgetPage" component={BudgetPage} />
+      <Stack.Screen
+        name="Budget"
+        component={BudgetPage}
+        options={{ headerLeft: false }}
+      />
       <Stack.Screen name="Location Search" component={LocationSearch} />
     </Stack.Navigator>
   );
@@ -140,7 +149,7 @@ function MyTabs() {
       })}
       sceneContainerStyle={{ backgroundColor: colours.white }}
     >
-      <Tab.Screen name="Home" component={HomePage} />
+      {/* <Tab.Screen name="Home" component={HomePage} /> */}
       <Tab.Screen
         name="Goal"
         component={GoalsAll}
@@ -149,7 +158,14 @@ function MyTabs() {
           headerShown: false,
         }}
       />
-      <Tab.Screen name="Budget" component={BudgetAll} />
+      <Tab.Screen
+        name="Budget"
+        component={BudgetAll}
+        options={{
+          tabBarHideOnKeyboard: true,
+          headerShown: false,
+        }}
+      />
       <Tab.Screen
         name="Report"
         component={ReportsPageAll}

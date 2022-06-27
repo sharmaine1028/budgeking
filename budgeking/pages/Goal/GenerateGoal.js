@@ -129,13 +129,13 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
           }
           onRequestClose={() => hideMenu(data.id)}
         >
-          <MenuItem
+          {/* <MenuItem
             onPress={() =>
               navigation.navigate("Edit Goal", { doc: doc, time: time })
             }
           >
             Edit
-          </MenuItem>
+          </MenuItem> */}
 
           <MenuItem
             onPress={() => {
