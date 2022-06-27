@@ -19,7 +19,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 class NewGoal extends React.Component {
   constructor() {
     super();
-    this.frequency = ["Daily", "Weekly", "Yearly"];
+    this.frequency = ["Daily", "Weekly", "Monthly", "Yearly"];
     this.state = {
       datePicker: false,
       goalDescription: "",
@@ -87,7 +87,7 @@ class NewGoal extends React.Component {
                   return (
                     <FontAwesome
                       name={isOpened ? "chevron-up" : "chevron-down"}
-                      color={colours.red}
+                      color={colours.black}
                       size={18}
                     />
                   );

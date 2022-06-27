@@ -67,8 +67,6 @@ function EditGoal({ route, navigation }) {
     if (data.target === "") return;
     const today = new Date();
 
-    console.log(data.deadline, data.target);
-
     const deadline =
       data.deadline instanceof Date
         ? data.deadline
@@ -102,8 +100,6 @@ function EditGoal({ route, navigation }) {
     const format = (num) => {
       return (Math.ceil(num * 100) / 100).toFixed(2);
     };
-
-    console.log(freqAmount);
 
     setData({ ...data, freqAmount: format(freqAmount) });
   };
@@ -147,7 +143,6 @@ function EditGoal({ route, navigation }) {
             <Picker
               selectedValue={data.frequency}
               onValueChange={(itemValue, itemIndex) => {
-                console.log(itemValue);
                 setData({ ...data, frequency: itemValue });
               }}
               mode="dialog"
