@@ -75,11 +75,13 @@ class ReportsPagePieChart extends React.Component {
 
   // calling budgetValue from firestore
   componentDidMount() {
+    this.setState({ dateTo: new Date(), dateFrom: new Date() });
     this.unsubscribe = this.fireStoreRef.onSnapshot(this.getCollection);
     this.callDatesValue();
     this.callChooseTimeValue();
-    // this.focusListener = this.props.navigation.addListener("focus", () => {
-    //   this.getCustomData();
+    // this.setState({
+    //   dateTo: this.state.shortTermGoals,
+    //   longTermGoals: this.state.longTermGoals,
     // });
   }
 
