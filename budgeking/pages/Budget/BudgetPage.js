@@ -25,6 +25,7 @@ import CurrencyInput from "react-native-currency-input";
 class BudgetPage extends React.Component {
   constructor() {
     super();
+    this.expenseCategory = [];
     this.state = {
       address: "",
       budget: "Expense",

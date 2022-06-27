@@ -41,15 +41,6 @@ class GoalsPage extends React.Component {
       "array-contains",
       auth.currentUser.email
     );
-
-    this.state = {
-      shortTermGoals: [],
-      longTermGoals: [],
-    };
-  }
-
-  componentDidMount() {
-    this.setState({ shortTermGoals: [], longTermGoals: [] });
     this.unsubscribeShortTermOri = this.shortTermOri.onSnapshot(
       (querySnapshot) => this.getGoals(querySnapshot, "short")
     );
@@ -62,11 +53,13 @@ class GoalsPage extends React.Component {
     this.unsubscribeLongTermShared = this.longTermShared.onSnapshot(
       (querySnapshot) => this.getGoals(querySnapshot, "long")
     );
-    this.setState({
-      shortTermGoals: this.state.shortTermGoals,
-      longTermGoals: this.state.longTermGoals,
-    });
+    this.state = {
+      shortTermGoals: [],
+      longTermGoals: [],
+    };
+  }
 
+  componentDidMount() {
     this.unsubscribeSavings = this.props.navigation.addListener("focus", () => {
       this.setState({ shortTermGoals: [], longTermGoals: [] });
       this.unsubscribeShortTermOri;
@@ -98,11 +91,11 @@ class GoalsPage extends React.Component {
             onPress={() => this.props.navigation.navigate("New Goal")}
           />
 
-          <BlackButton
+          {/* <BlackButton
             text={"Show goal history"}
             style={styles.button}
             onPress={() => this.props.navigation.navigate("Goal History")}
-          />
+          /> */}
         </View>
         <Title text={"Short-term goals"} />
         {this.state.shortTermGoals.length !== 0
@@ -135,25 +128,25 @@ class GoalsPage extends React.Component {
 
   getGoals = (querySnapshot, timePeriod) => {
     try {
-      const activeGoals = [];
-
-      querySnapshot.forEach((doc) => {
-        if (
-          this.state.shortTermGoals.some((x) => x.id === doc.id) ||
-          this.state.longTermGoals.some((x) => x.id === doc.id)
-        )
-          activeGoals.push({ ...doc.data(), id: doc.id });
-      });
-
       if (timePeriod === "short") {
+        let newState = this.state.shortTermGoals;
+        querySnapshot.forEach((doc) => {
+          newState = newState.filter((item) => item.id !== doc.id);
+          newState.push({ ...doc.data(), id: doc.id });
+        });
         this.setState({
-          shortTermGoals: [...this.state.shortTermGoals, ...activeGoals],
+          shortTermGoals: newState,
         });
       }
 
       if (timePeriod === "long") {
+        let newState = this.state.longTermGoals;
+        querySnapshot.forEach((doc) => {
+          newState = newState.filter((item) => item.id !== doc.id);
+          newState.push({ ...doc.data(), id: doc.id });
+        });
         this.setState({
-          longTermGoals: [...this.state.longTermGoals, ...activeGoals],
+          longTermGoals: newState,
         });
       }
     } catch {

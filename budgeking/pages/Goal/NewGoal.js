@@ -9,15 +9,17 @@ import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import colours from "../../config/colours";
-import { Picker } from "@react-native-picker/picker";
 import { TextInput } from "react-native-gesture-handler";
 import CurrencyInput from "react-native-currency-input";
 import { auth, db } from "../../config/firebase";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import SelectDropdown from "react-native-select-dropdown";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 class NewGoal extends React.Component {
   constructor() {
     super();
+    this.frequency = ["Daily", "Weekly", "Yearly"];
     this.state = {
       datePicker: false,
       goalDescription: "",
@@ -34,7 +36,9 @@ class NewGoal extends React.Component {
   }
   render() {
     return (
-      <KeyboardAwareScrollView contentContainerStyle={{ margin: 5 }}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={{ margin: 5, paddingBottom: 20 }}
+      >
         <NewGoalInput
           title={"Goal Description"}
           onChangeText={(val) => this.updateInputVal(val, "goalDescription")}
@@ -63,21 +67,32 @@ class NewGoal extends React.Component {
             <TextInput style={{ flex: 0.6 }} editable={false}>
               ${this.state.freqAmount}
             </TextInput>
-            <View style={styles.frequencyDropdown}>
-              <Picker
-                selectedValue={this.state.frequency}
-                onValueChange={(itemValue, itemIndex) => {
+            <View style={{ flex: 0.8 }}>
+              <SelectDropdown
+                buttonStyle={styles.frequencyDropdown}
+                buttonTextStyle={{ fontSize: 15 }}
+                data={this.frequency}
+                onSelect={(itemValue, itemIndex) => {
                   this.updateInputVal(itemValue, "frequency");
                   this.updateFreqAmount();
                 }}
-                mode="dialog"
-              >
-                <Picker.Item label="Select" enabled={false} />
-                <Picker.Item label="Daily" value="daily" />
-                <Picker.Item label="Weekly" value="weekly" />
-                <Picker.Item label="Monthly" value="monthly" />
-                <Picker.Item label="Yearly" value="yearly" />
-              </Picker>
+                defaultButtonText={"Select"}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                  return selectedItem;
+                }}
+                rowTextForSelection={(item, index) => {
+                  return item;
+                }}
+                renderDropdownIcon={(isOpened) => {
+                  return (
+                    <FontAwesome
+                      name={isOpened ? "chevron-up" : "chevron-down"}
+                      color={colours.red}
+                      size={18}
+                    />
+                  );
+                }}
+              />
             </View>
           </View>
         </View>
@@ -233,16 +248,16 @@ class NewGoal extends React.Component {
     const years = deadline.getFullYear() - today.getFullYear();
     let freqAmount;
 
-    if (this.state.frequency === "yearly") {
+    if (this.state.frequency === "Yearly") {
       freqAmount = years === 0 ? target : target / years;
-    } else if (this.state.frequency === "monthly") {
+    } else if (this.state.frequency === "Monthly") {
       const months =
         years * 12 + deadline.getMonth() - today.getMonth() <= 0
           ? 0
           : years * 12 + deadline.getMonth() - today.getMonth();
 
       freqAmount = months === 0 ? target : target / months;
-    } else if (this.state.frequency === "weekly") {
+    } else if (this.state.frequency === "Weekly") {
       const msInWeek = 1000 * 60 * 60 * 24 * 7;
       const weeks = Math.round(Math.abs(deadline - today) / msInWeek);
       freqAmount = weeks === 0 ? target : target / weeks;
@@ -349,7 +364,7 @@ class NewGoal extends React.Component {
         return;
       }
 
-      db.collection("goals").doc(time).collection("active").doc().set({
+      db.collection("goals").doc(timePeriod).collection("active").doc().set({
         createdBy: auth.currentUser.uid,
         goalDescription: this.state.goalDescription,
         target: this.state.target,
@@ -396,12 +411,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   frequencyDropdown: {
-    flex: 0.4,
     backgroundColor: colours.darkBrown,
     borderRadius: 30,
-    width: 100,
-    height: 40,
-    justifyContent: "center",
   },
   newGoalInput: {
     backgroundColor: colours.lightBrown,
