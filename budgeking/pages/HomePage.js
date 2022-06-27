@@ -388,7 +388,7 @@ class HomePage extends React.Component {
   }
 
   generate3ExpensesLR = (doc) => {
-    console.log(doc);
+    console.log("doc", doc);
     return (
       <View key={doc.key} style={styles.row}>
         <View style={styles.dateRow}>
@@ -422,6 +422,12 @@ class HomePage extends React.Component {
         </View>
         <GreyLine />
       </View>
+    );
+  };
+
+  renderNoRecords = () => {
+    return (
+      <Text style={{ alignSelf: "center", marginTop: 20 }}>No Records Yet</Text>
     );
   };
 
@@ -614,7 +620,10 @@ class HomePage extends React.Component {
           <View style={styles.lastRecordTitle}>
             <Header style={styles.lastRecordText} text={"Last records"} />
             <RedLine />
-            {this.show3Expenses().map((doc) => this.generate3ExpensesLR(doc))}
+            {/* console.log(this.state.expenseArr.length) */}
+            {this.state.expenseArr.length !== 0
+              ? this.show3Expenses().map((doc) => this.generate3ExpensesLR(doc))
+              : this.renderNoRecords()}
             <BlackButton
               text={"Show more"}
               style={{ flexGrow: 0.5, marginTop: 10, marginBottom: 10 }}
