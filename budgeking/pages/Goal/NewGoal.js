@@ -349,12 +349,7 @@ class NewGoal extends React.Component {
         return;
       }
 
-<<<<<<< HEAD
-      console.log("hi");
-      db.collection("goals").doc(timePeriod).collection("active").doc().set({
-=======
       db.collection("goals").doc(time).collection("active").doc().set({
->>>>>>> origin
         createdBy: auth.currentUser.uid,
         goalDescription: this.state.goalDescription,
         target: this.state.target,

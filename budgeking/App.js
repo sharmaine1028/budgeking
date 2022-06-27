@@ -175,13 +175,13 @@ function MyTabs() {
       })}
       sceneContainerStyle={{ backgroundColor: colours.white }}
     >
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Home"
         component={HomePageAll}
         options={{
           headerShown: false,
         }}
-      /> */}
+      />
       <Tab.Screen
         name="Goal"
         component={GoalsAll}

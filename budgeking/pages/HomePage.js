@@ -400,7 +400,7 @@ class HomePage extends React.Component {
         <View style={styles.dateRow}>
           <Icon.Button
             name="arrowright"
-            size="20%"
+            size={20}
             color={colours.tomato}
             backgroundColor={"transparent"}
             iconStyle={{ marginLeft: 5, marginRight: 0 }}
