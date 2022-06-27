@@ -374,6 +374,14 @@ class BudgetPage extends React.Component {
         .doc();
     }
 
+    console.log(this.state.location, this.state.address);
+    if (this.state.location === undefined || this.state.address === undefined) {
+      this.updateInputVal(null, "location");
+      this.updateInputVal("", "address");
+    }
+
+    console.log(this.state.location, this.state.address);
+
     // Set fields accordingly
     currDb.set({
       date: this.state.date,

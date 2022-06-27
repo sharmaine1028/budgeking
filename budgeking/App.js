@@ -190,7 +190,6 @@ function MyTabs() {
           headerShown: false,
         }}
       />
-
       <Tab.Screen
         name="Budget"
         component={BudgetAll}
@@ -199,7 +198,6 @@ function MyTabs() {
           headerShown: false,
         }}
       />
-
       <Tab.Screen
         name="Report"
         component={ReportsPageAll}
