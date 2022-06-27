@@ -83,17 +83,17 @@ class ReportsPagePieChart extends React.Component {
     // });
   }
 
+  componentWillUnmount() {
+    this.unsubscribe();
+    // this.focusListener();
+  }
+
   inputChooseTimeFireStore = () => {
     // console.log(this.state.timeUserWants)
     db.collection("users").doc(auth.currentUser.uid).update({
       timeUserWants: this.state.timeUserWants,
     });
   };
-
-  componentWillUnmount() {
-    this.unsubscribe();
-    // this.focusListener();
-  }
 
   // update pie chart based on update on dateTo and dateFrom
   // componentDidUpdate(prevProps) {
