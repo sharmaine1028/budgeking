@@ -124,7 +124,7 @@ export class LocationSearch extends React.Component {
       alert("Enter a location");
     } else {
       this.props.navigation.navigate({
-        name: "BudgetPage",
+        name: "Budget",
         params: {
           address: this.state.address,
           location: this.state.location,

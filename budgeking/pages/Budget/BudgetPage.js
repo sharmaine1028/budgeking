@@ -337,6 +337,7 @@ class BudgetPage extends React.Component {
             }
             this.updateInputVal(itemValue, "category");
           }}
+          mode="dropdown"
         >
           <Picker.Item label="Please select a category" enabled={false} />
           <Picker.Item label="Salary" value="salary" />

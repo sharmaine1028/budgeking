@@ -76,7 +76,7 @@ function BudgetAll() {
       }}
     >
       <Stack.Screen
-        name="BudgetPage"
+        name="Budget"
         component={BudgetPage}
         options={{ headerLeft: false }}
       />

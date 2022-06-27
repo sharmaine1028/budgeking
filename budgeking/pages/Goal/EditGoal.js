@@ -145,7 +145,7 @@ function EditGoal({ route, navigation }) {
               onValueChange={(itemValue, itemIndex) => {
                 setData({ ...data, frequency: itemValue });
               }}
-              mode="dialog"
+              mode="dropdown"
             >
               <Picker.Item label="Select" enabled={false} />
               <Picker.Item label="Daily" value="daily" />
