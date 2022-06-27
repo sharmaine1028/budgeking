@@ -70,7 +70,7 @@ function BudgetAll() {
       }}
     >
       <Stack.Screen
-        name="Budget"
+        name="BudgetPage"
         component={BudgetPage}
         options={{ headerLeft: false }}
       />
@@ -99,6 +99,28 @@ function ReportsPageAll() {
       <Stack.Screen name="Pie Chart View" component={ReportsPagePieChart} />
       <Stack.Screen name="Custom Date" component={ChooseCustomDate} />
       <Stack.Screen name="Table View" component={ReportsPageTable} />
+    </Stack.Navigator>
+  );
+}
+
+function HomePageAll() {
+  return (
+    <Stack.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colours.whiteRock,
+        },
+        cardStyle: { backgroundColor: colours.white },
+      }}
+    >
+      <Stack.Screen
+        name="Home"
+        component={HomePage}
+        options={{ headerLeft: false }}
+      />
+      <Stack.Screen name="HomePage" component={HomePage} />
+      <Stack.Screen name="All Table View" component={AllTableView} />
     </Stack.Navigator>
   );
 }
@@ -149,7 +171,13 @@ function MyTabs() {
       })}
       sceneContainerStyle={{ backgroundColor: colours.white }}
     >
-      {/* <Tab.Screen name="Home" component={HomePage} /> */}
+      <Tab.Screen
+        name="Home"
+        component={HomePageAll}
+        options={{
+          headerShown: false,
+        }}
+      />
       <Tab.Screen
         name="Goal"
         component={GoalsAll}
@@ -173,6 +201,7 @@ function MyTabs() {
           headerShown: false,
         }}
       />
+
       <Tab.Screen name="Settings" component={SettingsPage} />
     </Tab.Navigator>
   );

@@ -17,7 +17,6 @@ import { BlackButton } from "../config/reusableButton";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-// **************getMonthlyData, getYearlyData() wrong => add key to list??
 // **************custom date choosing - chart only changes after refreshing (idk how to refresh)
 
 const wait = (timeout) => {
@@ -57,7 +56,7 @@ class ReportsPagePieChart extends React.Component {
     };
   }
 
-  updateInputVal(val, prop) {
+  updateInputValCurrExpenseArr(val, prop) {
     const state = this.state;
     state[prop] = val;
     this.setState(state);
@@ -68,11 +67,20 @@ class ReportsPagePieChart extends React.Component {
   //   wait(2000).then(() => this.setState({ setRefreshing: false }));
   // };
 
+  updateInputVal(val, prop) {
+    const state = this.state;
+    state[prop] = val;
+    this.setState(state);
+  }
+
   // calling budgetValue from firestore
   componentDidMount() {
     this.unsubscribe = this.fireStoreRef.onSnapshot(this.getCollection);
     this.callDatesValue();
     this.callChooseTimeValue();
+    // this.focusListener = this.props.navigation.addListener("focus", () => {
+    //   this.getCustomData();
+    // });
   }
 
   inputChooseTimeFireStore = () => {
@@ -84,7 +92,23 @@ class ReportsPagePieChart extends React.Component {
 
   componentWillUnmount() {
     this.unsubscribe();
+    // this.focusListener();
   }
+
+  // update pie chart based on update on dateTo and dateFrom
+  // componentDidUpdate(prevProps) {
+  //   console.log("componentdidupdatedateto", this.state.dateTo);
+  //   console.log("componentdidupdatedatef", this.state.dateFrom);
+  //   if (
+  //     this.props.dateFrom !== prevProps.dateFrom ||
+  //     this.props.dateTo !== prevProps.dateTo
+  //   ) {
+  //     this.fetchData(this.props.dateTo);
+  //     this.fetchData(this.props.dateFrom);
+  //   }
+  //   console.log("componentdidupdatedateto", this.state.dateTo);
+  //   console.log("componentdidupdatedatef", this.state.dateFrom);
+  // }
 
   getCollection = (querySnapshot) => {
     const expenseArrPush = [];
@@ -140,7 +164,7 @@ class ReportsPagePieChart extends React.Component {
     this.getMonthlyData().map((item, i) => {
       sum += item.value;
     });
-    return sum;
+    return sum.toFixed(2);
   }
 
   addExpensesDaily() {
@@ -148,7 +172,7 @@ class ReportsPagePieChart extends React.Component {
     this.getDailyData().map((item, i) => {
       sum += item.value;
     });
-    return sum;
+    return sum.toFixed(2);
   }
 
   addExpensesYearly() {
@@ -156,7 +180,7 @@ class ReportsPagePieChart extends React.Component {
     this.getYearlyData().map((item, i) => {
       sum += item.value;
     });
-    return sum;
+    return sum.toFixed(2);
   }
 
   addExpensesCustom() {
@@ -164,7 +188,7 @@ class ReportsPagePieChart extends React.Component {
     this.getCustomData().map((item, i) => {
       sum += item.value;
     });
-    return sum;
+    return sum.toFixed(2);
   }
 
   updatePieData() {
@@ -343,15 +367,10 @@ class ReportsPagePieChart extends React.Component {
   getYearlyData() {
     const currYear = new Date().getFullYear();
     const expenseArrayTimeConverted = this.state.expenseArr;
-    // const expenseItems = expenseArrayTimeConverted.map((i) => (
-    //   <li key={i.uid}>{i}</li>
-    // ));
-    // console.log("expense item", expenseItems);
     const yearlyExpenseArray = [];
     expenseArrayTimeConverted.map((item, i) => {
       const dateItem = expenseArrayTimeConverted[i]["date"];
       if (dateItem.toDate().getFullYear() == currYear) {
-        // second health UXhKu3Nk5nOi6PdeHMt2 replacing first health
         yearlyExpenseArray.push(expenseArrayTimeConverted[i]);
       }
     });
@@ -359,19 +378,19 @@ class ReportsPagePieChart extends React.Component {
   }
 
   getCustomData() {
-    console.log("dateto", this.state.dateTo.toDate());
-    console.log("datef", this.state.dateFrom.toDate());
-    let end = this.state.dateTo.toDate();
-    let start = this.state.dateFrom.toDate();
+    // console.log("dateto", this.state.dateTo.toDate());
+    // console.log("datef", this.state.dateFrom.toDate());
+    let end = this.state.dateTo.seconds;
+    let start = this.state.dateFrom.seconds;
     const expenseArrayTimeConverted = this.state.expenseArr;
-    const dailyExpenseArray = [];
+    const customExpenseArray = [];
     expenseArrayTimeConverted.map((item, i) => {
       const dateItem = expenseArrayTimeConverted[i]["date"];
-      if (dateItem.toDate() >= start && dateItem.toDate() <= end) {
-        dailyExpenseArray.push(expenseArrayTimeConverted[i]);
+      if (dateItem.seconds >= start && dateItem.seconds <= end) {
+        customExpenseArray.push(expenseArrayTimeConverted[i]);
       }
     });
-    return dailyExpenseArray;
+    return customExpenseArray;
   }
 
   toggleMonthlyDailyYearly = (val) => {
@@ -403,6 +422,18 @@ class ReportsPagePieChart extends React.Component {
       dayText += this.state.dateTo.toDate().toLocaleDateString();
     }
     return dayText;
+  }
+
+  timeUserWantText() {
+    if (this.state.timeUserWants == "This Month") {
+      return "monthly";
+    } else if (this.state.timeUserWants == "Today") {
+      return "daily";
+    } else if (this.state.timeUserWants == "This Year") {
+      return "yearly";
+    } else {
+      return "custom";
+    }
   }
 
   onDateSelected = (event, value) => {
@@ -455,9 +486,7 @@ class ReportsPagePieChart extends React.Component {
           > */}
           <View style={styles.reportPieChart}>
             <Header
-              text={`${"\n"}Categories (${this.textBesideCategories()} ${
-                this.state.timeUserWants
-              } expenses)\n\n`}
+              text={`${"\n"}Categories (${this.textBesideCategories()} ${this.timeUserWantText()} expenses)\n\n`}
             />
 
             <PieChart
@@ -506,7 +535,7 @@ class ReportsPagePieChart extends React.Component {
             <SelectDropdown
               data={this.state.timePeriod}
               onSelect={(selectedItem, index) => {
-                console.log(selectedItem, index);
+                // console.log(selectedItem, index);
                 return this.toggleMonthlyDailyYearly(index);
               }}
               defaultButtonText={this.state.timeUserWants}

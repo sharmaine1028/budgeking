@@ -13,4 +13,5 @@ export default {
   grey: "#E0E0E0",
   darkgrey: "#6C757D",
   whiteRock: "#e8e0ce",
+  beige: "#F9F4F1",
 };

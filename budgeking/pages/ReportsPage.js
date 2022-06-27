@@ -59,7 +59,7 @@ class ReportsPage extends React.Component {
     this.state.expenseArr.map((item, i) => {
       sum += item.value;
     });
-    return sum; //255.78
+    return sum.toFixed(2); //255.78
   }
 
   render() {
