@@ -14,6 +14,10 @@ import LocationSearch from "./pages/Budget/LocationSearch";
 import NewGoal from "./pages/Goal/NewGoal";
 import SaveToGoal from "./pages/Goal/SaveToGoal";
 import EditGoal from "./pages/Goal/EditGoal";
+import AllTableView from "./pages/AllTableView";
+import ReportsPagePieChart from "./pages/ReportsPagePieChart";
+import ChooseCustomDate from "./pages/ChooseCustomDate";
+import ReportsPageTable from "./pages/ReportsPageTable";
 import GoalHistory from "./pages/Goal/GoalHistory";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -194,6 +198,7 @@ function MyTabs() {
           tabBarHideOnKeyboard: true,
           headerShown: false,
         }}
+      />
 
       <Tab.Screen
         name="Report"
