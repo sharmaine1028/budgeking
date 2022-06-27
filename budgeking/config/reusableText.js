@@ -66,12 +66,14 @@ export function ImageTextInput({
   placeholder,
   editable,
   onChangeText,
+  style,
 }) {
   return (
     <View
       style={[
         styles.whiteInput,
         { flexDirection: "row", justifyContent: "space-between" },
+        style,
       ]}
     >
       <TextInput
@@ -87,6 +89,41 @@ export function ImageTextInput({
           style={{
             width: 20,
             height: 20,
+            alignSelf: "center",
+          }}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+export function SmallTextInput({
+  value,
+  onPress,
+  source,
+  placeholder,
+  editable,
+  onChangeText,
+}) {
+  return (
+    <View
+      style={[
+        styles.whiteInput,
+        { flexDirection: "row", justifyContent: "space-between" },
+      ]}
+    >
+      <TextInput
+        placeholder={placeholder}
+        value={value}
+        editable={editable}
+        onChangeText={onChangeText}
+      />
+      <TouchableOpacity onPress={onPress} style={{ justifyContent: "center" }}>
+        <Image
+          source={source}
+          style={{
+            width: 10,
+            height: 10,
             alignSelf: "center",
           }}
         />
@@ -129,6 +166,8 @@ export function NewGoalInput({
   onChangeText,
   onChange,
   value,
+  keyboardType,
+  onKeyPress,
 }) {
   return (
     <View style={styles.newGoalInput}>
@@ -140,6 +179,8 @@ export function NewGoalInput({
         value={value}
         autoCapitalize="none"
         maxLength={maxLength}
+        keyboardType={keyboardType}
+        onKeyPress={onKeyPress}
       />
     </View>
   );
@@ -168,7 +209,7 @@ export function BudgetInput({
   );
 }
 
-export function YesOrNo({ title }) {
+export function YesOrNo({ title, selectedBtn }) {
   const data = [{ label: "Yes" }, { label: "No" }];
   return (
     <View style={styles.newGoalInput}>
@@ -179,6 +220,7 @@ export function YesOrNo({ title }) {
         circleSize={10}
         deactiveColor={colours.white}
         initial={2}
+        selectedBtn={selectedBtn}
       />
     </View>
   );

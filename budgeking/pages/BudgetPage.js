@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import React from "react";
 import {
   Image,
   View,
@@ -178,6 +178,9 @@ class BudgetPage extends React.Component {
     this.setState(state);
   }
 
+  /**
+   * Toggle between expense and income
+   */
   budgetButtons = () => {
     return (
       <View style={styles.tabContainer}>
@@ -199,17 +202,15 @@ class BudgetPage extends React.Component {
     );
   };
 
+  /**
+   * The below four functions handles logic for showing the date and time picker correctly
+   */
   showDatePicker = () => {
     this.setState({ datePicker: true });
   };
 
   showTimePicker = () => {
     this.setState({ timePicker: true });
-  };
-
-  showLocationPicker = () => {
-    this.setState({ locationPicker: true });
-    this.props.navigation.navigate("Location Search");
   };
 
   onDateSelected = (event, value) => {
@@ -226,6 +227,10 @@ class BudgetPage extends React.Component {
     });
   };
 
+  /**
+   * The below two functions ensure that date and time is
+   * formatted correctly.
+   */
   dateFormat = () => {
     const [day, month, year] = [
       this.state.date.getDate(),
@@ -262,6 +267,9 @@ class BudgetPage extends React.Component {
     return hour.toString() + ":" + minute.toString();
   };
 
+  /**
+   * Allows user to pick images from gallery
+   */
   pickImage = async () => {
     try {
       let pickerResult = await ImagePicker.launchImageLibraryAsync({
@@ -274,6 +282,18 @@ class BudgetPage extends React.Component {
     }
   };
 
+  /**
+   * Navigates to Location Search page
+   */
+  showLocationPicker = () => {
+    this.setState({ locationPicker: true });
+    this.props.navigation.navigate("Location Search");
+  };
+
+  /**
+   * Updates state if user changes location in
+   * location search page
+   */
   maybeLocation = () => {
     const address = this.props.route.params?.address;
     const location = this.props.route.params?.location;
@@ -282,6 +302,10 @@ class BudgetPage extends React.Component {
     }
   };
 
+  /**
+   * Updates categories in dropdown menu according to whether
+   * user chooses expense or income
+   */
   maybeCategories = () => {
     if (this.state.budget === "Expense") {
       return (
@@ -323,13 +347,19 @@ class BudgetPage extends React.Component {
     }
   };
 
+  /**
+   * Updates user's expenses or income in firebase and resets fields
+   */
   addToGoals = () => {
-    // TODO
+    // Error handling if user does not fill in necessary fields
     if (this.state.value === "0.00" || this.state.category === "") {
       alert("Please enter both value and category");
       return;
     }
+
     let currDb = db;
+
+    // Navigate to correct doc in firestore
     if (this.state.budget === "Expense") {
       currDb = db
         .collection("users")
@@ -343,6 +373,8 @@ class BudgetPage extends React.Component {
         .collection("income")
         .doc();
     }
+
+    // Set fields accordingly
     currDb.set({
       date: this.state.date,
       time: this.state.time,
@@ -353,10 +385,15 @@ class BudgetPage extends React.Component {
       location: this.state.location,
       category: this.state.category,
     });
+
     alert("Budget updated");
+
     this.reset();
   };
 
+  /**
+   * Resets all fields in form including location and address in location search page
+   */
   reset = () => {
     let budget = this.state.budget;
     this.setState({ budget: budget });
@@ -374,7 +411,6 @@ class BudgetPage extends React.Component {
       locationRegion: null,
     });
     this.props.navigation.setParams({ address: "", location: null });
-    // console.log(this.state);
   };
 }
 

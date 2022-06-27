@@ -15,3 +15,14 @@ export default function RedLine() {
     />
   );
 }
+
+export function GreyLine() {
+  return (
+    <Divider
+      orientation="horizontal"
+      color={colours.grey}
+      width={2}
+      style={{ marginVertical: 3 }}
+    />
+  );
+}

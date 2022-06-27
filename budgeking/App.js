@@ -1,3 +1,4 @@
+import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Platform, StyleSheet, StatusBar, Image } from "react-native";
@@ -10,6 +11,9 @@ import GoalsPage from "./pages/GoalsPage";
 import BudgetPage from "./pages/BudgetPage";
 import ReportsPage from "./pages/ReportsPage";
 import LocationSearch from "./pages/LocationSearch";
+import ReportsPagePieChart from "./pages/ReportsPagePieChart";
+import ReportsPageTable from "./pages/ReportsPageTable";
+import ChooseCustomDate from "./pages/ChooseCustomDate";
 import NewGoal from "./pages/NewGoal";
 import GoalHistory from "./pages/GoalHistory";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -17,14 +21,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-
-// export default function App() {
-//   return (
-//     <NavigationContainer>
-//       <BudgetAll />
-//     </NavigationContainer>
-//   );
-// }
 
 function MyStack() {
   return (
@@ -82,6 +78,30 @@ function BudgetAll() {
   );
 }
 
+function ReportsPageAll() {
+  return (
+    <Stack.Navigator
+      initialRouteName="Report"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colours.whiteRock,
+        },
+        cardStyle: { backgroundColor: colours.white },
+      }}
+    >
+      <Stack.Screen
+        name="Report"
+        component={ReportsPage}
+        options={{ headerLeft: false }}
+      />
+      <Stack.Screen name="ReportsPage" component={ReportsPage} />
+      <Stack.Screen name="Pie Chart View" component={ReportsPagePieChart} />
+      <Stack.Screen name="Custom Date" component={ChooseCustomDate} />
+      <Stack.Screen name="Table View" component={ReportsPageTable} />
+    </Stack.Navigator>
+  );
+}
+
 const screenOptions = (route, color) => {
   let iconName;
   switch (route.name) {
@@ -108,6 +128,7 @@ const screenOptions = (route, color) => {
   }
   return <MaterialCommunityIcons name={iconName} color={color} size={28} />;
 };
+
 function MyTabs() {
   return (
     <Tab.Navigator
@@ -136,6 +157,7 @@ function MyTabs() {
           headerShown: false,
         }}
       />
+
       <Tab.Screen
         name="Budget"
         component={BudgetAll}
@@ -143,8 +165,15 @@ function MyTabs() {
           tabBarHideOnKeyboard: true,
           headerShown: false,
         }}
+
+      <Tab.Screen
+        name="Report"
+        component={ReportsPageAll}
+        options={{
+          headerShown: false,
+        }}
       />
-      <Tab.Screen name="Report" component={ReportsPage} />
+
       <Tab.Screen name="Settings" component={SettingsPage} />
     </Tab.Navigator>
   );
