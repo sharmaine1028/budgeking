@@ -226,7 +226,7 @@ class ReportsPageTable extends React.Component {
         <View style={styles.dateRow}>
           <Icon.Button
             name={this.state.budget == "Expense" ? "arrowright" : "arrowleft"}
-            size="20%"
+            size={20}
             color={
               this.state.budget == "Expense" ? colours.tomato : colours.green
             }
@@ -334,7 +334,7 @@ class ReportsPageTable extends React.Component {
           <View style={styles.transactionTitle}>
             <Icon.Button
               name="profile"
-              size="30%"
+              size={30}
               color={colours.black}
               backgroundColor={"transparent"}
               iconStyle={{ alignSelf: "center" }}
