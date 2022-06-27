@@ -1,3 +1,4 @@
+import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Platform, StyleSheet, StatusBar, Image } from "react-native";
@@ -69,6 +70,30 @@ function BudgetAll() {
   );
 }
 
+function ReportsPageAll() {
+  return (
+    <Stack.Navigator
+      initialRouteName="Report"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colours.whiteRock,
+        },
+        cardStyle: { backgroundColor: colours.white },
+      }}
+    >
+      <Stack.Screen
+        name="Report"
+        component={ReportsPage}
+        options={{ headerLeft: false }}
+      />
+      <Stack.Screen name="ReportsPage" component={ReportsPage} />
+      <Stack.Screen name="Pie Chart View" component={ReportsPagePieChart} />
+      <Stack.Screen name="Custom Date" component={ChooseCustomDate} />
+      <Stack.Screen name="Table View" component={ReportsPageTable} />
+    </Stack.Navigator>
+  );
+}
+
 const screenOptions = (route, color) => {
   let iconName;
   switch (route.name) {
@@ -95,6 +120,7 @@ const screenOptions = (route, color) => {
   }
   return <MaterialCommunityIcons name={iconName} color={color} size={28} />;
 };
+
 function MyTabs() {
   return (
     <Tab.Navigator
@@ -124,7 +150,13 @@ function MyTabs() {
         }}
       />
       <Tab.Screen name="Budget" component={BudgetAll} />
-      <Tab.Screen name="Report" component={ReportsPage} />
+      <Tab.Screen
+        name="Report"
+        component={ReportsPageAll}
+        options={{
+          headerShown: false,
+        }}
+      />
       <Tab.Screen name="Settings" component={SettingsPage} />
     </Tab.Navigator>
   );
