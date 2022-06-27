@@ -91,11 +91,11 @@ class GoalsPage extends React.Component {
             onPress={() => this.props.navigation.navigate("New Goal")}
           />
 
-          <BlackButton
+          {/* <BlackButton
             text={"Show goal history"}
             style={styles.button}
             onPress={() => this.props.navigation.navigate("Goal History")}
-          />
+          /> */}
         </View>
         <Title text={"Short-term goals"} />
         {this.state.shortTermGoals.length !== 0
