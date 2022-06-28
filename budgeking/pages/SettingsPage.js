@@ -126,6 +126,7 @@ class SettingsPage extends React.Component {
       auth.currentUser.updatePassword(`${this.state.password}`).then((res) => {
         this.setState({ passwordEditable: false });
         alert("Password updated!");
+        this.setState({ password: "" });
       });
     } catch (error) {
       alert(error.message);
