@@ -162,7 +162,7 @@ class SettingsPage extends React.Component {
       });
 
       if (!pickerResult.cancelled) {
-        this.setState({ imageSource: pickerResult.uri });
+        this.setState({ uri: pickerResult.uri });
       }
 
       auth.currentUser.updateProfile({ photoURL: this.state.uri });
