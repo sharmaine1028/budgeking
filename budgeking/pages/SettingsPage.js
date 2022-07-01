@@ -123,10 +123,14 @@ class SettingsPage extends React.Component {
 
   updateUserPassword = (props) => {
     try {
-      auth.currentUser.updatePassword(`${this.state.password}`).then((res) => {
-        this.setState({ passwordEditable: false });
-        alert("Password updated!");
-      });
+      auth.currentUser
+        .updatePassword(`${this.state.password}`)
+        .then((res) => {
+          this.setState({ passwordEditable: false });
+          alert("Password updated!");
+          this.setState({ password: "" });
+        })
+        .catch((err) => alert(err.message));
     } catch (error) {
       alert(error.message);
     }
@@ -162,7 +166,7 @@ class SettingsPage extends React.Component {
       });
 
       if (!pickerResult.cancelled) {
-        this.setState({ imageSource: pickerResult.uri });
+        this.setState({ uri: pickerResult.uri });
       }
 
       auth.currentUser.updateProfile({ photoURL: this.state.uri });
