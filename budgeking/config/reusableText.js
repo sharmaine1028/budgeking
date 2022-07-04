@@ -282,7 +282,7 @@ export const styles = StyleSheet.create({
     borderRadius: 5,
     shadowColor: "#000",
     marginVertical: 5,
-    shadowOpacity: 0,
+
     shadowRadius: 1,
     elevation: 8,
     paddingHorizontal: 5,

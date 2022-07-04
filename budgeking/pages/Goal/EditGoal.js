@@ -15,12 +15,13 @@ import CurrencyInput from "react-native-currency-input";
 
 function EditGoal({ route, navigation }) {
   const { doc, time, editItem } = route.params;
+  doc.deadline = new Date(doc.deadline.seconds * 1000);
   const [data, setData] = useState(doc);
   const [datePicker, setDatePicker] = useState(false);
 
   useEffect(
     () => updateFreqAmount(),
-    [data.frequency, date.target, data.deadline]
+    [data.frequency, data.target, data.deadline]
   );
 
   const showDatePicker = () => {
@@ -28,12 +29,12 @@ function EditGoal({ route, navigation }) {
   };
 
   const onDateSelected = (event, value) => {
-    setData({ ...data, deadline: value }, () => updateFreqAmount());
     setDatePicker(false);
+    setData({ ...data, deadline: value });
   };
 
-  const dateFormat = (seconds) => {
-    const date = new Date(seconds * 1000);
+  const dateFormat = () => {
+    const date = data.deadline;
 
     const [day, month, year] = [
       date.getDate(),
@@ -67,12 +68,7 @@ function EditGoal({ route, navigation }) {
     if (data.target === "") return;
     const today = new Date();
 
-    console.log(data.deadline, data.target);
-
-    const deadline =
-      data.deadline instanceof Date
-        ? data.deadline
-        : new Date(data.deadline.seconds * 1000);
+    const deadline = data.deadline;
 
     const target = data.target;
 
@@ -102,8 +98,6 @@ function EditGoal({ route, navigation }) {
     const format = (num) => {
       return (Math.ceil(num * 100) / 100).toFixed(2);
     };
-
-    console.log(freqAmount);
 
     setData({ ...data, freqAmount: format(freqAmount) });
   };
@@ -147,7 +141,6 @@ function EditGoal({ route, navigation }) {
             <Picker
               selectedValue={data.frequency}
               onValueChange={(itemValue, itemIndex) => {
-                console.log(itemValue);
                 setData({ ...data, frequency: itemValue });
               }}
               mode="dialog"
@@ -167,8 +160,7 @@ function EditGoal({ route, navigation }) {
         <ImageTextInput
           source={require("../../assets/calendar.png")}
           onPress={() => showDatePicker()}
-          d
-          value={dateFormat(data.deadline.seconds)}
+          value={dateFormat(data.deadline)}
           editable={false}
           style={[styles.newGoalInput, { paddingHorizontal: 0, margin: 0 }]}
         />
@@ -176,7 +168,7 @@ function EditGoal({ route, navigation }) {
 
       {datePicker && (
         <RNDateTimePicker
-          value={new Date(data.deadline.seconds * 1000)}
+          value={data.deadline}
           mode="date"
           display={Platform.OS === "ios" ? "spinner" : "default"}
           is24Hour={true}

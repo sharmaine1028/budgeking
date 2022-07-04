@@ -94,7 +94,7 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   const deleteGoal = () => {
     return Alert.alert(
       "Are you sure?",
-      "Are you sure you want to delete this goal? This is irreversible.",
+      "This is irreversible. Are you sure you want to delete this goal?",
       [
         // "Yes button"
         {
@@ -138,13 +138,17 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
           }
           onRequestClose={() => hideMenu(data.id)}
         >
-          {/* <MenuItem
+          <MenuItem
             onPress={() =>
-              navigation.navigate("Edit Goal", { doc: doc, time: time })
+              navigation.navigate("Edit Goal", {
+                doc: doc,
+                time: time,
+                editItem: editItem,
+              })
             }
           >
             Edit
-          </MenuItem> */}
+          </MenuItem>
 
           <MenuItem
             onPress={() => {

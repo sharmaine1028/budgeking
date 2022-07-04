@@ -106,6 +106,7 @@ class GoalsPage extends React.Component {
                 time={"short term"}
                 deleteItem={this.deleteGoal}
                 saveItem={this.saveToGoal}
+                editItem={this.editGoal}
               />
             ))
           : this.renderNoGoals()}
@@ -119,6 +120,7 @@ class GoalsPage extends React.Component {
                 time={"long term"}
                 deleteItem={this.deleteGoal}
                 saveItem={this.saveToGoal}
+                editItem={this.editGoal}
               />
             ))
           : this.renderNoGoals()}
@@ -154,10 +156,7 @@ class GoalsPage extends React.Component {
     }
   };
 
-  addGoal = (doc, time) => {};
-
   editGoal = (id, time, data) => {
-    let ref;
     if (time === "short term") {
       const newList = this.state.shortTermGoals.filter(
         (item) => item.id !== id
@@ -169,7 +168,19 @@ class GoalsPage extends React.Component {
       this.setState({ longTermGoals: newList });
       ref = this.longTermRef;
     }
-    // ref.doc(id).update({ currSavingsAmt: newAmt });
+    ref.doc(id).set({
+      createdBy: data.createdBy,
+      goalDescription: data.goalDescription,
+      target: data.target,
+      frequency: data.frequency,
+      freqAmount: data.freqAmount,
+      deadline: data.deadline,
+      notes: data.notes,
+      isSharing: data.isSharing,
+      sharingEmails: data.sharingEmails,
+      sharingUIDs: data.sharingUIDs,
+      currSavingsAmt: data.currSavingsAmt,
+    });
   };
 
   saveToGoal = (id, time, newAmt) => {
