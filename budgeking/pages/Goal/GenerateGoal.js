@@ -237,7 +237,6 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
 
           <>
             <GreyLine />
-
             <Text style={[styles.goalLine, { fontSize: 16 }]}>Notes </Text>
             <Text style={{ paddingLeft: 10 }}>
               {doc.notes === "" ? "None" : doc.notes}

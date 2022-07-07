@@ -14,6 +14,8 @@ import { TextInput } from "react-native-gesture-handler";
 import CurrencyInput from "react-native-currency-input";
 import { auth } from "../../config/firebase";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import SelectDropdown from "react-native-select-dropdown";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 function EditGoal({ route, navigation }) {
   const { doc, time, editItem } = route.params;
@@ -21,6 +23,7 @@ function EditGoal({ route, navigation }) {
   const [data, setData] = useState(doc);
   const [datePicker, setDatePicker] = useState(false);
   const [email, setEmail] = useState("");
+  const frequency = ["Daily", "Weekly", "Monthly", "Yearly"];
 
   useEffect(
     () => updateFreqAmount(),
@@ -105,21 +108,36 @@ function EditGoal({ route, navigation }) {
     setData({ ...data, freqAmount: format(freqAmount) });
   };
 
+  const share = (choice) => {
+    if (choice.label === "Yes") {
+      setData({ ...data, isSharing: true });
+    } else {
+      setData({
+        ...data,
+        isSharing: false,
+        sharingEmails: [],
+        sharingUIDs: [],
+      });
+    }
+  };
+
   const checkEmail = async (e) => {
     var key = e.nativeEvent.key;
     if (key === "Enter" || key === " ") {
-      const email = this.state.email.trim();
+      const email = data.email.trim();
 
       if (email) {
         if (email === auth.currentUser.email) {
           alert("You can't add yourself!");
-          this.setState({ email: "" });
+          setEmail("");
+
           return;
         }
 
-        if (this.state.sharingEmails.includes(email)) {
+        if (data.sharingEmails.includes(email)) {
           alert("This email has already been added");
-          this.setState({ email: "" });
+          setEmail("");
+
           return;
         }
 
@@ -127,19 +145,22 @@ function EditGoal({ route, navigation }) {
           .collection("userLookup")
           .doc(email)
           .get()
-          .then((data) => {
-            if (data.exists) {
-              this.setState({
-                sharingEmails: [...this.state.sharingEmails, email],
-                email: "",
+          .then((doc) => {
+            if (doc.exists) {
+              setData({
+                ...data,
+                sharingEmails: [...data.sharingEmails, email],
               });
-              this.setState({
-                sharingUIDs: [...this.state.sharingUIDs, data.data().uid],
+              setEmail("");
+              setData({
+                ...data,
+                sharingUIDs: [...data.sharingUIDs, doc.data().uid],
               });
-              return data.data().uid;
+              return doc.data().uid;
             } else {
               alert("User does not exist");
-              this.setState({ email: "" });
+              setEmail("");
+
               return null;
             }
           })
@@ -155,7 +176,9 @@ function EditGoal({ route, navigation }) {
   };
 
   return (
-    <KeyboardAwareScrollView contentContainerStyle={{ margin: 5 }}>
+    <KeyboardAwareScrollView
+      contentContainerStyle={{ margin: 5, paddingBottom: 20 }}
+    >
       <NewGoalInput
         title={"Goal Description"}
         onChangeText={(val) => setData({ ...data, goalDescription: val })}
@@ -185,20 +208,35 @@ function EditGoal({ route, navigation }) {
           <TextInput style={{ flex: 0.6 }} editable={false}>
             ${data.freqAmount}
           </TextInput>
-          <View style={styles.frequencyDropdown}>
-            <Picker
-              selectedValue={data.frequency}
-              onValueChange={(itemValue, itemIndex) => {
+
+          <View style={{ flex: 0.8 }}>
+            <SelectDropdown
+              buttonStyle={styles.frequencyDropdown}
+              buttonTextStyle={{ fontSize: 15 }}
+              data={frequency}
+              onSelect={(itemValue, itemIndex) => {
                 setData({ ...data, frequency: itemValue });
+                updateFreqAmount();
               }}
-              mode="dropdown"
-            >
-              <Picker.Item label="Select" enabled={false} />
-              <Picker.Item label="Daily" value="daily" />
-              <Picker.Item label="Weekly" value="weekly" />
-              <Picker.Item label="Monthly" value="monthly" />
-              <Picker.Item label="Yearly" value="yearly" />
-            </Picker>
+              defaultButtonText={"Select"}
+              buttonTextAfterSelection={(selectedItem, index) => {
+                return selectedItem;
+              }}
+              rowTextForSelection={(item, index) => {
+                return item;
+              }}
+              renderDropdownIcon={(isOpened) => {
+                return (
+                  <FontAwesome
+                    name={isOpened ? "chevron-up" : "chevron-down"}
+                    color={colours.black}
+                    size={18}
+                  />
+                );
+              }}
+              dropdownStyle={styles.dropdownStyle}
+              rowTextStyle={{ fontSize: 14 }}
+            />
           </View>
         </View>
       </View>
@@ -233,30 +271,37 @@ function EditGoal({ route, navigation }) {
       />
 
       {data.createdBy === auth.currentUser.uid && (
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          {data.sharingEmails.map((email) => (
-            <View key={email} style={styles.emailsContainer}>
-              <Text key={email} style={styles.emails}>
-                {email}
-              </Text>
-              <TouchableOpacity
-                style={{ justifyContent: "center" }}
-                onPress={() => deleteEmail(email)}
-              >
-                <MaterialCommunityIcons
-                  name="close-box"
-                  color={colours.black}
-                  size={20}
-                />
-              </TouchableOpacity>
-            </View>
-          ))}
+        <View>
+          <YesOrNo
+            title={"Would you like to share the goal with someone else?"}
+            initial={data.isSharing ? 1 : 2}
+            selectedBtn={(choice) => share(choice)}
+          />
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {data.sharingEmails.map((email) => (
+              <View key={email} style={styles.emailsContainer}>
+                <Text key={email} style={styles.emails}>
+                  {email}
+                </Text>
+                <TouchableOpacity
+                  style={{ justifyContent: "center" }}
+                  onPress={() => deleteEmail(email)}
+                >
+                  <MaterialCommunityIcons
+                    name="close-box"
+                    color={colours.black}
+                    size={20}
+                  />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
         </View>
       )}
 
@@ -298,6 +343,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     height: 40,
   },
+  dropdownStyle: {
+    backgroundColor: "#EFEFEF",
+    borderRadius: 10,
+  },
   emailsContainer: {
     flexDirection: "row",
     backgroundColor: colours.lightBrown,
@@ -315,12 +364,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   frequencyDropdown: {
-    flex: 0.4,
     backgroundColor: colours.darkBrown,
     borderRadius: 30,
-    width: 100,
-    height: 40,
-    justifyContent: "center",
   },
   newGoalInput: {
     backgroundColor: colours.lightBrown,

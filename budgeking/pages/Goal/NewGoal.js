@@ -93,6 +93,8 @@ class NewGoal extends React.Component {
                     />
                   );
                 }}
+                dropdownStyle={styles.dropdownStyle}
+                rowTextStyle={{ fontSize: 14 }}
               />
             </View>
           </View>
@@ -394,6 +396,10 @@ const styles = StyleSheet.create({
   buttons: {
     flexGrow: 1,
     height: 40,
+  },
+  dropdownStyle: {
+    backgroundColor: "#EFEFEF",
+    borderRadius: 10,
   },
   emailsContainer: {
     flexDirection: "row",

@@ -211,7 +211,7 @@ export function BudgetInput({
   );
 }
 
-export function YesOrNo({ title, selectedBtn }) {
+export function YesOrNo({ title, selectedBtn, initial }) {
   const data = [{ label: "Yes" }, { label: "No" }];
   return (
     <View style={styles.newGoalInput}>
@@ -221,7 +221,7 @@ export function YesOrNo({ title, selectedBtn }) {
         box={false}
         circleSize={10}
         deactiveColor={colours.white}
-        initial={2}
+        initial={initial ? initial : 2}
         selectedBtn={selectedBtn}
       />
     </View>

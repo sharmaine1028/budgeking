@@ -1,9 +1,12 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
+import { db } from "../../config/firebase";
 import { BlackButton } from "../../config/reusableButton";
 import { Title } from "../../config/reusableText";
 
 function GoalHistory(props) {
+  const inactiveRef = db.collection("inactive goals");
+
   return (
     <View>
       <View style={styles.buttonContainer}>
