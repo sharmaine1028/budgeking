@@ -12,12 +12,15 @@ import colours from "../../config/colours";
 import { Picker } from "@react-native-picker/picker";
 import { TextInput } from "react-native-gesture-handler";
 import CurrencyInput from "react-native-currency-input";
+import { auth } from "../../config/firebase";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 function EditGoal({ route, navigation }) {
   const { doc, time, editItem } = route.params;
   doc.deadline = new Date(doc.deadline.seconds * 1000);
   const [data, setData] = useState(doc);
   const [datePicker, setDatePicker] = useState(false);
+  const [email, setEmail] = useState("");
 
   useEffect(
     () => updateFreqAmount(),
@@ -102,7 +105,51 @@ function EditGoal({ route, navigation }) {
     setData({ ...data, freqAmount: format(freqAmount) });
   };
 
+  const checkEmail = async (e) => {
+    var key = e.nativeEvent.key;
+    if (key === "Enter" || key === " ") {
+      const email = this.state.email.trim();
+
+      if (email) {
+        if (email === auth.currentUser.email) {
+          alert("You can't add yourself!");
+          this.setState({ email: "" });
+          return;
+        }
+
+        if (this.state.sharingEmails.includes(email)) {
+          alert("This email has already been added");
+          this.setState({ email: "" });
+          return;
+        }
+
+        const sharingUID = await db
+          .collection("userLookup")
+          .doc(email)
+          .get()
+          .then((data) => {
+            if (data.exists) {
+              this.setState({
+                sharingEmails: [...this.state.sharingEmails, email],
+                email: "",
+              });
+              this.setState({
+                sharingUIDs: [...this.state.sharingUIDs, data.data().uid],
+              });
+              return data.data().uid;
+            } else {
+              alert("User does not exist");
+              this.setState({ email: "" });
+              return null;
+            }
+          })
+          .catch((err) => console.log(err));
+      }
+    }
+  };
+
   const editGoal = () => {
+    // time period check
     editItem(doc.id, time, data);
     navigation.navigate("Goals");
   };
@@ -183,6 +230,45 @@ function EditGoal({ route, navigation }) {
         value={data.notes}
         maxLength={50}
       />
+
+      {data.createdBy === auth.currentUser.uid && (
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          {data.sharingEmails.map((email) => (
+            <View key={email} style={styles.emailsContainer}>
+              <Text key={email} style={styles.emails}>
+                {email}
+              </Text>
+              <TouchableOpacity
+                style={{ justifyContent: "center" }}
+                onPress={() => deleteEmail(email)}
+              >
+                <MaterialCommunityIcons
+                  name="close-box"
+                  color={colours.black}
+                  size={20}
+                />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {data.isSharing && (
+        <NewGoalInput
+          title={"Add user's email to share the goal with"}
+          onChangeText={(val) => {
+            setEmail(val);
+          }}
+          value={data.email}
+          onKeyPress={checkEmail}
+        />
+      )}
 
       <View style={styles.beside}>
         <BlackButton

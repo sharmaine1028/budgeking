@@ -18,42 +18,13 @@ import { db } from "../../config/firebase";
 function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   const navigation = useNavigation();
   const [isMenu, setIsMenu] = useState(false);
-  const [data, setData] = useState(doc);
-
-  const dataRef = db
-    .collection("goals")
-    .doc(time)
-    .collection("active")
-    .doc(doc.id);
-
-  let unsubscribe;
-  useEffect(() => {
-    unsubscribe = dataRef.onSnapshot((doc) => {
-      const document = doc.data();
-      setData(document);
-    });
-    return unsubscribe;
-  }, [data, setData]);
-
-  useEffect(() => {
-    const unsubscribe2 = navigation.addListener("focus", () => unsubscribe);
-    return unsubscribe2;
-  }, [navigation]);
-
-  useIsFocused(() => {
-    const unsubscribe = dataRef.onSnapshot((doc) => {
-      const document = doc.data();
-      setData(document);
-    });
-    return unsubscribe;
-  });
 
   const getPercent = () => {
-    const percent = (data.currSavingsAmt / data.target) * 100;
+    const percent = (doc.currSavingsAmt / doc.target) * 100;
     if (percent > 100) {
       return "100%";
     } else {
-      return (data.currSavingsAmt / data.target) * 100 + "%";
+      return (doc.currSavingsAmt / doc.target) * 100 + "%";
     }
   };
 
@@ -113,7 +84,7 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   };
 
   return (
-    <View key={data.id} style={styles.goal}>
+    <View key={doc.id} style={styles.goal}>
       <View
         style={{
           flexDirection: "row",
@@ -121,14 +92,14 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
         }}
       >
         <Header
-          text={`Save for ${data.goalDescription}`}
+          text={`Save for ${doc.goalDescription}`}
           style={{ fontWeight: "bold" }}
         />
 
         <Menu
           visible={isMenu}
           anchor={
-            <TouchableOpacity onPress={() => showMenu(data.id)}>
+            <TouchableOpacity onPress={() => showMenu(doc.id)}>
               <MaterialCommunityIcons
                 name="more"
                 size={24}
@@ -136,7 +107,7 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
               />
             </TouchableOpacity>
           }
-          onRequestClose={() => hideMenu(data.id)}
+          onRequestClose={() => hideMenu(doc.id)}
         >
           <MenuItem
             onPress={() =>
@@ -161,12 +132,12 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
           >
             Save
           </MenuItem>
-          <MenuItem onPress={() => deleteGoal(data.id)}>Delete</MenuItem>
+          <MenuItem onPress={() => deleteGoal(doc.id)}>Delete</MenuItem>
         </Menu>
       </View>
 
       <Text style={styles.goalTagline}>
-        Save ${data.freqAmount} {data.frequency}
+        Save ${doc.freqAmount} {doc.frequency}
       </Text>
       <View style={styles.goalLine}>
         <MaterialCommunityIcons
@@ -183,7 +154,7 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
                 {
                   backgroundColor: "#96D3FF",
                   width: getPercent(),
-                  // width: (data.currSavingsAmt / data.target) * 100 + "%",
+                  // width: (doc.currSavingsAmt / doc.target) * 100 + "%",
                   borderRadius: 5,
                 },
               ]}
@@ -196,9 +167,9 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
             }}
           >
             <Text style={styles.goalTagline}>
-              ${data.currSavingsAmt.toFixed(2)}
+              ${doc.currSavingsAmt.toFixed(2)}
             </Text>
-            <Text style={styles.goalTagline}>${data.target}</Text>
+            <Text style={styles.goalTagline}>${doc.target.toFixed(2)}</Text>
           </View>
         </View>
       </View>
@@ -212,7 +183,7 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
         />
         <Text style={{ flex: 0.3, paddingLeft: 30 }}> Deadline </Text>
         <Text style={{ flex: 0.5, paddingLeft: 30 }}>
-          {dateFormat(data.deadline.seconds)}
+          {dateFormat(doc.deadline.seconds)}
         </Text>
       </View>
     </View>

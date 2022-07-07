@@ -12,11 +12,7 @@ function SaveToGoal({ route, navigation }) {
   const [savingsAmt, setSavingsAmt] = useState("0");
   const [currSavingsAmt, setCurrSavingsAmt] = useState(doc.currSavingsAmt);
 
-  const dataRef = db
-    .collection("goals")
-    .doc(time)
-    .collection("active")
-    .doc(doc.id);
+  const dataRef = db.collection("active goals").doc(doc.id);
 
   useEffect(() => {
     const unsubscribe = dataRef.onSnapshot((doc) => {

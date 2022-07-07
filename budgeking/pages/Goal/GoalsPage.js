@@ -13,46 +13,31 @@ LogBox.ignoreLogs([
 class GoalsPage extends React.Component {
   constructor() {
     super();
-    this.shortTermRef = db
-      .collection("goals")
-      .doc("short term")
-      .collection("active");
-    this.longTermRef = db
-      .collection("goals")
-      .doc("long term")
-      .collection("active");
-    this.shortTermOri = this.shortTermRef.where(
+    this.activeGoalsRef = db.collection("active goals");
+    this.activeGoalsOri = this.activeGoalsRef.where(
       "createdBy",
       "==",
       auth.currentUser.uid
     );
-    this.shortTermShared = this.shortTermRef.where(
+    this.activeGoalsShared = this.activeGoalsRef.where(
       "sharingEmails",
       "array-contains",
       auth.currentUser.email
     );
-    this.longTermOri = this.longTermRef.where(
-      "createdBy",
-      "==",
-      auth.currentUser.uid
-    );
-    this.longTermShared = this.longTermRef.where(
-      "sharingEmails",
-      "array-contains",
-      auth.currentUser.email
-    );
-    this.unsubscribeShortTermOri = this.shortTermOri.onSnapshot(
-      (querySnapshot) => this.getGoals(querySnapshot, "short")
-    );
-    this.unsubscribeShortTermShared = this.shortTermShared.onSnapshot(
-      (querySnapshot) => this.getGoals(querySnapshot, "short")
-    );
-    this.unsubscribeLongTermOri = this.longTermOri.onSnapshot((querySnapshot) =>
-      this.getGoals(querySnapshot, "long")
-    );
-    this.unsubscribeLongTermShared = this.longTermShared.onSnapshot(
-      (querySnapshot) => this.getGoals(querySnapshot, "long")
-    );
+
+    // this.unsubscribeShortTermOri = this.shortTermOri.onSnapshot(
+    //   (querySnapshot) => this.getGoals(querySnapshot, "short")
+    // );
+    // this.unsubscribeShortTermShared = this.shortTermShared.onSnapshot(
+    //   (querySnapshot) => this.getGoals(querySnapshot, "short")
+    // );
+    // this.unsubscribeLongTermOri = this.longTermOri.onSnapshot((querySnapshot) =>
+    //   this.getGoals(querySnapshot, "long")
+    // );
+    // this.unsubscribeLongTermShared = this.longTermShared.onSnapshot(
+    //   (querySnapshot) => this.getGoals(querySnapshot, "long")
+    // );
+
     this.state = {
       shortTermGoals: [],
       longTermGoals: [],
@@ -60,24 +45,26 @@ class GoalsPage extends React.Component {
   }
 
   componentDidMount() {
+    this.unsubscribeActiveGoalsOri = this.activeGoalsOri.onSnapshot(
+      this.getGoals
+    );
+    this.unsubscribeActiveGoalsShared = this.activeGoalsShared.onSnapshot(
+      this.getGoals
+    );
+
     this.unsubscribeSavings = this.props.navigation.addListener("focus", () => {
-      this.setState({ shortTermGoals: [], longTermGoals: [] });
-      this.unsubscribeShortTermOri;
-      this.unsubscribeShortTermShared;
-      this.unsubscribeLongTermOri;
-      this.unsubscribeLongTermShared;
-      this.setState({
-        shortTermGoals: this.state.shortTermGoals,
-        longTermGoals: this.state.longTermGoals,
-      });
+      this.unsubscribeActiveGoalsOri;
+      this.unsubscribeActiveGoalsShared;
+      // this.setState({
+      //   shortTermGoals: this.state.shortTermGoals,
+      //   longTermGoals: this.state.longTermGoals,
+      // });
     });
   }
 
   componentWillUnmount() {
-    this.unsubscribeShortTermOri();
-    this.unsubscribeShortTermShared();
-    this.unsubscribeLongTermOri();
-    this.unsubscribeLongTermShared();
+    this.unsubscribeActiveGoalsOri();
+    this.unsubscribeActiveGoalsShared();
     this.unsubscribeSavings();
   }
 
@@ -128,6 +115,38 @@ class GoalsPage extends React.Component {
     );
   }
 
+  getGoals = (querySnapshot) => {
+    try {
+      querySnapshot.forEach((doc) => {
+        const deadlineYear = new Date(
+          doc.data().deadline.seconds * 1000
+        ).getFullYear();
+        const todayYear = new Date().getFullYear();
+
+        if (deadlineYear - todayYear < 5) {
+          const newState = this.state.shortTermGoals.filter(
+            (item) => item.id !== doc.id
+          );
+
+          this.setState({
+            shortTermGoals: [...newState, { ...doc.data(), id: doc.id }],
+          });
+        } else {
+          const newState = this.state.longTermGoals.filter(
+            (item) => item.id !== doc.id
+          );
+          this.setState({
+            longTermGoals: [...newState, { ...doc.data(), id: doc.id }],
+          });
+        }
+        // newState.push({ ...doc.data(), id: doc.id });
+      });
+    } catch {
+      (err) => console.log(err);
+    }
+  };
+
+  /*
   getGoals = (querySnapshot, timePeriod) => {
     try {
       if (timePeriod === "short") {
@@ -155,6 +174,7 @@ class GoalsPage extends React.Component {
       (err) => console.log(err);
     }
   };
+  */
 
   editGoal = (id, time, data) => {
     if (time === "short term") {
@@ -162,13 +182,11 @@ class GoalsPage extends React.Component {
         (item) => item.id !== id
       );
       this.setState({ shortTermGoals: newList });
-      ref = this.shortTermRef;
     } else {
       const newList = this.state.longTermGoals.filter((item) => item.id !== id);
       this.setState({ longTermGoals: newList });
-      ref = this.longTermRef;
     }
-    ref.doc(id).set({
+    this.activeGoalsRef.doc(id).set({
       createdBy: data.createdBy,
       goalDescription: data.goalDescription,
       target: data.target,
@@ -189,12 +207,11 @@ class GoalsPage extends React.Component {
         (item) => item.id !== id
       );
       this.setState({ shortTermGoals: newList });
-      this.shortTermRef.doc(id).update({ currSavingsAmt: newAmt });
     } else {
       const newList = this.state.longTermGoals.filter((item) => item.id !== id);
       this.setState({ longTermGoals: newList });
-      this.longTermRef.doc(id).update({ currSavingsAmt: newAmt });
     }
+    this.activeGoalsRef.doc(id).update({ currSavingsAmt: newAmt });
   };
 
   deleteGoal = (id, time) => {
@@ -203,12 +220,11 @@ class GoalsPage extends React.Component {
         (item) => item.id !== id
       );
       this.setState({ shortTermGoals: newList });
-      this.shortTermRef.doc(id).delete();
     } else {
       const newList = this.state.longTermGoals.filter((item) => item.id !== id);
       this.setState({ longTermGoals: newList });
-      this.longTermRef.doc(id).delete();
     }
+    this.activeGoalsRef.doc(id).delete();
   };
 
   renderNoGoals = () => {
