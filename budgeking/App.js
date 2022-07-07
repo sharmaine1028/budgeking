@@ -213,21 +213,21 @@ function MyTabs() {
   );
 }
 
-// export default function App() {
-//   return (
-//     <NavigationContainer theme={{ colors: colours.black }}>
-//       <MyStack />
-//     </NavigationContainer>
-//   );
-// }
-
 export default function App() {
   return (
     <NavigationContainer theme={{ colors: colours.black }}>
-      <GoalsAll />
+      <MyStack />
     </NavigationContainer>
   );
 }
+
+// export default function App() {
+//   return (
+//     <NavigationContainer theme={{ colors: colours.black }}>
+//       <GoalsAll />
+//     </NavigationContainer>
+//   );
+// }
 
 const styles = StyleSheet.create({
   bottomTabIcon: {

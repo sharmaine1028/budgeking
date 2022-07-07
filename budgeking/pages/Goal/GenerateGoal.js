@@ -14,10 +14,12 @@ import { Header } from "../../config/reusableText";
 import colours from "../../config/colours";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { db } from "../../config/firebase";
+import { Ionicons } from "@expo/vector-icons";
 
 function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   const navigation = useNavigation();
   const [isMenu, setIsMenu] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
   const getPercent = () => {
     const percent = (doc.currSavingsAmt / doc.target) * 100;
@@ -146,7 +148,7 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
           color="black"
           style={{ flex: 0.1 }}
         />
-        <View style={{ paddingLeft: 30, flex: 0.8 }}>
+        <View style={{ paddingLeft: 30, flex: 0.85 }}>
           <View style={[styles.progressBar]}>
             <Animated.View
               style={[
@@ -174,7 +176,7 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
         </View>
       </View>
       <GreyLine />
-      <View style={[styles.goalLine, { marginTop: 5 }]}>
+      <View style={styles.goalLine}>
         <MaterialCommunityIcons
           name="clock-outline"
           size={24}
@@ -182,10 +184,67 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
           style={{ flex: 0.1 }}
         />
         <Text style={{ flex: 0.3, paddingLeft: 30 }}> Deadline </Text>
-        <Text style={{ flex: 0.5, paddingLeft: 30 }}>
-          {dateFormat(doc.deadline.seconds)}
-        </Text>
+        <Text style={{ flex: 0.55 }}>{dateFormat(doc.deadline.seconds)}</Text>
+
+        {showMore ? (
+          <TouchableOpacity onPress={() => setShowMore(false)}>
+            <MaterialCommunityIcons
+              name="chevron-up"
+              size={24}
+              color={colours.darkgrey}
+            />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={() => setShowMore(true)}>
+            <MaterialCommunityIcons
+              name="chevron-down"
+              size={24}
+              color={colours.darkgrey}
+            />
+          </TouchableOpacity>
+        )}
       </View>
+
+      {showMore && (
+        <View>
+          {doc.isSharing ? (
+            <>
+              <GreyLine />
+              <View style={styles.goalLine}>
+                <Ionicons
+                  name="md-share-outline"
+                  size={24}
+                  color="black"
+                  style={{ flex: 0.1 }}
+                />
+                <Text style={{ flex: 0.8, paddingLeft: 30 }}>
+                  Goal shared with{" "}
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      paddingLeft: 30,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {doc.sharingEmails.map(
+                      (email) => email.slice(0, email.indexOf("@")) + " "
+                    )}
+                  </Text>
+                </Text>
+              </View>
+            </>
+          ) : null}
+
+          <>
+            <GreyLine />
+
+            <Text style={[styles.goalLine, { fontSize: 16 }]}>Notes </Text>
+            <Text style={{ paddingLeft: 10 }}>
+              {doc.notes === "" ? "None" : doc.notes}
+            </Text>
+          </>
+        </View>
+      )}
     </View>
   );
 }
@@ -199,7 +258,8 @@ const styles = StyleSheet.create({
   },
   goalLine: {
     flexDirection: "row",
-    justifyContent: "center",
+    paddingLeft: 10,
+    marginVertical: 5,
   },
   goalTagline: {
     color: colours.darkgrey,
