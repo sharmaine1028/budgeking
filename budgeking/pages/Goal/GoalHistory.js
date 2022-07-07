@@ -1,32 +1,94 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
-import { db } from "../../config/firebase";
+import React, { useEffect } from "react";
+import { View, StyleSheet, Text } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { auth, db } from "../../config/firebase";
 import { BlackButton } from "../../config/reusableButton";
 import { Title } from "../../config/reusableText";
+import GenerateOldGoal from "./GenerateOldGoal";
 
-function GoalHistory(props) {
-  const inactiveRef = db.collection("inactive goals");
+class GoalHistory extends React.Component {
+  constructor() {
+    super();
+    this.inactiveGoalsRef = db.collection("inactive goals");
+    this.inactiveGoalsOriRef = this.inactiveGoalsRef.where(
+      "createdBy",
+      "==",
+      auth.currentUser.uid
+    );
+    this.inactiveGoalsSharedRef = this.inactiveGoalsRef.where(
+      "sharingEmails",
+      "array-contains",
+      auth.currentUser.email
+    );
 
-  return (
-    <View>
-      <View style={styles.buttonContainer}>
-        <BlackButton text={"Short-term goals"} style={styles.button} />
-        <BlackButton text={"Long-term goals"} style={styles.button} />
-      </View>
-    </View>
-  );
+    this.state = {
+      inactiveGoals: [],
+    };
+  }
+
+  componentDidMount() {
+    this.unsubscribeInactiveGoalsOri = this.inactiveGoalsOriRef.onSnapshot(
+      this.getGoals
+    );
+    this.unsubscribeInactiveGoalsShared =
+      this.inactiveGoalsSharedRef.onSnapshot(this.getGoals);
+
+    this.unsubscribeAll = this.props.navigation.addListener("focus", () => {
+      this.unsubscribeInactiveGoalsOri;
+      this.unsubscribeInactiveGoalsShared;
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribeInactiveGoalsOri();
+    this.unsubscribeInactiveGoalsShared();
+    this.unsubscribeAll();
+  }
+
+  render() {
+    return (
+      <KeyboardAwareScrollView contentContainerStyle={styles.container}>
+        <View>
+          {this.state.inactiveGoals.length !== 0
+            ? this.state.inactiveGoals.map((doc) => (
+                <GenerateOldGoal key={doc.id} doc={doc} />
+              ))
+            : this.renderNoGoals()}
+        </View>
+      </KeyboardAwareScrollView>
+    );
+  }
+
+  getGoals = (querySnapshot) => {
+    try {
+      querySnapshot.forEach((doc) => {
+        this.setState({
+          inactiveGoals: [
+            ...this.state.inactiveGoals,
+            { ...doc.data(), id: doc.id },
+          ],
+        });
+      });
+    } catch {
+      (err) => console.log(err);
+    }
+  };
+
+  renderNoGoals = () => {
+    return (
+      <Text
+        style={[styles.goalTagline, { alignSelf: "center", marginTop: 20 }]}
+      >
+        No Past Goals yet
+      </Text>
+    );
+  };
 }
 
 const styles = StyleSheet.create({
-  button: {
-    flexGrow: 1,
-    height: 40,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
+  container: {
     margin: 10,
-    flexGrow: 1,
+    paddingBottom: 50,
   },
 });
 

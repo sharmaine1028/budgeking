@@ -25,19 +25,6 @@ class GoalsPage extends React.Component {
       auth.currentUser.email
     );
 
-    // this.unsubscribeShortTermOri = this.shortTermOri.onSnapshot(
-    //   (querySnapshot) => this.getGoals(querySnapshot, "short")
-    // );
-    // this.unsubscribeShortTermShared = this.shortTermShared.onSnapshot(
-    //   (querySnapshot) => this.getGoals(querySnapshot, "short")
-    // );
-    // this.unsubscribeLongTermOri = this.longTermOri.onSnapshot((querySnapshot) =>
-    //   this.getGoals(querySnapshot, "long")
-    // );
-    // this.unsubscribeLongTermShared = this.longTermShared.onSnapshot(
-    //   (querySnapshot) => this.getGoals(querySnapshot, "long")
-    // );
-
     this.state = {
       shortTermGoals: [],
       longTermGoals: [],
@@ -55,10 +42,6 @@ class GoalsPage extends React.Component {
     this.unsubscribeSavings = this.props.navigation.addListener("focus", () => {
       this.unsubscribeActiveGoalsOri;
       this.unsubscribeActiveGoalsShared;
-      // this.setState({
-      //   shortTermGoals: this.state.shortTermGoals,
-      //   longTermGoals: this.state.longTermGoals,
-      // });
     });
   }
 

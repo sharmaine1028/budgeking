@@ -22,6 +22,7 @@ class NewGoal extends React.Component {
     this.frequency = ["Daily", "Weekly", "Monthly", "Yearly"];
     this.state = {
       datePicker: false,
+      dateCreated: new Date(),
       goalDescription: "",
       target: "",
       frequency: "",
@@ -369,6 +370,7 @@ class NewGoal extends React.Component {
 
       db.collection("active goals").doc().set({
         createdBy: auth.currentUser.uid,
+        dateCreated: this.state.dateCreated,
         goalDescription: this.state.goalDescription,
         target: this.state.target,
         frequency: this.state.frequency,
