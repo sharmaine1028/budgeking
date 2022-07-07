@@ -19,9 +19,9 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 // **************custom date choosing - chart only changes after refreshing (idk how to refresh)
 
-const wait = (timeout) => {
-  return new Promise((resolve) => setTimeout(resolve, timeout));
-};
+// const wait = (timeout) => {
+//   return new Promise((resolve) => setTimeout(resolve, timeout));
+// };
 
 class ReportsPagePieChart extends React.Component {
   constructor() {
@@ -51,15 +51,10 @@ class ReportsPagePieChart extends React.Component {
       ],
       dateTo: new Date(),
       dateFrom: new Date(),
-      refreshing: false,
-      setRefreshing: false,
+      customExpenseArr: [],
+      // refreshing: false,
+      // setRefreshing: false,
     };
-  }
-
-  updateInputValCurrExpenseArr(val, prop) {
-    const state = this.state;
-    state[prop] = val;
-    this.setState(state);
   }
 
   // onRefresh = () => {
@@ -75,18 +70,30 @@ class ReportsPagePieChart extends React.Component {
 
   // calling budgetValue from firestore
   componentDidMount() {
-    this.setState({ dateTo: new Date(), dateFrom: new Date() });
+    this.setState({ customExpenseArr: [] });
     this.unsubscribe = this.fireStoreRef.onSnapshot(this.getCollection);
-    this.callDatesValue();
     this.callChooseTimeValue();
-    // this.setState({
-    //   dateTo: this.state.shortTermGoals,
-    //   longTermGoals: this.state.longTermGoals,
-    // });
+    this.callDatesValue();
+    this.setState({
+      customExpenseArr: this.state.customExpenseArr,
+    });
+    this.unsubscribeCurrExpense = this.props.navigation.addListener(
+      "focus",
+      () => {
+        this.setState({ customExpenseArr: [] });
+        this.unsubscribe;
+        this.callChooseTimeValue();
+        this.callDatesValue();
+        this.setState({
+          customExpenseArr: this.state.customExpenseArr,
+        });
+      }
+    );
   }
 
   componentWillUnmount() {
     this.unsubscribe();
+    this.unsubscribeCurrExpense();
     // this.focusListener();
   }
 
@@ -96,6 +103,19 @@ class ReportsPagePieChart extends React.Component {
       timeUserWants: this.state.timeUserWants,
     });
   };
+
+  inputCustExpenseFireStore = () => {
+    db.collection("users").doc(auth.currentUser.uid).update({
+      customExpenseArr: this.state.customExpenseArr,
+    });
+  };
+
+  updateCustExpenseState(val, prop) {
+    const state = this.state;
+    state[prop] = val;
+    this.setState(state);
+    this.inputCustExpenseFireStore();
+  }
 
   // update pie chart based on update on dateTo and dateFrom
   // componentDidUpdate(prevProps) {
@@ -392,6 +412,7 @@ class ReportsPagePieChart extends React.Component {
         customExpenseArray.push(expenseArrayTimeConverted[i]);
       }
     });
+    // this.updateCustExpenseState();
     return customExpenseArray;
   }
 
@@ -406,6 +427,8 @@ class ReportsPagePieChart extends React.Component {
       this.updateInputVal("This Year", "timeUserWants");
       this.inputChooseTimeFireStore();
     } else {
+      this.updateInputVal("Choose custom dates", "timeUserWants");
+      this.inputChooseTimeFireStore();
       this.props.navigation.navigate("Custom Date");
     }
   };
@@ -419,12 +442,39 @@ class ReportsPagePieChart extends React.Component {
     } else if (this.state.timeUserWants == "This Year") {
       dayText += new Date().getFullYear();
     } else {
-      dayText += this.state.dateFrom.toDate().toLocaleDateString();
+      console.log("hellloooo", this.state.dateTo);
+      dayText += this.dateFormat(this.state.dateFrom.seconds);
       dayText += " - ";
-      dayText += this.state.dateTo.toDate().toLocaleDateString();
+      dayText += this.dateFormat(this.state.dateTo.seconds);
     }
     return dayText;
   }
+
+  dateFormat = (seconds) => {
+    const date = new Date(seconds * 1000);
+    const [day, month, year] = [
+      date.getDate(),
+      date.getMonth(),
+      date.getFullYear(),
+    ];
+
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    return day.toString() + " " + months[month] + " " + year.toString();
+  };
 
   timeUserWantText() {
     if (this.state.timeUserWants == "This Month") {
@@ -500,7 +550,7 @@ class ReportsPagePieChart extends React.Component {
               radius={Dimensions.get("window").width * 0.4}
               textSize={15}
               data={pieData}
-              focusOnPress
+              // focusOnPress
               centerLabelComponent={() => {
                 return (
                   <Text

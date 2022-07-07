@@ -68,12 +68,12 @@ class ReportsPage extends React.Component {
     return (
       <KeyboardAwareScrollView>
         {/* change to OVERALL BALANCE (total savings = total budget value - total spending) */}
-        <View style={styles.reportBlocks}>
+        {/* <View style={styles.reportBlocks}>
           <Text style={styles.reportTitle}>OVERALL BALANCE</Text>
           <Text
             style={styles.reportInText}
           >{`$${this.state.budgetValue}`}</Text>
-        </View>
+        </View> */}
         <TouchableOpacity
           style={styles.reportBlocks}
           onPress={() => navigation.navigate("Pie Chart View")}

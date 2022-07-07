@@ -1,7 +1,7 @@
 import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Platform, StyleSheet, StatusBar, Image } from "react-native";
+import { Platform, StyleSheet, StatusBar, Image, LogBox } from "react-native";
 import colours from "./config/colours";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
@@ -24,6 +24,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+LogBox.ignoreAllLogs();
 
 function MyStack() {
   return (
@@ -74,7 +76,7 @@ function BudgetAll() {
       }}
     >
       <Stack.Screen
-        name="BudgetPage"
+        name="Budget"
         component={BudgetPage}
         options={{ headerLeft: false }}
       />

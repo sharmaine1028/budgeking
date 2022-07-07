@@ -112,6 +112,7 @@ class AllTableView extends React.Component {
   // locale time string????
   timeFormat(seconds) {
     var t = new Date(seconds * 1000);
+    console.log("t", t.getHours());
     var hours = t.getHours();
     var minutes = t.getMinutes();
     var newFormat = t.getHours() > 12 ? "PM" : "AM";
@@ -170,16 +171,27 @@ class AllTableView extends React.Component {
   };
 
   whatBudget() {
-    if (this.state.budget == "Expense") {
+    if (this.state.budget == "Expense" && this.state.expenseArr.length !== 0) {
       return this.sortedArr(this.state.expenseArr).map((doc) =>
         this.generateExpensesIncome(doc)
       );
-    } else {
+    } else if (
+      this.state.budget == "Income" &&
+      this.state.incomeArr.length !== 0
+    ) {
       return this.sortedArr(this.state.incomeArr).map((doc) =>
         this.generateExpensesIncome(doc)
       );
+    } else {
+      return this.renderNoRecords();
     }
   }
+
+  renderNoRecords = () => {
+    return (
+      <Text style={{ alignSelf: "center", marginTop: 20 }}>No Records Yet</Text>
+    );
+  };
 
   budgetButtons = () => {
     return (

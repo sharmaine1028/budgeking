@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableHighlight,
   View,
   Image,
 } from "react-native";
@@ -70,9 +71,9 @@ class ChooseCustomDate extends React.Component {
   };
 
   confirmBlackButton() {
-    console.log("before", this.state.timeUserWants);
+    // console.log("before", this.state.timeUserWants);
     this.updateInputVal1("Choose custom dates", "timeUserWants");
-    console.log("after", this.state.timeUserWants);
+    // console.log("after", this.state.timeUserWants);
     this.inputChooseTimeFireStore();
     this.props.navigation.navigate("Pie Chart View");
   }
