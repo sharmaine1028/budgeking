@@ -56,6 +56,7 @@ class NewGoal extends React.Component {
             separator="."
             precision={2}
             minValue={0}
+            maxValue={9999999999999}
             onChangeValue={(val) => this.updateInputVal(val, "target")}
             placeholder="Type Here"
           />

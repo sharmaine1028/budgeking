@@ -38,6 +38,11 @@ function SaveToGoal({ route, navigation }) {
         style={{ marginBottom: 5 }}
       />
       <NewGoalInput
+        title={"Target"}
+        value={"$" + String(doc.target)}
+        editable={false}
+      />
+      <NewGoalInput
         title={"Current Savings"}
         value={"$" + String(currSavingsAmt)}
         editable={false}
@@ -53,6 +58,7 @@ function SaveToGoal({ route, navigation }) {
           separator="."
           precision={2}
           minValue={0}
+          maxValue={doc.target}
           onChangeValue={(val) => setSavingsAmt(val)}
           placeholder="Type Here"
         />

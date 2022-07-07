@@ -169,10 +169,11 @@ function EditGoal({ route, navigation }) {
           value={data.target}
           prefix="$"
           unit="$"
-          delimiter=","
+          delimiter="," 
           separator="."
           precision={2}
           minValue={0}
+          maxValue={9999999999999}
           onChangeValue={(val) => setData({ ...data, target: val })}
           placeholder="Type Here"
         />
