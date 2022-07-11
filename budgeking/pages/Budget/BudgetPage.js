@@ -69,6 +69,7 @@ class BudgetPage extends React.Component {
                 delimiter=","
                 separator="."
                 precision={2}
+                minValue={0}
                 onChangeValue={(val) => this.updateInputVal(val, "value")}
                 // onChangeText={(formattedValue) => {
                 //   this.updateInputVal(formattedValue, "value");
