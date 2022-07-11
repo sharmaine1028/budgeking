@@ -16,19 +16,26 @@ function SaveToGoal({ route, navigation }) {
 
   useEffect(() => {
     const unsubscribe = dataRef.onSnapshot((doc) => {
-      setCurrSavingsAmt(doc.data().currSavingsAmt.toFixed(2));
+      if (doc.exists) {
+        setCurrSavingsAmt(doc.data().currSavingsAmt.toFixed(2));
+      }
     });
     return unsubscribe;
   }, [currSavingsAmt, setCurrSavingsAmt]);
 
-  const updateSavings = (val) => {
+  const updateSavings = async (val) => {
     if (Number(val) === 0) {
       alert("Please enter a value");
       return;
     }
     const newAmt = Number(currSavingsAmt) + Number(val);
-    saveItem(doc.id, time, newAmt);
+
+    const data = await dataRef
+      .get()
+      .then((doc) => doc.data())
+      .catch((err) => console.log(err));
     navigation.navigate("Goals");
+    saveItem(doc.id, time, newAmt, data);
   };
 
   return (

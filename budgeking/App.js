@@ -1,7 +1,7 @@
 import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Platform, StyleSheet, StatusBar, Image, LogBox } from "react-native";
+import { Platform, StyleSheet, StatusBar, LogBox } from "react-native";
 import colours from "./config/colours";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
@@ -213,21 +213,21 @@ function MyTabs() {
   );
 }
 
-// export default function App() {
-//   return (
-//     <NavigationContainer theme={{ colors: colours.black }}>
-//       <MyStack />
-//     </NavigationContainer>
-//   );
-// }
-
 export default function App() {
   return (
     <NavigationContainer theme={{ colors: colours.black }}>
-      <GoalsAll />
+      <MyStack />
     </NavigationContainer>
   );
 }
+
+// export default function App() {
+//   return (
+//     <NavigationContainer theme={{ colors: colours.black }}>
+//       <GoalsAll />
+//     </NavigationContainer>
+//   );
+// }
 
 const styles = StyleSheet.create({
   bottomTabIcon: {

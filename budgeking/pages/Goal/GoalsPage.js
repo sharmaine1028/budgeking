@@ -1,10 +1,19 @@
 import React from "react";
-import { View, StyleSheet, Text, LogBox } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  LogBox,
+  Modal,
+  TouchableOpacity,
+} from "react-native";
 import { BlackButton } from "../../config/reusableButton";
 import { Title } from "../../config/reusableText";
 import { auth, db } from "../../config/firebase";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import GenerateGoal from "./GenerateGoal";
+import { Image } from "react-native";
+import colours from "../../config/colours";
 
 LogBox.ignoreLogs([
   "Non-serializable values were found in the navigation state",
@@ -28,6 +37,7 @@ class GoalsPage extends React.Component {
     this.state = {
       shortTermGoals: [],
       longTermGoals: [],
+      showModal: false,
     };
   }
 
@@ -54,6 +64,40 @@ class GoalsPage extends React.Component {
   render() {
     return (
       <KeyboardAwareScrollView contentContainerStyle={styles.container}>
+        {this.state.showModal && (
+          <View style={styles.modalView}>
+            <Modal
+              transparent={true}
+              visible={this.state.showModal}
+              onRequestClose={() =>
+                this.setState({ showModal: forModalPresentationIOS })
+              }
+            >
+              <View style={styles.modalView}>
+                <View style={styles.modal}>
+                  <Image
+                    source={require("../../assets/congrats.gif")}
+                    style={styles.modalImage}
+                  />
+                  <Text style={{ fontSize: 16, marginBottom: 10 }}>
+                    Goal completed
+                  </Text>
+                  <Text style={{ marginBottom: 20 }}>
+                    {" "}
+                    Congrats on completing your goal!
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => this.setState({ showModal: false })}
+                  >
+                    <Text>High Five!</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </View>
+        )}
+
         <View style={styles.buttonContainer}>
           <BlackButton
             text={"Add new goals"}
@@ -128,6 +172,22 @@ class GoalsPage extends React.Component {
     }
   };
 
+  moveToInactive = (id, data) => {
+    db.collection("inactive goals").doc(id).set({
+      createdBy: data.createdBy,
+      goalDescription: data.goalDescription,
+      target: data.target,
+      frequency: data.frequency,
+      freqAmount: data.freqAmount,
+      deadline: data.deadline,
+      notes: data.notes,
+      isSharing: data.isSharing,
+      sharingEmails: data.sharingEmails,
+      sharingUIDs: data.sharingUIDs,
+      currSavingsAmt: data.currSavingsAmt,
+    });
+  };
+
   editGoal = (id, time, data) => {
     if (time === "short term") {
       const newList = this.state.shortTermGoals.filter(
@@ -153,7 +213,13 @@ class GoalsPage extends React.Component {
     });
   };
 
-  saveToGoal = (id, time, newAmt) => {
+  saveToGoal = (id, time, newAmt, data) => {
+    if (newAmt >= data.target) {
+      this.setState({ showModal: true });
+      this.moveToInactive(id, data);
+      this.deleteGoal(id, time);
+    }
+
     if (time === "short term") {
       const newList = this.state.shortTermGoals.filter(
         (item) => item.id !== id
@@ -199,6 +265,40 @@ const styles = StyleSheet.create({
   container: {
     margin: 10,
     paddingBottom: 50,
+  },
+  modal: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  modalButton: {
+    borderRadius: 20,
+    padding: 10,
+    backgroundColor: colours.lightBrown,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  modalImage: {
+    width: 70,
+    height: 90,
+    overflow: "visible",
+    resizeMode: "contain",
+  },
+  modalView: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
