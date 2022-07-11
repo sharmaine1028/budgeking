@@ -112,7 +112,7 @@ class AllTableView extends React.Component {
   // locale time string????
   timeFormat(seconds) {
     var t = new Date(seconds * 1000);
-    console.log("t", t.getHours());
+    // console.log("t", t.getHours());
     var hours = t.getHours();
     var minutes = t.getMinutes();
     var newFormat = t.getHours() > 12 ? "PM" : "AM";

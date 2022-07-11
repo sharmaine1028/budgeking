@@ -16,7 +16,7 @@ import { db } from "../../config/firebase";
 import { Ionicons } from "@expo/vector-icons";
 import { Menu, MenuItem } from "react-native-material-menu";
 
-function GenerateOldGoal({ doc, time, deleteItem, saveItem, editItem }) {
+function GenerateOldGoal({ doc, deleteItem }) {
   const navigation = useNavigation();
   const [showMore, setShowMore] = useState(false);
   const [showMenu, setShowMenu] = useState(false);

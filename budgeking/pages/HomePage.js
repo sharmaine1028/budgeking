@@ -1,4 +1,4 @@
-import React, { useState, Component } from "react";
+import React, { useState, Component, useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,6 +9,7 @@ import {
   Animated,
   ActivityIndicator,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import colours from "../config/colours";
 import { auth, db } from "../config/firebase";
@@ -21,10 +22,10 @@ import CurrencyInput, { TextWithCursor } from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SmallBlackButton } from "../config/reusableButton";
 import Icon from "react-native-vector-icons/AntDesign";
-import { color } from "react-native-elements/dist/helpers";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { GreyLine } from "../config/reusablePart";
 import { BlackButton } from "../config/reusableButton";
+import { Context } from "../App";
+import { Divider } from "react-native-elements";
 
 const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
@@ -62,6 +63,8 @@ class HomePage extends React.Component {
       ],
     };
   }
+
+  static contextType = Context;
 
   updateInputVal(val, prop) {
     const state = this.state;
@@ -440,6 +443,7 @@ class HomePage extends React.Component {
   render() {
     const { navigation } = this.props;
     const pieData = this.putInTextToPie();
+    const { offTrackGoals } = this.context;
 
     const renderLegend = (text, color) => {
       return (
@@ -625,6 +629,35 @@ class HomePage extends React.Component {
             </View>
           </View>
 
+          {offTrackGoals === undefined || offTrackGoals.length === 0 ? null : (
+            <View style={styles.notifContainer}>
+              <Text style={{ color: colours.darkgrey }}>Notifications</Text>
+              <Divider
+                orientation="horizontal"
+                color={colours.darkgrey}
+                width={0.5}
+                style={{ marginVertical: 3 }}
+              />
+              {offTrackGoals.map((item) => (
+                <View key={item.id}>
+                  <View style={{ padding: 10 }}>
+                    <Text>Attention! Goal</Text>
+                    <Text style={{ color: colours.darkgrey }}>
+                      You went off track for a goal: Save for{" "}
+                      {item.goalDescription}
+                    </Text>
+                    <Divider
+                      orientation="horizontal"
+                      color={colours.darkgrey}
+                      width={0.5}
+                      style={{ marginVertical: 3 }}
+                    />
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+
           <View style={styles.lastRecordTitle}>
             <Header style={styles.lastRecordText} text={"Last records"} />
             <RedLine />
@@ -670,6 +703,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
     fontWeight: "300",
+  },
+  notifContainer: {
+    marginTop: 20,
+    backgroundColor: colours.lightBrown,
+    borderRadius: 10,
+    padding: 10,
   },
   // changeLineHeightWeeklyBudget: {
   //   lineHeight: 10,

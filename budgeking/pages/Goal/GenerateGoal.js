@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   StyleSheet,
@@ -15,11 +15,13 @@ import colours from "../../config/colours";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { db } from "../../config/firebase";
 import { Ionicons } from "@expo/vector-icons";
+import { Context } from "../../App";
 
 function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   const navigation = useNavigation();
   const [isMenu, setIsMenu] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const { offTrackGoals, setOffTrackGoals } = useContext(Context);
 
   const getPercent = () => {
     const percent = (doc.currSavingsAmt / doc.target) * 100;
@@ -73,6 +75,9 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
         {
           text: "Yes",
           onPress: () => {
+            const newList = offTrackGoals.filter((item) => item.id !== doc.id);
+            console.log("hi", newList);
+            setOffTrackGoals(newList);
             deleteItem(doc.id, time);
           },
         },
@@ -100,26 +105,33 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
       supposedAmt = doc.freqAmount * years;
     } else if (doc.frequency === "Monthly") {
       const months =
-        years * 12 + deadline.getMonth() - today.getMonth() <= 0
+        years * 12 + today.getMonth() - dateCreated.getMonth() <= 0
           ? 0
-          : years * 12 + deadline.getMonth() - today.getMonth();
+          : years * 12 + today.getMonth() - dateCreated.getMonth();
       supposedAmt = doc.freqAmount * months;
     } else if (doc.frequency === "Weekly") {
       const msInWeek = 1000 * 60 * 60 * 24 * 7;
-      const weeks = Math.round(Math.abs(deadline - today) / msInWeek);
+      const weeks = Math.round(Math.abs(today - dateCreated) / msInWeek);
       supposedAmt = doc.freqAmount * weeks;
     } else {
       const msInDay = 1000 * 3600 * 24;
-      const days = Math.round(Math.abs(deadline - today) / msInDay);
+      const days = Math.round(Math.abs(today - dateCreated) / msInDay);
       supposedAmt = doc.freqAmount * days;
     }
 
-    console.log(supposedAmt);
+    const { offTrackGoals, setOffTrackGoals } = useContext(Context);
     // Compare supposed amount with curramount
     if (doc.currSavingsAmt < supposedAmt) {
+      const newList = offTrackGoals.filter((item) => item.id !== doc.id);
+      newList.push({ ...doc });
+      useEffect(() => setOffTrackGoals(newList), []);
+
       return true;
+    } else {
+      const newList = offTrackGoals.filter((item) => item.id !== doc.id);
+      useEffect(() => setOffTrackGoals(newList), []);
+      return false;
     }
-    return false;
   };
 
   return (
@@ -175,9 +187,18 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
         </Menu>
       </View>
 
-      <Text style={styles.goalTagline}>
-        Save ${doc.freqAmount} {doc.frequency}
-      </Text>
+      {isOffTrack() ? (
+        <Text style={styles.goalTagline}>
+          You're behind schedule to save ${doc.freqAmount}{" "}
+          {doc.frequency.toString().toLowerCase()}
+        </Text>
+      ) : (
+        <Text style={styles.goalTagline}>
+          You're on track to save ${doc.freqAmount}{" "}
+          {doc.frequency.toString().toLowerCase()}
+        </Text>
+      )}
+
       <View style={styles.goalLine}>
         <MaterialCommunityIcons
           name="bullseye-arrow"

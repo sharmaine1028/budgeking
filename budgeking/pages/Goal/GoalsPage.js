@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   View,
   StyleSheet,
@@ -14,6 +14,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import GenerateGoal from "./GenerateGoal";
 import { Image } from "react-native";
 import colours from "../../config/colours";
+import { Context } from "../../App";
 
 LogBox.ignoreLogs([
   "Non-serializable values were found in the navigation state",
@@ -211,6 +212,7 @@ class GoalsPage extends React.Component {
 
     this.activeGoalsRef.doc(id).set({
       createdBy: data.createdBy,
+      dateCreated: data.dateCreated,
       goalDescription: data.goalDescription,
       target: data.target,
       frequency: data.frequency,
@@ -253,6 +255,7 @@ class GoalsPage extends React.Component {
       const newList = this.state.longTermGoals.filter((item) => item.id !== id);
       this.setState({ longTermGoals: newList });
     }
+
     this.activeGoalsRef.doc(id).delete();
   };
 
