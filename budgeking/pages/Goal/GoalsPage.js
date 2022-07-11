@@ -183,7 +183,6 @@ class GoalsPage extends React.Component {
   };
 
   moveToInactive = (id, data) => {
-    console.log("hi");
     db.collection("inactive goals").doc(id).set({
       createdBy: data.createdBy,
       goalDescription: data.goalDescription,
@@ -252,7 +251,6 @@ class GoalsPage extends React.Component {
   };
 
   deleteGoal = (id, time) => {
-    console.log("bye");
     if (time === "short term") {
       const newList = this.state.shortTermGoals.filter(
         (item) => item.id !== id

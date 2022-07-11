@@ -66,7 +66,7 @@ class GoalHistory extends React.Component {
   getGoals = (querySnapshot) => {
     try {
       querySnapshot.forEach((doc) => {
-        const newState = this.state.shortTermGoals.filter(
+        const newState = this.state.inactiveGoals.filter(
           (item) => item.id !== doc.id
         );
         this.setState({
