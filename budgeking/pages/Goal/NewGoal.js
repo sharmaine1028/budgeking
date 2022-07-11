@@ -27,7 +27,7 @@ class NewGoal extends React.Component {
       target: "",
       frequency: "",
       freqAmount: "",
-      deadline: new Date().setHours(23).setMinutes(59).setSeconds(59),
+      deadline: new Date(),
       notes: "",
       isSharing: false,
       email: "",
@@ -204,12 +204,8 @@ class NewGoal extends React.Component {
   };
 
   onDateSelected = (event, value) => {
-    const val = value;
-    val.setHours(23);
-    val.setMinutes(59);
-    val.setSeconds(59);
     this.setState({
-      deadline: val,
+      deadline: value,
       datePicker: false,
     });
     this.updateFreqAmount();
@@ -375,6 +371,11 @@ class NewGoal extends React.Component {
         return;
       }
 
+      const deadline = this.state.deadline;
+      deadline.setHours(23);
+      deadline.setMinutes(59);
+      deadline.setSeconds(59);
+
       db.collection("active goals").doc().set({
         createdBy: auth.currentUser.uid,
         dateCreated: this.state.dateCreated,
@@ -382,7 +383,7 @@ class NewGoal extends React.Component {
         target: this.state.target,
         frequency: this.state.frequency,
         freqAmount: this.state.freqAmount,
-        deadline: this.state.deadline,
+        deadline: deadline,
         notes: this.state.notes,
         isSharing: this.state.isSharing,
         sharingEmails: this.state.sharingEmails,
