@@ -122,42 +122,11 @@ class GoalsPage extends React.Component {
             longTermGoals: [...newState, { ...doc.data(), id: doc.id }],
           });
         }
-        // newState.push({ ...doc.data(), id: doc.id });
       });
     } catch {
       (err) => console.log(err);
     }
   };
-
-  /*
-  getGoals = (querySnapshot, timePeriod) => {
-    try {
-      if (timePeriod === "short") {
-        let newState = this.state.shortTermGoals;
-        querySnapshot.forEach((doc) => {
-          newState = newState.filter((item) => item.id !== doc.id);
-          newState.push({ ...doc.data(), id: doc.id });
-        });
-        this.setState({
-          shortTermGoals: newState,
-        });
-      }
-
-      if (timePeriod === "long") {
-        let newState = this.state.longTermGoals;
-        querySnapshot.forEach((doc) => {
-          newState = newState.filter((item) => item.id !== doc.id);
-          newState.push({ ...doc.data(), id: doc.id });
-        });
-        this.setState({
-          longTermGoals: newState,
-        });
-      }
-    } catch {
-      (err) => console.log(err);
-    }
-  };
-  */
 
   editGoal = (id, time, data) => {
     if (time === "short term") {
