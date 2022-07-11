@@ -107,15 +107,16 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
     } else if (doc.frequency === "Weekly") {
       const msInWeek = 1000 * 60 * 60 * 24 * 7;
       const weeks = Math.round(Math.abs(deadline - today) / msInWeek);
-      supposedAmt = doc.freqAmount * years;
+      supposedAmt = doc.freqAmount * weeks;
     } else {
       const msInDay = 1000 * 3600 * 24;
       const days = Math.round(Math.abs(deadline - today) / msInDay);
-      supposedAmt = doc.freqAmount * years;
+      supposedAmt = doc.freqAmount * days;
     }
 
+    console.log(supposedAmt);
     // Compare supposed amount with curramount
-    if (doc.currSavingsAmt < doc.supposedAmt) {
+    if (doc.currSavingsAmt < supposedAmt) {
       return true;
     }
     return false;
