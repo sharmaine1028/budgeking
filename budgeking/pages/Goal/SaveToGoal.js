@@ -65,7 +65,7 @@ function SaveToGoal({ route, navigation }) {
           separator="."
           precision={2}
           minValue={0}
-          maxValue={doc.target}
+          maxValue={doc.target - doc.currSavingsAmt}
           onChangeValue={(val) => setSavingsAmt(val)}
           placeholder="Type Here"
         />
