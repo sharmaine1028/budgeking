@@ -58,7 +58,10 @@ class NewGoal extends React.Component {
             precision={2}
             minValue={0}
             maxValue={9999999999999}
-            onChangeValue={(val) => this.updateInputVal(val, "target")}
+            onChangeValue={(val) => {
+              this.updateInputVal(val, "target");
+              this.updateFreqAmount();
+            }}
             placeholder="Type Here"
           />
         </View>

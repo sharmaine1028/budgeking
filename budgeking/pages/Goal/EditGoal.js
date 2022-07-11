@@ -171,8 +171,8 @@ function EditGoal({ route, navigation }) {
 
   const editGoal = () => {
     // time period check
-    editItem(doc.id, time, data);
     navigation.navigate("Goals");
+    editItem(doc.id, time, data);
   };
 
   return (

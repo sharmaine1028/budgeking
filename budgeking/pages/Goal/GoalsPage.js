@@ -142,6 +142,9 @@ class GoalsPage extends React.Component {
     );
   }
 
+  /*
+  Getting goals from database and categorising to short and long term goal
+  */
   getGoals = (querySnapshot) => {
     try {
       querySnapshot.forEach((doc) => {
@@ -172,7 +175,15 @@ class GoalsPage extends React.Component {
     }
   };
 
+  isOffTrack = (data) => {
+    const today = new Date();
+    // Get supposed amount
+    // Compare supposed amount with curramount
+    // If behind track, send to home page
+  };
+
   moveToInactive = (id, data) => {
+    console.log("hi");
     db.collection("inactive goals").doc(id).set({
       createdBy: data.createdBy,
       goalDescription: data.goalDescription,
@@ -198,6 +209,14 @@ class GoalsPage extends React.Component {
       const newList = this.state.longTermGoals.filter((item) => item.id !== id);
       this.setState({ longTermGoals: newList });
     }
+
+    if (data.target <= data.currSavingsAmt) {
+      this.setState({ showModal: true });
+      this.moveToInactive(id, data);
+      this.deleteGoal(id, time);
+      return;
+    }
+
     this.activeGoalsRef.doc(id).set({
       createdBy: data.createdBy,
       goalDescription: data.goalDescription,
@@ -233,6 +252,7 @@ class GoalsPage extends React.Component {
   };
 
   deleteGoal = (id, time) => {
+    console.log("bye");
     if (time === "short term") {
       const newList = this.state.shortTermGoals.filter(
         (item) => item.id !== id

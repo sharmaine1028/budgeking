@@ -51,7 +51,11 @@ class GoalHistory extends React.Component {
         <View>
           {this.state.inactiveGoals.length !== 0
             ? this.state.inactiveGoals.map((doc) => (
-                <GenerateOldGoal key={doc.id} doc={doc} />
+                <GenerateOldGoal
+                  key={doc.id}
+                  doc={doc}
+                  deleteItem={this.deleteItem}
+                />
               ))
             : this.renderNoGoals()}
         </View>
@@ -62,11 +66,11 @@ class GoalHistory extends React.Component {
   getGoals = (querySnapshot) => {
     try {
       querySnapshot.forEach((doc) => {
+        const newState = this.state.shortTermGoals.filter(
+          (item) => item.id !== doc.id
+        );
         this.setState({
-          inactiveGoals: [
-            ...this.state.inactiveGoals,
-            { ...doc.data(), id: doc.id },
-          ],
+          inactiveGoals: [...newState, { ...doc.data(), id: doc.id }],
         });
       });
     } catch {
@@ -82,6 +86,12 @@ class GoalHistory extends React.Component {
         No Past Goals yet
       </Text>
     );
+  };
+
+  deleteItem = (id) => {
+    const newList = this.state.inactiveGoals.filter((item) => item.id !== id);
+    this.setState({ inactiveGoals: newList });
+    this.inactiveGoalsRef.doc(id).delete();
   };
 }
 
