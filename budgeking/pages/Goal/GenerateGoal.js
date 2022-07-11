@@ -85,8 +85,44 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
     );
   };
 
+  const isOffTrack = () => {
+    const today = new Date();
+    const deadline = new Date(doc.deadline.seconds * 1000);
+    const dateCreated = new Date(doc.dateCreated.seconds * 1000);
+
+    if (deadline < today) {
+      return true;
+    }
+    // Get supposed amount based on frequency
+    const years = today.getFullYear() - dateCreated.getFullYear();
+    let supposedAmt;
+    if (doc.frequency === "Yearly") {
+      supposedAmt = doc.freqAmount * years;
+    } else if (doc.frequency === "Monthly") {
+      const months =
+        years * 12 + deadline.getMonth() - today.getMonth() <= 0
+          ? 0
+          : years * 12 + deadline.getMonth() - today.getMonth();
+      supposedAmt = doc.freqAmount * months;
+    } else if (doc.frequency === "Weekly") {
+      const msInWeek = 1000 * 60 * 60 * 24 * 7;
+      const weeks = Math.round(Math.abs(deadline - today) / msInWeek);
+      supposedAmt = doc.freqAmount * years;
+    } else {
+      const msInDay = 1000 * 3600 * 24;
+      const days = Math.round(Math.abs(deadline - today) / msInDay);
+      supposedAmt = doc.freqAmount * years;
+    }
+
+    // Compare supposed amount with curramount
+    if (doc.currSavingsAmt < doc.supposedAmt) {
+      return true;
+    }
+    return false;
+  };
+
   return (
-    <View key={doc.id} style={styles.goal}>
+    <View key={doc.id} style={isOffTrack() ? styles.goalRed : styles.goal}>
       <View
         style={{
           flexDirection: "row",
@@ -251,6 +287,12 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
 const styles = StyleSheet.create({
   goal: {
     backgroundColor: colours.lightBrown,
+    borderRadius: 15,
+    marginVertical: 5,
+    padding: 10,
+  },
+  goalRed: {
+    backgroundColor: colours.tomato,
     borderRadius: 15,
     marginVertical: 5,
     padding: 10,

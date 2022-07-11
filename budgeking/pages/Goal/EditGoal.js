@@ -35,6 +35,9 @@ function EditGoal({ route, navigation }) {
   };
 
   const onDateSelected = (event, value) => {
+    value.setHours(23);
+    value.setMinutes(59);
+    value.setSeconds(59);
     setDatePicker(false);
     setData({ ...data, deadline: value });
   };

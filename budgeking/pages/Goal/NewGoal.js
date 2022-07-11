@@ -27,7 +27,7 @@ class NewGoal extends React.Component {
       target: "",
       frequency: "",
       freqAmount: "",
-      deadline: new Date(),
+      deadline: new Date().setHours(23).setMinutes(59).setSeconds(59),
       notes: "",
       isSharing: false,
       email: "",
@@ -204,8 +204,12 @@ class NewGoal extends React.Component {
   };
 
   onDateSelected = (event, value) => {
+    const val = value;
+    val.setHours(23);
+    val.setMinutes(59);
+    val.setSeconds(59);
     this.setState({
-      deadline: value,
+      deadline: val,
       datePicker: false,
     });
     this.updateFreqAmount();

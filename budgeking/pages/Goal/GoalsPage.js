@@ -175,13 +175,6 @@ class GoalsPage extends React.Component {
     }
   };
 
-  isOffTrack = (data) => {
-    const today = new Date();
-    // Get supposed amount
-    // Compare supposed amount with curramount
-    // If behind track, send to home page
-  };
-
   moveToInactive = (id, data) => {
     db.collection("inactive goals").doc(id).set({
       createdBy: data.createdBy,
