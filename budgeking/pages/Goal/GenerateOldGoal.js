@@ -56,46 +56,24 @@ function GenerateOldGoal({ doc, time, deleteItem, saveItem, editItem }) {
     return day.toString() + " " + months[month] + " " + year.toString();
   };
 
-  const renderMenu = () => {
-    return (
-      <Menu
-        visible={showMenu}
-        anchor={
-          <TouchableOpacity onPress={() => setShowMenu(true)}>
-            <MaterialCommunityIcons
-              name="more"
-              size={24}
-              color={colours.black}
-            />
-          </TouchableOpacity>
-        }
-        onRequestClose={() => setShowMenu(false)}
-      >
-        <MenuItem
-          onPress={() =>
-            navigation.navigate("Edit Goal", {
-              doc: doc,
-              time: time,
-              editItem: editItem,
-            })
-          }
-        >
-          Edit
-        </MenuItem>
-
-        <MenuItem
-          onPress={() => {
-            navigation.navigate("Save to Goal", {
-              doc: doc,
-              time: time,
-              saveItem: saveItem,
-            });
-          }}
-        >
-          Save
-        </MenuItem>
-        <MenuItem onPress={() => deleteItem(doc.id)}>Delete</MenuItem>
-      </Menu>
+  const deleteGoal = (id) => {
+    return Alert.alert(
+      "Are you sure?",
+      "This is irreversible. Are you sure you want to delete this goal?",
+      [
+        // "Yes button"
+        {
+          text: "Yes",
+          onPress: () => {
+            deleteItem(id);
+          },
+        },
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: "No",
+        },
+      ]
     );
   };
 
@@ -236,30 +214,7 @@ function GenerateOldGoal({ doc, time, deleteItem, saveItem, editItem }) {
       }
       onRequestClose={() => setShowMenu(false)}
     >
-      <MenuItem
-        onPress={() =>
-          navigation.navigate("Edit Goal", {
-            doc: doc,
-            time: time,
-            editItem: editItem,
-          })
-        }
-      >
-        Edit
-      </MenuItem>
-
-      <MenuItem
-        onPress={() => {
-          navigation.navigate("Save to Goal", {
-            doc: doc,
-            time: time,
-            saveItem: saveItem,
-          });
-        }}
-      >
-        Save
-      </MenuItem>
-      <MenuItem onPress={() => deleteItem(doc.id)}>Delete</MenuItem>
+      <MenuItem onPress={() => deleteGoal(doc.id)}>Delete</MenuItem>
     </Menu>
   );
 }
