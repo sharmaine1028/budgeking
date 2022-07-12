@@ -169,6 +169,8 @@ export function NewGoalInput({
   keyboardType,
   onKeyPress,
   editable,
+  returnKeyType,
+  onSubmitEditing,
 }) {
   return (
     <View style={styles.newGoalInput}>
@@ -183,6 +185,8 @@ export function NewGoalInput({
         keyboardType={keyboardType}
         onKeyPress={onKeyPress}
         editable={editable}
+        returnKeyType={returnKeyType}
+        onSubmitEditing={onSubmitEditing}
       />
     </View>
   );
@@ -211,7 +215,7 @@ export function BudgetInput({
   );
 }
 
-export function YesOrNo({ title, selectedBtn }) {
+export function YesOrNo({ title, selectedBtn, initial }) {
   const data = [{ label: "Yes" }, { label: "No" }];
   return (
     <View style={styles.newGoalInput}>
@@ -221,7 +225,7 @@ export function YesOrNo({ title, selectedBtn }) {
         box={false}
         circleSize={10}
         deactiveColor={colours.white}
-        initial={2}
+        initial={initial ? initial : 2}
         selectedBtn={selectedBtn}
       />
     </View>
@@ -282,7 +286,7 @@ export const styles = StyleSheet.create({
     borderRadius: 5,
     shadowColor: "#000",
     marginVertical: 5,
-    shadowOpacity: 0,
+
     shadowRadius: 1,
     elevation: 8,
     paddingHorizontal: 5,

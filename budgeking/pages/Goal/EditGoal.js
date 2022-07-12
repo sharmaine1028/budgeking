@@ -9,32 +9,38 @@ import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import colours from "../../config/colours";
-import { Picker } from "@react-native-picker/picker";
 import { TextInput } from "react-native-gesture-handler";
 import CurrencyInput from "react-native-currency-input";
+import { auth, db } from "../../config/firebase";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import SelectDropdown from "react-native-select-dropdown";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 function EditGoal({ route, navigation }) {
   const { doc, time, editItem } = route.params;
   const [data, setData] = useState(doc);
   const [datePicker, setDatePicker] = useState(false);
+  const [email, setEmail] = useState("");
+  const frequency = ["Daily", "Weekly", "Monthly", "Yearly"];
+  const [sharingEmails, setSharingEmails] = useState(
+    doc.sharingEmails.filter((item) => item !== auth.currentUser.email)
+  );
 
   useEffect(
     () => updateFreqAmount(),
-    [data.frequency, date.target, data.deadline]
+    [data.frequency, data.target, data.deadline]
   );
 
   const showDatePicker = () => {
     setDatePicker(true);
   };
 
-  const onDateSelected = (event, value) => {
-    setData({ ...data, deadline: value }, () => updateFreqAmount());
+  const onDateSelected = async (event, value) => {
     setDatePicker(false);
+    setData({ ...data, deadline: value });
   };
 
-  const dateFormat = (seconds) => {
-    const date = new Date(seconds * 1000);
-
+  const dateFormat = (date) => {
     const [day, month, year] = [
       date.getDate(),
       date.getMonth(),
@@ -67,12 +73,9 @@ function EditGoal({ route, navigation }) {
     if (data.target === "") return;
     const today = new Date();
 
-    const deadline =
-      data.deadline instanceof Date
-        ? data.deadline
-        : new Date(data.deadline.seconds * 1000);
+    const deadline = data.deadline;
 
-    const target = data.target;
+    const target = data.target - data.currSavingsAmt;
 
     const years = deadline.getFullYear() - today.getFullYear();
 
@@ -104,13 +107,87 @@ function EditGoal({ route, navigation }) {
     setData({ ...data, freqAmount: format(freqAmount) });
   };
 
+  const deleteEmail = (tobeRemoved) => {
+    const changedEmails = sharingEmails.filter(
+      (email) => email !== tobeRemoved
+    );
+    setSharingEmails(changedEmails);
+    if (changedEmails.length === 0) {
+      setData({ ...data, isSharing: false });
+    }
+  };
+
+  const share = (choice) => {
+    if (choice.label === "Yes") {
+      setData({ ...data, isSharing: true });
+    } else {
+      setData({
+        ...data,
+        isSharing: false,
+        sharingEmails: [],
+      });
+    }
+  };
+
+  const onSubmitEmail = () => {
+    checkEmail(email);
+  };
+
+  const onTypingEmail = (e) => {
+    var key = e.nativeEvent.key;
+    if (key === "Enter" || key === " " || key === ",") {
+      const trimEmail = email.trim();
+      checkEmail(trimEmail);
+    }
+  };
+
+  const checkEmail = async (email) => {
+    if (email === auth.currentUser.email) {
+      alert("You can't add yourself!");
+      setEmail("");
+
+      return;
+    }
+
+    if (sharingEmails.includes(email)) {
+      alert("This email has already been added");
+      setEmail("");
+      return;
+    }
+
+    const sharingUID = await db
+      .collection("userLookup")
+      .doc(email)
+      .get()
+      .then((data) => {
+        if (data.exists) {
+          setSharingEmails([...sharingEmails, email]);
+          setEmail("");
+          return data.data().uid;
+        } else {
+          alert("User does not exist");
+          setEmail("");
+
+          return null;
+        }
+      })
+      .catch((err) => console.log(err));
+  };
+
   const editGoal = () => {
-    editItem(doc.id, time, data);
+    const finalData = data;
+    finalData.sharingEmails = [...sharingEmails, auth.currentUser.email];
+    finalData.deadline.setHours(23);
+    finalData.deadline.setMinutes(59);
+    finalData.deadline.setSeconds(59);
+    editItem(doc.id, time, finalData);
     navigation.navigate("Goals");
   };
 
   return (
-    <KeyboardAwareScrollView contentContainerStyle={{ margin: 5 }}>
+    <KeyboardAwareScrollView
+      contentContainerStyle={{ margin: 5, paddingBottom: 20 }}
+    >
       <NewGoalInput
         title={"Goal Description"}
         onChangeText={(val) => setData({ ...data, goalDescription: val })}
@@ -128,6 +205,7 @@ function EditGoal({ route, navigation }) {
           separator="."
           precision={2}
           minValue={0}
+          maxValue={9999999999999}
           onChangeValue={(val) => setData({ ...data, target: val })}
           placeholder="Type Here"
         />
@@ -139,20 +217,35 @@ function EditGoal({ route, navigation }) {
           <TextInput style={{ flex: 0.6 }} editable={false}>
             ${data.freqAmount}
           </TextInput>
-          <View style={styles.frequencyDropdown}>
-            <Picker
-              selectedValue={data.frequency}
-              onValueChange={(itemValue, itemIndex) => {
+
+          <View style={{ flex: 0.8 }}>
+            <SelectDropdown
+              buttonStyle={styles.frequencyDropdown}
+              buttonTextStyle={{ fontSize: 15 }}
+              data={frequency}
+              onSelect={(itemValue, itemIndex) => {
                 setData({ ...data, frequency: itemValue });
+                updateFreqAmount();
               }}
-              mode="dropdown"
-            >
-              <Picker.Item label="Select" enabled={false} />
-              <Picker.Item label="Daily" value="daily" />
-              <Picker.Item label="Weekly" value="weekly" />
-              <Picker.Item label="Monthly" value="monthly" />
-              <Picker.Item label="Yearly" value="yearly" />
-            </Picker>
+              defaultButtonText={"Select"}
+              buttonTextAfterSelection={(selectedItem, index) => {
+                return selectedItem;
+              }}
+              rowTextForSelection={(item, index) => {
+                return item;
+              }}
+              renderDropdownIcon={(isOpened) => {
+                return (
+                  <FontAwesome
+                    name={isOpened ? "chevron-up" : "chevron-down"}
+                    color={colours.black}
+                    size={18}
+                  />
+                );
+              }}
+              dropdownStyle={styles.dropdownStyle}
+              rowTextStyle={{ fontSize: 14 }}
+            />
           </View>
         </View>
       </View>
@@ -162,8 +255,7 @@ function EditGoal({ route, navigation }) {
         <ImageTextInput
           source={require("../../assets/calendar.png")}
           onPress={() => showDatePicker()}
-          d
-          value={dateFormat(data.deadline.seconds)}
+          value={dateFormat(data.deadline)}
           editable={false}
           style={[styles.newGoalInput, { paddingHorizontal: 0, margin: 0 }]}
         />
@@ -171,7 +263,7 @@ function EditGoal({ route, navigation }) {
 
       {datePicker && (
         <RNDateTimePicker
-          value={new Date(data.deadline.seconds * 1000)}
+          value={data.deadline}
           mode="date"
           display={Platform.OS === "ios" ? "spinner" : "default"}
           is24Hour={true}
@@ -186,6 +278,53 @@ function EditGoal({ route, navigation }) {
         value={data.notes}
         maxLength={50}
       />
+
+      {data.createdBy === auth.currentUser.uid && (
+        <View>
+          <YesOrNo
+            title={"Would you like to share the goal with someone else?"}
+            initial={data.isSharing ? 1 : 2}
+            selectedBtn={(choice) => share(choice)}
+          />
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {sharingEmails.map((email) => (
+              <View key={email} style={styles.emailsContainer}>
+                <Text key={email} style={styles.emails}>
+                  {email}
+                </Text>
+                <TouchableOpacity
+                  style={{ justifyContent: "center" }}
+                  onPress={() => deleteEmail(email)}
+                >
+                  <MaterialCommunityIcons
+                    name="close-box"
+                    color={colours.black}
+                    size={20}
+                  />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
+
+      {data.isSharing && (
+        <NewGoalInput
+          title={"Add user's email to share the goal with"}
+          onChangeText={(val) => {
+            setEmail(val);
+          }}
+          value={email}
+          onSubmitEditing={onSubmitEmail}
+          onKeyPress={onTypingEmail}
+        />
+      )}
 
       <View style={styles.beside}>
         <BlackButton
@@ -214,6 +353,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     height: 40,
   },
+  dropdownStyle: {
+    backgroundColor: "#EFEFEF",
+    borderRadius: 10,
+  },
   emailsContainer: {
     flexDirection: "row",
     backgroundColor: colours.lightBrown,
@@ -231,12 +374,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   frequencyDropdown: {
-    flex: 0.4,
     backgroundColor: colours.darkBrown,
     borderRadius: 30,
-    width: 100,
-    height: 40,
-    justifyContent: "center",
   },
   newGoalInput: {
     backgroundColor: colours.lightBrown,

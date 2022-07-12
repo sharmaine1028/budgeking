@@ -22,6 +22,7 @@ class NewGoal extends React.Component {
     this.frequency = ["Daily", "Weekly", "Monthly", "Yearly"];
     this.state = {
       datePicker: false,
+      dateCreated: new Date(),
       goalDescription: "",
       target: "",
       frequency: "",
@@ -31,7 +32,6 @@ class NewGoal extends React.Component {
       isSharing: false,
       email: "",
       sharingEmails: [],
-      sharingUIDs: [],
     };
   }
   render() {
@@ -56,7 +56,11 @@ class NewGoal extends React.Component {
             separator="."
             precision={2}
             minValue={0}
-            onChangeValue={(val) => this.updateInputVal(val, "target")}
+            maxValue={9999999999999}
+            onChangeValue={(val) => {
+              this.updateInputVal(val, "target");
+              this.updateFreqAmount();
+            }}
             placeholder="Type Here"
           />
         </View>
@@ -92,6 +96,8 @@ class NewGoal extends React.Component {
                     />
                   );
                 }}
+                dropdownStyle={styles.dropdownStyle}
+                rowTextStyle={{ fontSize: 14 }}
               />
             </View>
           </View>
@@ -102,7 +108,6 @@ class NewGoal extends React.Component {
           <ImageTextInput
             source={require("../../assets/calendar.png")}
             onPress={() => this.showDatePicker()}
-            d
             value={this.dateFormat()}
             editable={false}
             style={[styles.newGoalInput, { paddingHorizontal: 0, margin: 0 }]}
@@ -164,7 +169,8 @@ class NewGoal extends React.Component {
               this.updateInputVal(val, "email");
             }}
             value={this.state.email}
-            onKeyPress={this.checkEmail}
+            onSubmitEditing={this.onSubmitEmail}
+            onKeyPress={this.onTypingEmail}
           />
         )}
         <View style={styles.beside}>
@@ -285,47 +291,49 @@ class NewGoal extends React.Component {
     }
   };
 
-  checkEmail = async (e) => {
+  onSubmitEmail = () => {
+    this.checkEmail(this.state.email);
+  };
+
+  onTypingEmail = (e) => {
     var key = e.nativeEvent.key;
-    if (key === "Enter" || key === " ") {
+    if (key === "Enter" || key === " " || key === ",") {
       const email = this.state.email.trim();
-
-      if (email) {
-        if (email === auth.currentUser.email) {
-          alert("You can't add yourself!");
-          this.setState({ email: "" });
-          return;
-        }
-
-        if (this.state.sharingEmails.includes(email)) {
-          alert("This email has already been added");
-          this.setState({ email: "" });
-          return;
-        }
-
-        const sharingUID = await db
-          .collection("userLookup")
-          .doc(email)
-          .get()
-          .then((data) => {
-            if (data.exists) {
-              this.setState({
-                sharingEmails: [...this.state.sharingEmails, email],
-                email: "",
-              });
-              this.setState({
-                sharingUIDs: [...this.state.sharingUIDs, data.data().uid],
-              });
-              return data.data().uid;
-            } else {
-              alert("User does not exist");
-              this.setState({ email: "" });
-              return null;
-            }
-          })
-          .catch((err) => console.log(err));
-      }
+      this.checkEmail(email);
     }
+  };
+
+  checkEmail = async (email) => {
+    if (email === auth.currentUser.email) {
+      alert("You can't add yourself!");
+      this.setState({ email: "" });
+      return;
+    }
+
+    if (this.state.sharingEmails.includes(email)) {
+      alert("This email has already been added");
+      this.setState({ email: "" });
+      return;
+    }
+
+    const sharingUID = await db
+      .collection("userLookup")
+      .doc(email)
+      .get()
+      .then((data) => {
+        if (data.exists) {
+          this.setState({
+            sharingEmails: [...this.state.sharingEmails, email],
+            email: "",
+          });
+          return data.data().uid;
+        } else {
+          alert("User does not exist");
+          this.setState({ email: "" });
+          return null;
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
   deleteEmail = (tobeRemoved) => {
@@ -364,18 +372,28 @@ class NewGoal extends React.Component {
         return;
       }
 
-      db.collection("goals").doc(timePeriod).collection("active").doc().set({
+      const deadline = this.state.deadline;
+      deadline.setHours(23);
+      deadline.setMinutes(59);
+      deadline.setSeconds(59);
+
+      const sharingEmails = this.state.sharingEmails;
+      sharingEmails.push(auth.currentUser.email);
+
+      db.collection("active goals").doc().set({
         createdBy: auth.currentUser.uid,
+        createdByEmail: auth.currentUser.email,
+        dateCreated: this.state.dateCreated,
         goalDescription: this.state.goalDescription,
         target: this.state.target,
         frequency: this.state.frequency,
         freqAmount: this.state.freqAmount,
-        deadline: this.state.deadline,
+        deadline: deadline,
         notes: this.state.notes,
         isSharing: this.state.isSharing,
-        sharingEmails: this.state.sharingEmails,
-        sharingUIDs: this.state.sharingUIDs,
+        sharingEmails: sharingEmails,
         currSavingsAmt: 0,
+        isOffTrack: false,
       });
 
       this.props.navigation.navigate("Goals");
@@ -393,6 +411,10 @@ const styles = StyleSheet.create({
   buttons: {
     flexGrow: 1,
     height: 40,
+  },
+  dropdownStyle: {
+    backgroundColor: "#EFEFEF",
+    borderRadius: 10,
   },
   emailsContainer: {
     flexDirection: "row",

@@ -12,53 +12,32 @@ import { Menu, MenuItem } from "react-native-material-menu";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Header } from "../../config/reusableText";
 import colours from "../../config/colours";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { db } from "../../config/firebase";
+import { useNavigation } from "@react-navigation/native";
+import { auth, db } from "../../config/firebase";
+import { Ionicons } from "@expo/vector-icons";
 
 function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   const navigation = useNavigation();
+  if (doc.deadline.seconds) {
+    doc.deadline = new Date(doc.deadline.seconds * 1000);
+  }
   const [isMenu, setIsMenu] = useState(false);
-  const [data, setData] = useState(doc);
-
-  const dataRef = db
-    .collection("goals")
-    .doc(time)
-    .collection("active")
-    .doc(doc.id);
-
-  let unsubscribe;
-  useEffect(() => {
-    unsubscribe = dataRef.onSnapshot((doc) => {
-      const document = doc.data();
-      setData(document);
-    });
-    return unsubscribe;
-  }, [data, setData]);
-
-  useEffect(() => {
-    const unsubscribe2 = navigation.addListener("focus", () => unsubscribe);
-    return unsubscribe2;
-  }, [navigation]);
-
-  useIsFocused(() => {
-    const unsubscribe = dataRef.onSnapshot((doc) => {
-      const document = doc.data();
-      setData(document);
-    });
-    return unsubscribe;
-  });
+  const [showMore, setShowMore] = useState(false);
+  const sharingEmails = doc.sharingEmails.filter(
+    (item) => item !== auth.currentUser.email
+  );
 
   const getPercent = () => {
-    const percent = (data.currSavingsAmt / data.target) * 100;
+    const percent = (doc.currSavingsAmt / doc.target) * 100;
     if (percent > 100) {
       return "100%";
     } else {
-      return (data.currSavingsAmt / data.target) * 100 + "%";
+      return (doc.currSavingsAmt / doc.target) * 100 + "%";
     }
   };
 
-  const dateFormat = (seconds) => {
-    const date = new Date(seconds * 1000);
+  const dateFormat = () => {
+    const date = doc.deadline;
     const [day, month, year] = [
       date.getDate(),
       date.getMonth(),
@@ -92,28 +71,72 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   };
 
   const deleteGoal = () => {
-    return Alert.alert(
-      "Are you sure?",
-      "Are you sure you want to delete this goal? This is irreversible.",
-      [
-        // "Yes button"
-        {
-          text: "Yes",
-          onPress: () => {
-            deleteItem(doc.id, time);
-          },
+    let text;
+    if (doc.createdBy === auth.currentUser.uid) {
+      if (doc.isSharing) {
+        text = "This goal will be deleted for all members and is irreversible.";
+      } else {
+        text = "This is an irreversible operation.";
+      }
+    } else {
+      text = "This goal will only be deleted for you and not sharing members";
+    }
+
+    return Alert.alert("Are you sure?", text, [
+      // "Yes button"
+      {
+        text: "Yes",
+        onPress: () => {
+          deleteItem(doc.id, time, doc);
         },
-        // The "No" button
-        // Does nothing but dismiss the dialog when tapped
-        {
-          text: "No",
-        },
-      ]
-    );
+      },
+      // The "No" button
+      // Does nothing but dismiss the dialog when tapped
+      {
+        text: "No",
+      },
+    ]);
+  };
+
+  const isOffTrack = () => {
+    const today = new Date();
+    const deadline = new Date(doc.deadline.seconds * 1000);
+    const dateCreated = new Date(doc.dateCreated.seconds * 1000);
+
+    if (deadline < today) {
+      return true;
+    }
+    // Get supposed amount based on frequency
+    const years = today.getFullYear() - dateCreated.getFullYear();
+    let supposedAmt;
+    if (doc.frequency === "Yearly") {
+      supposedAmt = doc.freqAmount * years;
+    } else if (doc.frequency === "Monthly") {
+      const months =
+        years * 12 + today.getMonth() - dateCreated.getMonth() <= 0
+          ? 0
+          : years * 12 + today.getMonth() - dateCreated.getMonth();
+      supposedAmt = doc.freqAmount * months;
+    } else if (doc.frequency === "Weekly") {
+      const msInWeek = 1000 * 60 * 60 * 24 * 7;
+      const weeks = Math.round(Math.abs(today - dateCreated) / msInWeek);
+      supposedAmt = doc.freqAmount * weeks;
+    } else {
+      const msInDay = 1000 * 3600 * 24;
+      const days = Math.round(Math.abs(today - dateCreated) / msInDay);
+      supposedAmt = doc.freqAmount * days;
+    }
+
+    // Compare supposed amount with curramount
+    if (doc.currSavingsAmt < supposedAmt) {
+      doc.isOffTrack = true;
+    } else {
+      doc.isOffTrack = false;
+    }
   };
 
   return (
-    <View key={data.id} style={styles.goal}>
+    <View key={doc.id} style={doc.isOffTrack ? styles.goalRed : styles.goal}>
       <View
         style={{
           flexDirection: "row",
@@ -121,14 +144,14 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
         }}
       >
         <Header
-          text={`Save for ${data.goalDescription}`}
+          text={`Save for ${doc.goalDescription}`}
           style={{ fontWeight: "bold" }}
         />
 
         <Menu
           visible={isMenu}
           anchor={
-            <TouchableOpacity onPress={() => showMenu(data.id)}>
+            <TouchableOpacity onPress={() => showMenu(doc.id)}>
               <MaterialCommunityIcons
                 name="more"
                 size={24}
@@ -136,15 +159,19 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
               />
             </TouchableOpacity>
           }
-          onRequestClose={() => hideMenu(data.id)}
+          onRequestClose={() => hideMenu(doc.id)}
         >
-          {/* <MenuItem
+          <MenuItem
             onPress={() =>
-              navigation.navigate("Edit Goal", { doc: doc, time: time })
+              navigation.navigate("Edit Goal", {
+                doc: doc,
+                time: time,
+                editItem: editItem,
+              })
             }
           >
             Edit
-          </MenuItem> */}
+          </MenuItem>
 
           <MenuItem
             onPress={() => {
@@ -157,13 +184,22 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
           >
             Save
           </MenuItem>
-          <MenuItem onPress={() => deleteGoal(data.id)}>Delete</MenuItem>
+          <MenuItem onPress={() => deleteGoal(doc.id)}>Delete</MenuItem>
         </Menu>
       </View>
 
-      <Text style={styles.goalTagline}>
-        Save ${data.freqAmount} {data.frequency}
-      </Text>
+      {doc.isOffTrack ? (
+        <Text style={styles.goalTagline}>
+          You're behind schedule to save ${doc.freqAmount}{" "}
+          {doc.frequency.toString().toLowerCase()}
+        </Text>
+      ) : (
+        <Text style={styles.goalTagline}>
+          You're on track to save ${doc.freqAmount}{" "}
+          {doc.frequency.toString().toLowerCase()}
+        </Text>
+      )}
+
       <View style={styles.goalLine}>
         <MaterialCommunityIcons
           name="bullseye-arrow"
@@ -171,7 +207,7 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
           color="black"
           style={{ flex: 0.1 }}
         />
-        <View style={{ paddingLeft: 30, flex: 0.8 }}>
+        <View style={{ paddingLeft: 30, flex: 0.85 }}>
           <View style={[styles.progressBar]}>
             <Animated.View
               style={[
@@ -179,7 +215,7 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
                 {
                   backgroundColor: "#96D3FF",
                   width: getPercent(),
-                  // width: (data.currSavingsAmt / data.target) * 100 + "%",
+                  // width: (doc.currSavingsAmt / doc.target) * 100 + "%",
                   borderRadius: 5,
                 },
               ]}
@@ -192,14 +228,14 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
             }}
           >
             <Text style={styles.goalTagline}>
-              ${data.currSavingsAmt.toFixed(2)}
+              ${doc.currSavingsAmt.toFixed(2)}
             </Text>
-            <Text style={styles.goalTagline}>${data.target}</Text>
+            <Text style={styles.goalTagline}>${doc.target.toFixed(2)}</Text>
           </View>
         </View>
       </View>
       <GreyLine />
-      <View style={[styles.goalLine, { marginTop: 5 }]}>
+      <View style={styles.goalLine}>
         <MaterialCommunityIcons
           name="clock-outline"
           size={24}
@@ -207,10 +243,66 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
           style={{ flex: 0.1 }}
         />
         <Text style={{ flex: 0.3, paddingLeft: 30 }}> Deadline </Text>
-        <Text style={{ flex: 0.5, paddingLeft: 30 }}>
-          {dateFormat(data.deadline.seconds)}
-        </Text>
+        <Text style={{ flex: 0.55 }}>{dateFormat(doc.deadline)}</Text>
+
+        {showMore ? (
+          <TouchableOpacity onPress={() => setShowMore(false)}>
+            <MaterialCommunityIcons
+              name="chevron-up"
+              size={24}
+              color={colours.darkgrey}
+            />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={() => setShowMore(true)}>
+            <MaterialCommunityIcons
+              name="chevron-down"
+              size={24}
+              color={colours.darkgrey}
+            />
+          </TouchableOpacity>
+        )}
       </View>
+
+      {showMore && (
+        <View>
+          {doc.isSharing ? (
+            <>
+              <GreyLine />
+              <View style={styles.goalLine}>
+                <Ionicons
+                  name="md-share-outline"
+                  size={24}
+                  color="black"
+                  style={{ flex: 0.1 }}
+                />
+                <Text style={{ flex: 0.8, paddingLeft: 30 }}>
+                  Goal shared with{" "}
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      paddingLeft: 30,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {sharingEmails
+                      .map((email) => email.slice(0, email.indexOf("@")))
+                      .join(", ")}
+                  </Text>
+                </Text>
+              </View>
+            </>
+          ) : null}
+
+          <>
+            <GreyLine />
+            <Text style={[styles.goalLine, { fontSize: 16 }]}>Notes </Text>
+            <Text style={{ paddingLeft: 10 }}>
+              {doc.notes === "" ? "None" : doc.notes}
+            </Text>
+          </>
+        </View>
+      )}
     </View>
   );
 }
@@ -222,9 +314,16 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     padding: 10,
   },
+  goalRed: {
+    backgroundColor: colours.tomato,
+    borderRadius: 15,
+    marginVertical: 5,
+    padding: 10,
+  },
   goalLine: {
     flexDirection: "row",
-    justifyContent: "center",
+    paddingLeft: 10,
+    marginVertical: 5,
   },
   goalTagline: {
     color: colours.darkgrey,
