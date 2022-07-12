@@ -167,15 +167,18 @@ export default class SignupPage extends React.Component {
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then((res) => {
           // Add in user details in firestore
-          db.collection("users").doc(res.user.uid).set({
-            name: this.state.firstName,
-            email: this.state.email,
-            budgetValue: 0.0,
-            dateTo: new Date(),
-            dateFrom: new Date(),
-            timeUserWants: "This Month",
-            customExpenseArr: [],
-          });
+          db.collection("users")
+            .doc(res.user.uid)
+            .set({
+              name: this.state.firstName,
+              email: this.state.email,
+              budgetValue: 0.0,
+              budgetValueList: [0.0],
+              dateTo: new Date(),
+              dateFrom: new Date(),
+              timeUserWants: "This Month",
+              customExpenseArr: [],
+            });
 
           db.collection("userLookup").doc(this.state.email).set({
             uid: res.user.uid,

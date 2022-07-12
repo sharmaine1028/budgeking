@@ -44,6 +44,7 @@ class HomePage extends React.Component {
       timeUserWants: "monthly",
       budgetEditable: false,
       budgetValue: 0.0,
+      budgetValueList: [0.0],
       expenseArr: [],
       isLoading: true,
       monthNames: [
@@ -84,8 +85,11 @@ class HomePage extends React.Component {
       .doc(auth.currentUser.uid)
       .get()
       .then((doc) => {
-        const { budgetValue } = doc.data();
-        this.setState({ budgetValue: budgetValue });
+        const { budgetValue, budgetValueList } = doc.data();
+        this.setState({
+          budgetValueList: budgetValueList,
+          budgetValue: budgetValueList.slice(-1),
+        });
       });
   }
 
