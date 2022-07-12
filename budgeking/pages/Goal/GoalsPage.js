@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   View,
   StyleSheet,
@@ -14,7 +14,6 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import GenerateGoal from "./GenerateGoal";
 import { Image } from "react-native";
 import colours from "../../config/colours";
-import { Context } from "../../App";
 
 LogBox.ignoreLogs([
   "Non-serializable values were found in the navigation state",
@@ -187,7 +186,6 @@ class GoalsPage extends React.Component {
       notes: data.notes,
       isSharing: data.isSharing,
       sharingEmails: data.sharingEmails,
-      sharingUIDs: data.sharingUIDs,
       currSavingsAmt: data.currSavingsAmt,
     });
   };
@@ -212,6 +210,7 @@ class GoalsPage extends React.Component {
 
     this.activeGoalsRef.doc(id).set({
       createdBy: data.createdBy,
+      createdByEmail: data.createdByEmail,
       dateCreated: data.dateCreated,
       goalDescription: data.goalDescription,
       target: data.target,
@@ -221,7 +220,6 @@ class GoalsPage extends React.Component {
       notes: data.notes,
       isSharing: data.isSharing,
       sharingEmails: data.sharingEmails,
-      sharingUIDs: data.sharingUIDs,
       currSavingsAmt: data.currSavingsAmt,
     });
   };
@@ -245,7 +243,7 @@ class GoalsPage extends React.Component {
     this.activeGoalsRef.doc(id).update({ currSavingsAmt: newAmt });
   };
 
-  deleteGoal = (id, time) => {
+  deleteGoal = (id, time, data) => {
     if (time === "short term") {
       const newList = this.state.shortTermGoals.filter(
         (item) => item.id !== id
@@ -256,7 +254,21 @@ class GoalsPage extends React.Component {
       this.setState({ longTermGoals: newList });
     }
 
-    this.activeGoalsRef.doc(id).delete();
+    if (data.createdBy === auth.currentUser.uid) {
+      this.activeGoalsRef.doc(id).delete();
+    } else {
+      if (data.sharingEmails.length === 1) {
+        data.isSharing = false;
+        data.sharingEmails = data.sharingEmails.filter(
+          (item) => item !== auth.currentUser.email
+        );
+      } else {
+        data.sharingEmails = data.sharingEmails.filter(
+          (item) => item !== auth.currentUser.email
+        );
+      }
+      this.editGoal(id, time, data);
+    }
   };
 
   renderNoGoals = () => {

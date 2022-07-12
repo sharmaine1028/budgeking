@@ -1,4 +1,4 @@
-import React, { useState, Component, useContext } from "react";
+import React from "react";
 import {
   StyleSheet,
   Text,
@@ -24,7 +24,6 @@ import { SmallBlackButton } from "../config/reusableButton";
 import Icon from "react-native-vector-icons/AntDesign";
 import { GreyLine } from "../config/reusablePart";
 import { BlackButton } from "../config/reusableButton";
-import { Context } from "../App";
 import { Divider } from "react-native-elements";
 
 const wait = (timeout) => {
@@ -63,8 +62,6 @@ class HomePage extends React.Component {
       ],
     };
   }
-
-  static contextType = Context;
 
   updateInputVal(val, prop) {
     const state = this.state;
@@ -443,7 +440,6 @@ class HomePage extends React.Component {
   render() {
     const { navigation } = this.props;
     const pieData = this.putInTextToPie();
-    const { offTrackGoals } = this.context;
 
     const renderLegend = (text, color) => {
       return (
@@ -475,15 +471,12 @@ class HomePage extends React.Component {
         <View style={styles.container}>
           {/* <Text>{this.addExpenses()}</Text>
           <Text>{this.percentExpenseOutOfBudget()}</Text> */}
-
           {/* <ScrollView
           refreshControl = {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         > */}
-
           <Title text={`Welcome, ${this.state.name}!`}></Title>
-
           <View style={styles.weeklyBudgetTab}>
             {/* <Header text={`${"\n"}Your weekly budget`} style={styles.changeLineHeightWeeklyBudget} /> */}
             <SelectDropdown
@@ -516,9 +509,7 @@ class HomePage extends React.Component {
             />
             {/* <View style={styles.dropdownTriangle} /> */}
           </View>
-
           <RedLine />
-
           <View
             style={{
               flexDirection: "row",
@@ -533,7 +524,6 @@ class HomePage extends React.Component {
               style={styles.leftText}
             >{`${this.textBesideWalking()}: $${this.leftAmount()}`}</Text>
           </View>
-
           <View style={styles.progressArea}>
             <View style={styles.progressBar}>
               <Animated.View
@@ -582,7 +572,6 @@ class HomePage extends React.Component {
               resizeMethod={"resize"}
             /> */}
           </View>
-
           <View style={styles.reportPieChart}>
             <Header
               text={`${"\n"} Categories (${this.textBesideCategories()} ${
@@ -628,7 +617,7 @@ class HomePage extends React.Component {
               {renderLegend("others", "#E8E0CE")}
             </View>
           </View>
-
+          {/*
           {offTrackGoals === undefined || offTrackGoals.length === 0 ? null : (
             <View style={styles.notifContainer}>
               <Text style={{ color: colours.darkgrey }}>Notifications</Text>
@@ -657,7 +646,7 @@ class HomePage extends React.Component {
               ))}
             </View>
           )}
-
+              */}
           <View style={styles.lastRecordTitle}>
             <Header style={styles.lastRecordText} text={"Last records"} />
             <RedLine />
@@ -671,7 +660,6 @@ class HomePage extends React.Component {
               onPress={() => navigation.navigate("All Table View")}
             />
           </View>
-
           {/* </ScrollView> */}
         </View>
       </KeyboardAwareScrollView>

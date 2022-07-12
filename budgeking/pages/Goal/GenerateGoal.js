@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -12,16 +12,17 @@ import { Menu, MenuItem } from "react-native-material-menu";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Header } from "../../config/reusableText";
 import colours from "../../config/colours";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { db } from "../../config/firebase";
+import { useNavigation } from "@react-navigation/native";
+import { auth, db } from "../../config/firebase";
 import { Ionicons } from "@expo/vector-icons";
-import { Context } from "../../App";
 
 function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   const navigation = useNavigation();
   const [isMenu, setIsMenu] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  const { offTrackGoals, setOffTrackGoals } = useContext(Context);
+  const sharingEmails = doc.sharingEmails.filter(
+    (item) => item !== auth.currentUser.email
+  );
 
   const getPercent = () => {
     const percent = (doc.currSavingsAmt / doc.target) * 100;
@@ -67,27 +68,31 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   };
 
   const deleteGoal = () => {
-    return Alert.alert(
-      "Are you sure?",
-      "This is irreversible. Are you sure you want to delete this goal?",
-      [
-        // "Yes button"
-        {
-          text: "Yes",
-          onPress: () => {
-            const newList = offTrackGoals.filter((item) => item.id !== doc.id);
-            console.log("hi", newList);
-            setOffTrackGoals(newList);
-            deleteItem(doc.id, time);
-          },
+    let text;
+    if (doc.createdBy === auth.currentUser.uid) {
+      if (doc.isSharing) {
+        text = "This goal will be deleted for all members and is irreversible.";
+      } else {
+        text = "This is an irreversible operation.";
+      }
+    } else {
+      text = "This goal will only be deleted for you and not sharing members";
+    }
+
+    return Alert.alert("Are you sure?", text, [
+      // "Yes button"
+      {
+        text: "Yes",
+        onPress: () => {
+          deleteItem(doc.id, time, doc);
         },
-        // The "No" button
-        // Does nothing but dismiss the dialog when tapped
-        {
-          text: "No",
-        },
-      ]
-    );
+      },
+      // The "No" button
+      // Does nothing but dismiss the dialog when tapped
+      {
+        text: "No",
+      },
+    ]);
   };
 
   const isOffTrack = () => {
@@ -119,17 +124,10 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
       supposedAmt = doc.freqAmount * days;
     }
 
-    const { offTrackGoals, setOffTrackGoals } = useContext(Context);
     // Compare supposed amount with curramount
     if (doc.currSavingsAmt < supposedAmt) {
-      const newList = offTrackGoals.filter((item) => item.id !== doc.id);
-      newList.push({ ...doc });
-      useEffect(() => setOffTrackGoals(newList), []);
-
       return true;
     } else {
-      const newList = offTrackGoals.filter((item) => item.id !== doc.id);
-      useEffect(() => setOffTrackGoals(newList), []);
       return false;
     }
   };
@@ -284,9 +282,9 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
                       flexWrap: "wrap",
                     }}
                   >
-                    {doc.sharingEmails.map(
-                      (email) => email.slice(0, email.indexOf("@")) + " "
-                    )}
+                    {sharingEmails
+                      .map((email) => email.slice(0, email.indexOf("@")))
+                      .join(", ")}
                   </Text>
                 </Text>
               </View>

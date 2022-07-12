@@ -9,21 +9,25 @@ import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import colours from "../../config/colours";
-import { Picker } from "@react-native-picker/picker";
 import { TextInput } from "react-native-gesture-handler";
 import CurrencyInput from "react-native-currency-input";
-import { auth } from "../../config/firebase";
+import { auth, db } from "../../config/firebase";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 function EditGoal({ route, navigation }) {
   const { doc, time, editItem } = route.params;
-  doc.deadline = new Date(doc.deadline.seconds * 1000);
+  if (doc) {
+    doc.deadline = new Date(doc.deadline.seconds * 1000);
+  }
   const [data, setData] = useState(doc);
   const [datePicker, setDatePicker] = useState(false);
   const [email, setEmail] = useState("");
   const frequency = ["Daily", "Weekly", "Monthly", "Yearly"];
+  const [sharingEmails, setSharingEmails] = useState(
+    doc.sharingEmails.filter((item) => item !== auth.currentUser.email)
+  );
 
   useEffect(
     () => updateFreqAmount(),
@@ -40,6 +44,7 @@ function EditGoal({ route, navigation }) {
     value.setSeconds(59);
     setDatePicker(false);
     setData({ ...data, deadline: value });
+    updateFreqAmount();
   };
 
   const dateFormat = () => {
@@ -79,7 +84,7 @@ function EditGoal({ route, navigation }) {
 
     const deadline = data.deadline;
 
-    const target = data.target;
+    const target = data.target - data.currSavingsAmt;
 
     const years = deadline.getFullYear() - today.getFullYear();
 
@@ -111,6 +116,16 @@ function EditGoal({ route, navigation }) {
     setData({ ...data, freqAmount: format(freqAmount) });
   };
 
+  const deleteEmail = (tobeRemoved) => {
+    const changedEmails = sharingEmails.filter(
+      (email) => email !== tobeRemoved
+    );
+    setSharingEmails(changedEmails);
+    if (changedEmails.length === 0) {
+      setData({ ...data, isSharing: false });
+    }
+  };
+
   const share = (choice) => {
     if (choice.label === "Yes") {
       setData({ ...data, isSharing: true });
@@ -119,33 +134,34 @@ function EditGoal({ route, navigation }) {
         ...data,
         isSharing: false,
         sharingEmails: [],
-        sharingUIDs: [],
       });
     }
   };
 
-  onSubmitEmail = () => {
-    this.checkEmail(this.state.email);
+  const onSubmitEmail = () => {
+    checkEmail(email);
   };
 
-  onTypingEmail = (e) => {
+  const onTypingEmail = (e) => {
     var key = e.nativeEvent.key;
     if (key === "Enter" || key === " " || key === ",") {
-      const email = this.state.email.trim();
-      this.checkEmail(email);
+      const trimEmail = email.trim();
+      console.log(trimEmail);
+      checkEmail(trimEmail);
     }
   };
 
-  checkEmail = async (email) => {
+  const checkEmail = async (email) => {
     if (email === auth.currentUser.email) {
       alert("You can't add yourself!");
-      this.setState({ email: "" });
+      setEmail("");
+
       return;
     }
 
-    if (this.state.sharingEmails.includes(email)) {
+    if (sharingEmails.includes(email)) {
       alert("This email has already been added");
-      this.setState({ email: "" });
+      setEmail("");
       return;
     }
 
@@ -155,17 +171,13 @@ function EditGoal({ route, navigation }) {
       .get()
       .then((data) => {
         if (data.exists) {
-          this.setState({
-            sharingEmails: [...this.state.sharingEmails, email],
-            email: "",
-          });
-          this.setState({
-            sharingUIDs: [...this.state.sharingUIDs, data.data().uid],
-          });
+          setSharingEmails([...sharingEmails, email]);
+          setEmail("");
           return data.data().uid;
         } else {
           alert("User does not exist");
-          this.setState({ email: "" });
+          setEmail("");
+
           return null;
         }
       })
@@ -173,9 +185,10 @@ function EditGoal({ route, navigation }) {
   };
 
   const editGoal = () => {
-    // time period check
+    const finalData = data;
+    finalData.sharingEmails = [...sharingEmails, auth.currentUser.email];
+    editItem(doc.id, time, finalData);
     navigation.navigate("Goals");
-    editItem(doc.id, time, data);
   };
 
   return (
@@ -287,7 +300,7 @@ function EditGoal({ route, navigation }) {
               flexWrap: "wrap",
             }}
           >
-            {data.sharingEmails.map((email) => (
+            {sharingEmails.map((email) => (
               <View key={email} style={styles.emailsContainer}>
                 <Text key={email} style={styles.emails}>
                   {email}
@@ -312,11 +325,11 @@ function EditGoal({ route, navigation }) {
         <NewGoalInput
           title={"Add user's email to share the goal with"}
           onChangeText={(val) => {
-            this.updateInputVal(val, "email");
+            setEmail(val);
           }}
-          value={this.state.email}
-          onSubmitEditing={this.onSubmitEmail}
-          onKeyPress={this.onTypingEmail}
+          value={email}
+          onSubmitEditing={onSubmitEmail}
+          onKeyPress={onTypingEmail}
         />
       )}
 

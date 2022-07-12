@@ -32,7 +32,6 @@ class NewGoal extends React.Component {
       isSharing: false,
       email: "",
       sharingEmails: [],
-      sharingUIDs: [],
     };
   }
   render() {
@@ -328,9 +327,6 @@ class NewGoal extends React.Component {
             sharingEmails: [...this.state.sharingEmails, email],
             email: "",
           });
-          this.setState({
-            sharingUIDs: [...this.state.sharingUIDs, data.data().uid],
-          });
           return data.data().uid;
         } else {
           alert("User does not exist");
@@ -382,8 +378,12 @@ class NewGoal extends React.Component {
       deadline.setMinutes(59);
       deadline.setSeconds(59);
 
+      const sharingEmails = this.state.sharingEmails;
+      sharingEmails.push(auth.currentUser.email);
+
       db.collection("active goals").doc().set({
         createdBy: auth.currentUser.uid,
+        createdByEmail: auth.currentUser.email,
         dateCreated: this.state.dateCreated,
         goalDescription: this.state.goalDescription,
         target: this.state.target,
@@ -392,9 +392,9 @@ class NewGoal extends React.Component {
         deadline: deadline,
         notes: this.state.notes,
         isSharing: this.state.isSharing,
-        sharingEmails: this.state.sharingEmails,
-        sharingUIDs: this.state.sharingUIDs,
+        sharingEmails: sharingEmails,
         currSavingsAmt: 0,
+        isOffTrack: false,
       });
 
       this.props.navigation.navigate("Goals");

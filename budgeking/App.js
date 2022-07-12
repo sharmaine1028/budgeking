@@ -24,10 +24,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-export const Context = React.createContext({
-  offTrackGoals: [],
-  setOffTrackGoals: () => {},
-});
 
 LogBox.ignoreAllLogs();
 
@@ -163,60 +159,57 @@ const screenOptions = (route, color) => {
 };
 
 function MyTabs() {
-  const [offTrackGoals, setOffTrackGoals] = React.useState([]);
   return (
-    <Context.Provider value={{ offTrackGoals, setOffTrackGoals }}>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          headerStyle: {
-            backgroundColor: colours.whiteRock,
-          },
-          unmountOnBlur: true,
-          tabBarActiveTintColor: colours.tomato,
-          tabBarStyle: {
-            backgroundColor: colours.whiteRock,
-            height: 60,
-            paddingBottom: 2,
-          },
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerStyle: {
+          backgroundColor: colours.whiteRock,
+        },
+        unmountOnBlur: true,
+        tabBarActiveTintColor: colours.tomato,
+        tabBarStyle: {
+          backgroundColor: colours.whiteRock,
+          height: 60,
+          paddingBottom: 2,
+        },
+        tabBarHideOnKeyboard: true,
+        tabBarIcon: ({ color }) => screenOptions(route, color),
+      })}
+      sceneContainerStyle={{ backgroundColor: colours.white }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={HomePageAll}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="Goal"
+        component={GoalsAll}
+        options={{
           tabBarHideOnKeyboard: true,
-          tabBarIcon: ({ color }) => screenOptions(route, color),
-        })}
-        sceneContainerStyle={{ backgroundColor: colours.white }}
-      >
-        <Tab.Screen
-          name="Home"
-          component={HomePageAll}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Tab.Screen
-          name="Goal"
-          component={GoalsAll}
-          options={{
-            tabBarHideOnKeyboard: true,
-            headerShown: false,
-          }}
-        />
-        <Tab.Screen
-          name="Budget"
-          component={BudgetAll}
-          options={{
-            tabBarHideOnKeyboard: true,
-            headerShown: false,
-          }}
-        />
-        <Tab.Screen
-          name="Report"
-          component={ReportsPageAll}
-          options={{
-            headerShown: false,
-          }}
-        />
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="Budget"
+        component={BudgetAll}
+        options={{
+          tabBarHideOnKeyboard: true,
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="Report"
+        component={ReportsPageAll}
+        options={{
+          headerShown: false,
+        }}
+      />
 
-        <Tab.Screen name="Settings" component={SettingsPage} />
-      </Tab.Navigator>
-    </Context.Provider>
+      <Tab.Screen name="Settings" component={SettingsPage} />
+    </Tab.Navigator>
   );
 }
 
