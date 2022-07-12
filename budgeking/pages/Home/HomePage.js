@@ -44,7 +44,7 @@ class HomePage extends React.Component {
       timeUserWants: "monthly",
       budgetEditable: false,
       budgetValue: 0.0,
-      budgetValueList: [0.0],
+      budgetValueDaily: 0.0,
       expenseArr: [],
       isLoading: true,
       monthNames: [
@@ -61,6 +61,7 @@ class HomePage extends React.Component {
         "November",
         "December",
       ],
+      showBudgetValueModal: false,
     };
   }
 
@@ -85,10 +86,10 @@ class HomePage extends React.Component {
       .doc(auth.currentUser.uid)
       .get()
       .then((doc) => {
-        const { budgetValue, budgetValueList } = doc.data();
+        const { budgetValue, budgetValueDaily } = doc.data();
         this.setState({
-          budgetValueList: budgetValueList,
-          budgetValue: budgetValueList.slice(-1),
+          budgetValue: budgetValue,
+          budgetValueDaily: budgetValueDaily,
         });
       });
   }
@@ -524,9 +525,6 @@ class HomePage extends React.Component {
               source={require("../../assets/home/walking.png")}
               resizeMethod={"resize"}
             />
-            <Text
-              style={styles.leftText}
-            >{`${this.textBesideWalking()}: $${this.leftAmount()}`}</Text>
           </View>
           <View style={styles.progressArea}>
             <View style={styles.progressBar}>
@@ -576,6 +574,9 @@ class HomePage extends React.Component {
               resizeMethod={"resize"}
             /> */}
           </View>
+          <Text
+            style={styles.leftText}
+          >{`${this.textBesideWalking()}: $${this.leftAmount()}`}</Text>
           <View style={styles.reportPieChart}>
             <Header
               text={`${"\n"} Categories (${this.textBesideCategories()} ${
@@ -687,9 +688,9 @@ const styles = StyleSheet.create({
   },
   leftText: {
     // marginVertical: 10,
-    marginTop: 20,
+    // marginTop: 20,
     color: "#000",
-    fontWeight: "200",
+    fontWeight: "300",
   },
   totalSpentText: {
     textAlign: "center",
@@ -702,23 +703,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
   },
-  // changeLineHeightWeeklyBudget: {
-  //   lineHeight: 10,
-  // },
-  // dropdownTriangle: {
-  //   width: 0,
-  //   height: 0,
-  //   backgroundColor: 'transparent',
-  //   borderStyle: 'solid',
-  //   borderLeftWidth: 8,
-  //   borderRightWidth: 8,
-  //   borderBottomWidth: 16,
-  //   borderLeftColor: 'transparent',
-  //   borderRightColor: 'transparent',
-  //   borderBottomColor: colours.red,
-  //   transform: [{rotate: '180deg'}]
-  // },
-
   dropdownStyle: {
     width: "100%",
     height: 50,
@@ -749,7 +733,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-evenly",
-    //paddingTop: 10,
   },
   progressBar: {
     flex: 1,
@@ -759,6 +742,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#3F4243",
     borderColor: "#3F4243",
     borderRadius: 5,
+    marginBottom: 0,
   },
   logo: {
     bottom: 0,
@@ -772,6 +756,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     paddingLeft: 20,
     borderColor: colours.red,
+    marginTop: 10,
   },
   whiteInput: {
     backgroundColor: "#fff",
