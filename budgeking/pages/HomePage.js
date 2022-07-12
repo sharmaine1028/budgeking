@@ -547,8 +547,9 @@ class HomePage extends React.Component {
               delimiter=","
               separator="."
               precision={2}
-              onChangeValue={(val) => this.updateInputVal(val, "budgetValue")}
+              minValue={0}
               maxValue={9999999999999}
+              onChangeValue={(val) => this.updateInputVal(val, "budgetValue")}
             />
             <TouchableOpacity onPress={this.inputBudgetFireStore()}>
               <Icon.Button
