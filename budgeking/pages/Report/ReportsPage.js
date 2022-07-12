@@ -2,8 +2,8 @@ import React from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import colours from "../config/colours";
-import { auth, db } from "../config/firebase";
+import colours from "../../config/colours";
+import { auth, db } from "../../config/firebase";
 
 class ReportsPage extends React.Component {
   constructor() {

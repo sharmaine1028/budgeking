@@ -9,10 +9,10 @@ import {
   Image,
 } from "react-native";
 import DatePicker from "react-native-date-ranges";
-import colours from "../config/colours";
+import colours from "../../config/colours";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { auth, db } from "../config/firebase";
-import { BlackButton } from "../config/reusableButton";
+import { auth, db } from "../../config/firebase";
+import { BlackButton } from "../../config/reusableButton";
 
 // choose custom date
 
@@ -85,7 +85,7 @@ class ChooseCustomDate extends React.Component {
         <View style={styles.container}>
           <Image
             style={styles.logo}
-            source={require("../assets/calendar.png")}
+            source={require("../../assets/calendar.png")}
           />
           <View style={styles.datepicker}>
             <DatePicker

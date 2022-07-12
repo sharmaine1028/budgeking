@@ -8,12 +8,12 @@ import {
   RefreshControl,
   ScrollView,
 } from "react-native";
-import colours from "../config/colours";
-import { auth, db } from "../config/firebase";
-import { Header, Title, SmallTextInput } from "../config/reusableText";
+import colours from "../../config/colours";
+import { auth, db } from "../../config/firebase";
+import { Header, Title, SmallTextInput } from "../../config/reusableText";
 import { PieChart } from "react-native-gifted-charts";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { BlackButton } from "../config/reusableButton";
+import { BlackButton } from "../../config/reusableButton";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 

@@ -11,19 +11,19 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import colours from "../config/colours";
-import { auth, db } from "../config/firebase";
-import RedLine from "../config/reusablePart";
-import { Header, Title, SmallTextInput } from "../config/reusableText";
+import colours from "../../config/colours";
+import { auth, db } from "../../config/firebase";
+import RedLine from "../../config/reusablePart";
+import { Header, Title, SmallTextInput } from "../../config/reusableText";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { PieChart } from "react-native-gifted-charts";
 import CurrencyInput, { TextWithCursor } from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { SmallBlackButton } from "../config/reusableButton";
+import { SmallBlackButton } from "../../config/reusableButton";
 import Icon from "react-native-vector-icons/AntDesign";
-import { GreyLine } from "../config/reusablePart";
-import { BlackButton } from "../config/reusableButton";
+import { GreyLine } from "../../config/reusablePart";
+import { BlackButton } from "../../config/reusableButton";
 import { Divider } from "react-native-elements";
 
 const wait = (timeout) => {
@@ -521,7 +521,7 @@ class HomePage extends React.Component {
           >
             <Image
               style={styles.logo}
-              source={require("../assets/home/walking.png")}
+              source={require("../../assets/home/walking.png")}
               resizeMethod={"resize"}
             />
             <Text
