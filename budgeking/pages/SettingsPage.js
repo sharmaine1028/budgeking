@@ -63,7 +63,7 @@ class SettingsPage extends React.Component {
 
         <Header text={"Change password"} />
         <ImageTextInput
-          placeholder={"At least 6 characters"}
+          placeholder={"********"}
           source={require("../assets/edit.jpg")}
           onPress={() => this.editPassword()}
           value={this.state.password}
@@ -98,10 +98,15 @@ class SettingsPage extends React.Component {
 
   editDisplayName = () => {
     this.setState({ displayNameEditable: true });
+    this.setState({ displayName: auth.currentUser.displayName });
   };
 
-  updateUserDisplayName = (props) => {
+  updateUserDisplayName = (val) => {
     try {
+      if (this.state.displayName === "") {
+        alert("Cannot be empty!");
+        return;
+      }
       auth.currentUser
         .updateProfile({
           displayName: `${this.state.displayName}`,
