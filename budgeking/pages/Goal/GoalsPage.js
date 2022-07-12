@@ -1,10 +1,19 @@
 import React from "react";
-import { View, StyleSheet, Text, LogBox } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  LogBox,
+  Modal,
+  TouchableOpacity,
+} from "react-native";
 import { BlackButton } from "../../config/reusableButton";
 import { Title } from "../../config/reusableText";
 import { auth, db } from "../../config/firebase";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import GenerateGoal from "./GenerateGoal";
+import { Image } from "react-native";
+import colours from "../../config/colours";
 
 LogBox.ignoreLogs([
   "Non-serializable values were found in the navigation state",
@@ -13,77 +22,82 @@ LogBox.ignoreLogs([
 class GoalsPage extends React.Component {
   constructor() {
     super();
-    this.shortTermRef = db
-      .collection("goals")
-      .doc("short term")
-      .collection("active");
-    this.longTermRef = db
-      .collection("goals")
-      .doc("long term")
-      .collection("active");
-    this.shortTermOri = this.shortTermRef.where(
+    this.activeGoalsRef = db.collection("active goals");
+    this.activeGoalsOri = this.activeGoalsRef.where(
       "createdBy",
       "==",
       auth.currentUser.uid
     );
-    this.shortTermShared = this.shortTermRef.where(
+    this.activeGoalsShared = this.activeGoalsRef.where(
       "sharingEmails",
       "array-contains",
       auth.currentUser.email
     );
-    this.longTermOri = this.longTermRef.where(
-      "createdBy",
-      "==",
-      auth.currentUser.uid
-    );
-    this.longTermShared = this.longTermRef.where(
-      "sharingEmails",
-      "array-contains",
-      auth.currentUser.email
-    );
-    this.unsubscribeShortTermOri = this.shortTermOri.onSnapshot(
-      (querySnapshot) => this.getGoals(querySnapshot, "short")
-    );
-    this.unsubscribeShortTermShared = this.shortTermShared.onSnapshot(
-      (querySnapshot) => this.getGoals(querySnapshot, "short")
-    );
-    this.unsubscribeLongTermOri = this.longTermOri.onSnapshot((querySnapshot) =>
-      this.getGoals(querySnapshot, "long")
-    );
-    this.unsubscribeLongTermShared = this.longTermShared.onSnapshot(
-      (querySnapshot) => this.getGoals(querySnapshot, "long")
-    );
+
     this.state = {
       shortTermGoals: [],
       longTermGoals: [],
+      showModal: false,
     };
   }
 
   componentDidMount() {
+    this.unsubscribeActiveGoalsOri = this.activeGoalsOri.onSnapshot(
+      this.getGoals
+    );
+    this.unsubscribeActiveGoalsShared = this.activeGoalsShared.onSnapshot(
+      this.getGoals
+    );
+
     this.unsubscribeSavings = this.props.navigation.addListener("focus", () => {
-      this.setState({ shortTermGoals: [], longTermGoals: [] });
-      this.unsubscribeShortTermOri;
-      this.unsubscribeShortTermShared;
-      this.unsubscribeLongTermOri;
-      this.unsubscribeLongTermShared;
-      this.setState({
-        shortTermGoals: this.state.shortTermGoals,
-        longTermGoals: this.state.longTermGoals,
-      });
+      this.unsubscribeActiveGoalsOri;
+      this.unsubscribeActiveGoalsShared;
     });
   }
 
   componentWillUnmount() {
-    this.unsubscribeShortTermOri();
-    this.unsubscribeShortTermShared();
-    this.unsubscribeLongTermOri();
-    this.unsubscribeLongTermShared();
+    this.unsubscribeActiveGoalsOri();
+    this.unsubscribeActiveGoalsShared();
     this.unsubscribeSavings();
   }
 
   render() {
     return (
       <KeyboardAwareScrollView contentContainerStyle={styles.container}>
+        {this.state.showModal && (
+          <View style={styles.modalView}>
+            <Modal
+              transparent={true}
+              visible={this.state.showModal}
+              onRequestClose={() =>
+                this.setState({ showModal: forModalPresentationIOS })
+              }
+            >
+              <View style={styles.modalView}>
+                <View style={styles.modal}>
+                  <Image
+                    source={require("../../assets/congrats.gif")}
+                    style={styles.modalImage}
+                  />
+                  <Text style={{ fontSize: 16, marginBottom: 10 }}>
+                    Goal completed
+                  </Text>
+                  <Text style={{ marginBottom: 20 }}>
+                    {" "}
+                    Congrats on completing your goal!
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => this.setState({ showModal: false })}
+                  >
+                    <Text>High Five!</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </View>
+        )}
+
         <View style={styles.buttonContainer}>
           <BlackButton
             text={"Add new goals"}
@@ -91,11 +105,11 @@ class GoalsPage extends React.Component {
             onPress={() => this.props.navigation.navigate("New Goal")}
           />
 
-          {/* <BlackButton
+          <BlackButton
             text={"Show goal history"}
             style={styles.button}
             onPress={() => this.props.navigation.navigate("Goal History")}
-          /> */}
+          />
         </View>
         <Title text={"Short-term goals"} />
         {this.state.shortTermGoals.length !== 0
@@ -106,6 +120,7 @@ class GoalsPage extends React.Component {
                 time={"short term"}
                 deleteItem={this.deleteGoal}
                 saveItem={this.saveToGoal}
+                editItem={this.editGoal}
               />
             ))
           : this.renderNoGoals()}
@@ -119,6 +134,7 @@ class GoalsPage extends React.Component {
                 time={"long term"}
                 deleteItem={this.deleteGoal}
                 saveItem={this.saveToGoal}
+                editItem={this.editGoal}
               />
             ))
           : this.renderNoGoals()}
@@ -126,77 +142,132 @@ class GoalsPage extends React.Component {
     );
   }
 
-  getGoals = (querySnapshot, timePeriod) => {
+  /*
+  Getting goals from database and categorising to short and long term goal
+  */
+  getGoals = (querySnapshot) => {
     try {
-      if (timePeriod === "short") {
-        let newState = this.state.shortTermGoals;
-        querySnapshot.forEach((doc) => {
-          newState = newState.filter((item) => item.id !== doc.id);
-          newState.push({ ...doc.data(), id: doc.id });
-        });
-        this.setState({
-          shortTermGoals: newState,
-        });
-      }
+      querySnapshot.forEach((doc) => {
+        const deadlineYear = new Date(
+          doc.data().deadline.seconds * 1000
+        ).getFullYear();
+        const todayYear = new Date().getFullYear();
 
-      if (timePeriod === "long") {
-        let newState = this.state.longTermGoals;
-        querySnapshot.forEach((doc) => {
-          newState = newState.filter((item) => item.id !== doc.id);
-          newState.push({ ...doc.data(), id: doc.id });
-        });
-        this.setState({
-          longTermGoals: newState,
-        });
-      }
+        if (deadlineYear - todayYear < 5) {
+          const newState = this.state.shortTermGoals.filter(
+            (item) => item.id !== doc.id
+          );
+
+          this.setState({
+            shortTermGoals: [...newState, { ...doc.data(), id: doc.id }],
+          });
+        } else {
+          const newState = this.state.longTermGoals.filter(
+            (item) => item.id !== doc.id
+          );
+          this.setState({
+            longTermGoals: [...newState, { ...doc.data(), id: doc.id }],
+          });
+        }
+      });
     } catch {
       (err) => console.log(err);
     }
   };
 
-  addGoal = (doc, time) => {};
+  moveToInactive = (id, data) => {
+    db.collection("inactive goals").doc(id).set({
+      createdBy: data.createdBy,
+      goalDescription: data.goalDescription,
+      target: data.target,
+      frequency: data.frequency,
+      freqAmount: data.freqAmount,
+      deadline: data.deadline,
+      notes: data.notes,
+      isSharing: data.isSharing,
+      sharingEmails: data.sharingEmails,
+      currSavingsAmt: data.currSavingsAmt,
+    });
+  };
 
   editGoal = (id, time, data) => {
-    let ref;
     if (time === "short term") {
       const newList = this.state.shortTermGoals.filter(
         (item) => item.id !== id
       );
       this.setState({ shortTermGoals: newList });
-      ref = this.shortTermRef;
     } else {
       const newList = this.state.longTermGoals.filter((item) => item.id !== id);
       this.setState({ longTermGoals: newList });
-      ref = this.longTermRef;
     }
-    // ref.doc(id).update({ currSavingsAmt: newAmt });
+
+    if (data.target <= data.currSavingsAmt) {
+      this.setState({ showModal: true });
+      this.moveToInactive(id, data);
+      this.deleteGoal(id, time);
+      return;
+    }
+
+    this.activeGoalsRef.doc(id).set({
+      createdBy: data.createdBy,
+      createdByEmail: data.createdByEmail,
+      dateCreated: data.dateCreated,
+      goalDescription: data.goalDescription,
+      target: data.target,
+      frequency: data.frequency,
+      freqAmount: data.freqAmount,
+      deadline: data.deadline,
+      notes: data.notes,
+      isSharing: data.isSharing,
+      sharingEmails: data.sharingEmails,
+      currSavingsAmt: data.currSavingsAmt,
+    });
   };
 
-  saveToGoal = (id, time, newAmt) => {
+  saveToGoal = (id, time, newAmt, data) => {
+    if (newAmt >= data.target) {
+      this.setState({ showModal: true });
+      this.moveToInactive(id, data);
+      this.deleteGoal(id, time);
+    }
+
     if (time === "short term") {
       const newList = this.state.shortTermGoals.filter(
         (item) => item.id !== id
       );
       this.setState({ shortTermGoals: newList });
-      this.shortTermRef.doc(id).update({ currSavingsAmt: newAmt });
     } else {
       const newList = this.state.longTermGoals.filter((item) => item.id !== id);
       this.setState({ longTermGoals: newList });
-      this.longTermRef.doc(id).update({ currSavingsAmt: newAmt });
     }
+    this.activeGoalsRef.doc(id).update({ currSavingsAmt: newAmt });
   };
 
-  deleteGoal = (id, time) => {
+  deleteGoal = (id, time, data) => {
     if (time === "short term") {
       const newList = this.state.shortTermGoals.filter(
         (item) => item.id !== id
       );
       this.setState({ shortTermGoals: newList });
-      this.shortTermRef.doc(id).delete();
     } else {
       const newList = this.state.longTermGoals.filter((item) => item.id !== id);
       this.setState({ longTermGoals: newList });
-      this.longTermRef.doc(id).delete();
+    }
+
+    if (data.createdBy === auth.currentUser.uid) {
+      this.activeGoalsRef.doc(id).delete();
+    } else {
+      if (data.sharingEmails.length === 1) {
+        data.isSharing = false;
+        data.sharingEmails = data.sharingEmails.filter(
+          (item) => item !== auth.currentUser.email
+        );
+      } else {
+        data.sharingEmails = data.sharingEmails.filter(
+          (item) => item !== auth.currentUser.email
+        );
+      }
+      this.editGoal(id, time, data);
     }
   };
 
@@ -220,6 +291,40 @@ const styles = StyleSheet.create({
   container: {
     margin: 10,
     paddingBottom: 50,
+  },
+  modal: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  modalButton: {
+    borderRadius: 20,
+    padding: 10,
+    backgroundColor: colours.lightBrown,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  modalImage: {
+    width: 70,
+    height: 90,
+    overflow: "visible",
+    resizeMode: "contain",
+  },
+  modalView: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

@@ -71,9 +71,7 @@ class BudgetPage extends React.Component {
                 precision={2}
                 minValue={0}
                 onChangeValue={(val) => this.updateInputVal(val, "value")}
-                // onChangeText={(formattedValue) => {
-                //   this.updateInputVal(formattedValue, "value");
-                // }}
+                maxValue={9999999999999}
               />
             </View>
 
@@ -462,7 +460,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     shadowColor: "#000",
     marginVertical: 5,
-    shadowOpacity: 0,
     shadowRadius: 1,
     elevation: 8,
     paddingHorizontal: 5,

@@ -1,4 +1,4 @@
-import React, { useState, Component } from "react";
+import React from "react";
 import {
   StyleSheet,
   Text,
@@ -9,6 +9,7 @@ import {
   Animated,
   ActivityIndicator,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import colours from "../config/colours";
 import { auth, db } from "../config/firebase";
@@ -21,10 +22,9 @@ import CurrencyInput, { TextWithCursor } from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SmallBlackButton } from "../config/reusableButton";
 import Icon from "react-native-vector-icons/AntDesign";
-import { color } from "react-native-elements/dist/helpers";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { GreyLine } from "../config/reusablePart";
 import { BlackButton } from "../config/reusableButton";
+import { Divider } from "react-native-elements";
 
 const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
@@ -475,15 +475,12 @@ class HomePage extends React.Component {
         <View style={styles.container}>
           {/* <Text>{this.addExpenses()}</Text>
           <Text>{this.percentExpenseOutOfBudget()}</Text> */}
-
           {/* <ScrollView
           refreshControl = {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         > */}
-
           <Title text={`Welcome, ${this.state.name}!`}></Title>
-
           <View style={styles.weeklyBudgetTab}>
             {/* <Header text={`${"\n"}Your weekly budget`} style={styles.changeLineHeightWeeklyBudget} /> */}
             <SelectDropdown
@@ -516,9 +513,7 @@ class HomePage extends React.Component {
             />
             {/* <View style={styles.dropdownTriangle} /> */}
           </View>
-
           <RedLine />
-
           <View
             style={{
               flexDirection: "row",
@@ -533,7 +528,6 @@ class HomePage extends React.Component {
               style={styles.leftText}
             >{`${this.textBesideWalking()}: $${this.leftAmount()}`}</Text>
           </View>
-
           <View style={styles.progressArea}>
             <View style={styles.progressBar}>
               <Animated.View
@@ -558,6 +552,7 @@ class HomePage extends React.Component {
               separator="."
               precision={2}
               onChangeValue={(val) => this.updateInputVal(val, "budgetValue")}
+              maxValue={9999999999999}
             />
             <TouchableOpacity onPress={this.inputBudgetFireStore()}>
               <Icon.Button
@@ -581,7 +576,6 @@ class HomePage extends React.Component {
               resizeMethod={"resize"}
             /> */}
           </View>
-
           <View style={styles.reportPieChart}>
             <Header
               text={`${"\n"} Categories (${this.textBesideCategories()} ${
@@ -627,7 +621,36 @@ class HomePage extends React.Component {
               {renderLegend("others", "#E8E0CE")}
             </View>
           </View>
-
+          {/*
+          {offTrackGoals === undefined || offTrackGoals.length === 0 ? null : (
+            <View style={styles.notifContainer}>
+              <Text style={{ color: colours.darkgrey }}>Notifications</Text>
+              <Divider
+                orientation="horizontal"
+                color={colours.darkgrey}
+                width={0.5}
+                style={{ marginVertical: 3 }}
+              />
+              {offTrackGoals.map((item) => (
+                <View key={item.id}>
+                  <View style={{ padding: 10 }}>
+                    <Text>Attention! Goal</Text>
+                    <Text style={{ color: colours.darkgrey }}>
+                      You went off track for a goal: Save for{" "}
+                      {item.goalDescription}
+                    </Text>
+                    <Divider
+                      orientation="horizontal"
+                      color={colours.darkgrey}
+                      width={0.5}
+                      style={{ marginVertical: 3 }}
+                    />
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+              */}
           <View style={styles.lastRecordTitle}>
             <Header style={styles.lastRecordText} text={"Last records"} />
             <RedLine />
@@ -641,7 +664,6 @@ class HomePage extends React.Component {
               onPress={() => navigation.navigate("All Table View")}
             />
           </View>
-
           {/* </ScrollView> */}
         </View>
       </KeyboardAwareScrollView>
@@ -673,6 +695,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
     fontWeight: "300",
+  },
+  notifContainer: {
+    marginTop: 20,
+    backgroundColor: colours.lightBrown,
+    borderRadius: 10,
+    padding: 10,
   },
   // changeLineHeightWeeklyBudget: {
   //   lineHeight: 10,
@@ -752,7 +780,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     shadowColor: "#000",
     marginVertical: 5,
-    shadowOpacity: 0,
     shadowRadius: 1,
     elevation: 8,
     paddingHorizontal: 5,
