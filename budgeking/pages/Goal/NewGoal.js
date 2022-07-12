@@ -108,7 +108,6 @@ class NewGoal extends React.Component {
           <ImageTextInput
             source={require("../../assets/calendar.png")}
             onPress={() => this.showDatePicker()}
-            d
             value={this.dateFormat()}
             editable={false}
             style={[styles.newGoalInput, { paddingHorizontal: 0, margin: 0 }]}

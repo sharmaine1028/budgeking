@@ -18,9 +18,6 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 function EditGoal({ route, navigation }) {
   const { doc, time, editItem } = route.params;
-  if (doc) {
-    doc.deadline = new Date(doc.deadline.seconds * 1000);
-  }
   const [data, setData] = useState(doc);
   const [datePicker, setDatePicker] = useState(false);
   const [email, setEmail] = useState("");
@@ -38,18 +35,12 @@ function EditGoal({ route, navigation }) {
     setDatePicker(true);
   };
 
-  const onDateSelected = (event, value) => {
-    value.setHours(23);
-    value.setMinutes(59);
-    value.setSeconds(59);
+  const onDateSelected = async (event, value) => {
     setDatePicker(false);
     setData({ ...data, deadline: value });
-    updateFreqAmount();
   };
 
-  const dateFormat = () => {
-    const date = data.deadline;
-
+  const dateFormat = (date) => {
     const [day, month, year] = [
       date.getDate(),
       date.getMonth(),
@@ -146,7 +137,6 @@ function EditGoal({ route, navigation }) {
     var key = e.nativeEvent.key;
     if (key === "Enter" || key === " " || key === ",") {
       const trimEmail = email.trim();
-      console.log(trimEmail);
       checkEmail(trimEmail);
     }
   };
@@ -187,6 +177,9 @@ function EditGoal({ route, navigation }) {
   const editGoal = () => {
     const finalData = data;
     finalData.sharingEmails = [...sharingEmails, auth.currentUser.email];
+    finalData.deadline.setHours(23);
+    finalData.deadline.setMinutes(59);
+    finalData.deadline.setSeconds(59);
     editItem(doc.id, time, finalData);
     navigation.navigate("Goals");
   };

@@ -18,6 +18,9 @@ import { Ionicons } from "@expo/vector-icons";
 
 function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   const navigation = useNavigation();
+  if (doc.deadline.seconds) {
+    doc.deadline = new Date(doc.deadline.seconds * 1000);
+  }
   const [isMenu, setIsMenu] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const sharingEmails = doc.sharingEmails.filter(
@@ -33,8 +36,8 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
     }
   };
 
-  const dateFormat = (seconds) => {
-    const date = new Date(seconds * 1000);
+  const dateFormat = () => {
+    const date = doc.deadline;
     const [day, month, year] = [
       date.getDate(),
       date.getMonth(),
@@ -126,14 +129,14 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
 
     // Compare supposed amount with curramount
     if (doc.currSavingsAmt < supposedAmt) {
-      return true;
+      doc.isOffTrack = true;
     } else {
-      return false;
+      doc.isOffTrack = false;
     }
   };
 
   return (
-    <View key={doc.id} style={isOffTrack() ? styles.goalRed : styles.goal}>
+    <View key={doc.id} style={doc.isOffTrack ? styles.goalRed : styles.goal}>
       <View
         style={{
           flexDirection: "row",
@@ -185,7 +188,7 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
         </Menu>
       </View>
 
-      {isOffTrack() ? (
+      {doc.isOffTrack ? (
         <Text style={styles.goalTagline}>
           You're behind schedule to save ${doc.freqAmount}{" "}
           {doc.frequency.toString().toLowerCase()}
@@ -240,7 +243,7 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
           style={{ flex: 0.1 }}
         />
         <Text style={{ flex: 0.3, paddingLeft: 30 }}> Deadline </Text>
-        <Text style={{ flex: 0.55 }}>{dateFormat(doc.deadline.seconds)}</Text>
+        <Text style={{ flex: 0.55 }}>{dateFormat(doc.deadline)}</Text>
 
         {showMore ? (
           <TouchableOpacity onPress={() => setShowMore(false)}>
