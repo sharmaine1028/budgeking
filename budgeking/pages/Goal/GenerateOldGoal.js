@@ -81,7 +81,10 @@ function GenerateOldGoal({ doc, deleteItem }) {
     <Menu
       visible={showMenu}
       anchor={
-        <TouchableOpacity onPress={() => setShowMenu(true)}>
+        <TouchableOpacity
+          onLongPress={() => setShowMenu(true)}
+          activeOpacity={0.7}
+        >
           <View key={doc.id} style={styles.goal}>
             <View
               style={{

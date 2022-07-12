@@ -171,7 +171,8 @@ class NewGoal extends React.Component {
               this.updateInputVal(val, "email");
             }}
             value={this.state.email}
-            onKeyPress={this.checkEmail}
+            onSubmitEditing={this.onSubmitEmail}
+            onKeyPress={this.onTypingEmail}
           />
         )}
         <View style={styles.beside}>
@@ -292,47 +293,52 @@ class NewGoal extends React.Component {
     }
   };
 
-  checkEmail = async (e) => {
+  onSubmitEmail = () => {
+    this.checkEmail(this.state.email);
+  };
+
+  onTypingEmail = (e) => {
     var key = e.nativeEvent.key;
-    if (key === "Enter" || key === " ") {
+    if (key === "Enter" || key === " " || key === ",") {
       const email = this.state.email.trim();
-
-      if (email) {
-        if (email === auth.currentUser.email) {
-          alert("You can't add yourself!");
-          this.setState({ email: "" });
-          return;
-        }
-
-        if (this.state.sharingEmails.includes(email)) {
-          alert("This email has already been added");
-          this.setState({ email: "" });
-          return;
-        }
-
-        const sharingUID = await db
-          .collection("userLookup")
-          .doc(email)
-          .get()
-          .then((data) => {
-            if (data.exists) {
-              this.setState({
-                sharingEmails: [...this.state.sharingEmails, email],
-                email: "",
-              });
-              this.setState({
-                sharingUIDs: [...this.state.sharingUIDs, data.data().uid],
-              });
-              return data.data().uid;
-            } else {
-              alert("User does not exist");
-              this.setState({ email: "" });
-              return null;
-            }
-          })
-          .catch((err) => console.log(err));
-      }
+      this.checkEmail(email);
     }
+  };
+
+  checkEmail = async (email) => {
+    if (email === auth.currentUser.email) {
+      alert("You can't add yourself!");
+      this.setState({ email: "" });
+      return;
+    }
+
+    if (this.state.sharingEmails.includes(email)) {
+      alert("This email has already been added");
+      this.setState({ email: "" });
+      return;
+    }
+
+    const sharingUID = await db
+      .collection("userLookup")
+      .doc(email)
+      .get()
+      .then((data) => {
+        if (data.exists) {
+          this.setState({
+            sharingEmails: [...this.state.sharingEmails, email],
+            email: "",
+          });
+          this.setState({
+            sharingUIDs: [...this.state.sharingUIDs, data.data().uid],
+          });
+          return data.data().uid;
+        } else {
+          alert("User does not exist");
+          this.setState({ email: "" });
+          return null;
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
   deleteEmail = (tobeRemoved) => {
