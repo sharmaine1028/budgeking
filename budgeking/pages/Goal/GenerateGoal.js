@@ -27,7 +27,7 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
     (item) => item !== auth.currentUser.email
   );
 
-  useEffect(() => isOffTrack(), []);
+  useEffect(() => isOffTrack(), [doc.isOffTrack]);
 
   const getPercent = () => {
     const percent = (doc.currSavingsAmt / doc.target) * 100;
@@ -106,7 +106,8 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
     const dateCreated = new Date(doc.dateCreated.seconds * 1000);
 
     if (deadline < today) {
-      doc.isOffTrack = true;
+      db.collection("active goals").doc(doc.id).update({ isOffTrack: true });
+      return;
     }
     // Get supposed amount based on frequency
     const years = today.getFullYear() - dateCreated.getFullYear();
@@ -131,9 +132,9 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
 
     // Compare supposed amount with curramount
     if (doc.currSavingsAmt < supposedAmt) {
-      doc.isOffTrack = true;
+      db.collection("active goals").doc(doc.id).update({ isOffTrack: true });
     } else {
-      doc.isOffTrack = false;
+      db.collection("active goals").doc(doc.id).update({ isOffTrack: false });
     }
   };
 
