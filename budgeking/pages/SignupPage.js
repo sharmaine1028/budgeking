@@ -12,6 +12,7 @@ import { BlackButton, AddButton } from "../config/reusableButton";
 import { Footer, BrownTextInput } from "../config/reusableText";
 import { auth, db, storage } from "../config/firebase";
 import * as ImagePicker from "expo-image-picker";
+import uuid from "uuid";
 
 export default class SignupPage extends React.Component {
   constructor() {
@@ -20,8 +21,7 @@ export default class SignupPage extends React.Component {
       firstName: "",
       email: "",
       password: "",
-      imageSource: "",
-      uploading: false,
+      photoURL: "",
       isLoading: false,
       cameraPermission: false,
     };
@@ -70,7 +70,7 @@ export default class SignupPage extends React.Component {
         <BrownTextInput
           placeholder={"First name"}
           onChangeText={(val) => this.updateInputVal(val, "firstName")}
-          value={this.state.username}
+          value={this.state.firstName}
         />
         <BrownTextInput
           placeholder={"Password"}
@@ -110,7 +110,7 @@ export default class SignupPage extends React.Component {
    * @returns profile picture that users add, default picture otherwise
    */
   maybeRenderImage = () => {
-    if (this.state.imageSource === "") {
+    if (this.state.photoURL === "") {
       return (
         <Image
           style={styles.image}
@@ -119,9 +119,7 @@ export default class SignupPage extends React.Component {
       );
     }
 
-    return (
-      <Image style={styles.image} source={{ uri: this.state.imageSource }} />
-    );
+    return <Image style={styles.image} source={{ uri: this.state.photoURL }} />;
   };
 
   /**
@@ -141,11 +139,11 @@ export default class SignupPage extends React.Component {
     }).catch((err) => console.log(error));
 
     if (!pickerResult.cancelled) {
-      this.setState({ imageSource: pickerResult.uri });
+      this.uploadImage(pickerResult.uri);
     }
   };
 
-  uploadUrl = async (uri, uid) => {
+  uploadImage = async (uri) => {
     const blob = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.onload = function () {
@@ -160,22 +158,13 @@ export default class SignupPage extends React.Component {
       xhr.send(null);
     });
 
-    const fileRef = storage.ref(uid).child("profilePhoto");
-    const result = await fileRef
-      .put(blob)
-      .then((snapshot) => console.log("success"))
-      .catch((err) => console.log(error));
-
-    // Done with blob, close and release it
+    const ref = storage.ref().child(uuid.v4());
+    const snapshot = await ref.put(blob);
     blob.close();
-
-    const url = await fileRef.getDownloadURL().then((url) => {
-      return url;
+    snapshot.ref.getDownloadURL().then((url) => {
+      this.setState({ photoURL: url });
     });
-
-    console.log(String(url));
-
-    return String(url);
+    return await snapshot.ref.getDownloadURL();
   };
 
   /**
@@ -215,34 +204,18 @@ export default class SignupPage extends React.Component {
             uid: res.user.uid,
           });
 
-          if (this.state.imageSource !== "") {
-            const downloadURL = this.uploadUrl(
-              this.state.imageSource,
-              res.user.uid
-            );
+          res.user.updateProfile({
+            displayName: this.state.firstName,
+            photoURL: this.state.photoURL,
+          });
 
-            const filePath = storage
-              .ref(res.user.uid)
-              .child("profilePhoto").fullPath;
-
-            console.log("FilePath: " + filePath);
-            res.user.updateProfile({
-              displayName: this.state.firstName,
-              photoURL: filePath,
-            });
-          } else {
-            // Update details in firebase authentication
-            res.user.updateProfile({
-              displayName: this.state.firstName,
-            });
-          }
           // Alerts user to log in with new account
           alert("Log in with your new account");
 
           // Reset state on sign up page
           this.setState({
             isLoading: false,
-            username: "",
+            firstName: "",
             email: "",
             password: "",
           });
