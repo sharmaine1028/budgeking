@@ -20,6 +20,7 @@ import {
 import { AddButton } from "../config/reusableButton";
 import colours from "../config/colours";
 import * as ImagePicker from "expo-image-picker";
+import uuid from "uuid";
 
 class SettingsPage extends React.Component {
   constructor() {
@@ -29,7 +30,7 @@ class SettingsPage extends React.Component {
       currDisplayName: auth.currentUser.displayName,
       displayName: "",
       password: "",
-      uri: auth.currentUser.photoURL,
+      photoURL: auth.currentUser.photoURL,
       displayNameEditable: false,
       passwordEditable: false,
       showModal: false,
@@ -152,10 +153,14 @@ class SettingsPage extends React.Component {
 
   updateUserDisplayName = (val) => {
     try {
-      console.log(this.state.uri);
       if (this.state.displayName === "") {
-        alert("Cannot be empty!");
-        return;
+        if (this.state.displayNameEditable === true) {
+          alert("Cannot be empty!");
+          return;
+        } else {
+          alert("No change to username made.");
+          return;
+        }
       }
       auth.currentUser
         .updateProfile({
@@ -226,7 +231,7 @@ class SettingsPage extends React.Component {
   };
 
   maybeRenderImage = () => {
-    if (!this.state.uri) {
+    if (!this.state.photoURL) {
       return (
         <Image
           style={styles.image}
@@ -235,24 +240,45 @@ class SettingsPage extends React.Component {
       );
     }
 
-    return <Image style={styles.image} source={{ uri: this.state.uri }} />;
+    return <Image style={styles.image} source={{ uri: this.state.photoURL }} />;
   };
 
   pickImage = async () => {
-    try {
-      let pickerResult = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
-        aspect: [1, 1],
-      });
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+    }).catch((err) => console.log(error));
 
-      if (!pickerResult.cancelled) {
-        this.setState({ uri: pickerResult.uri });
-      }
-
-      auth.currentUser.updateProfile({ photoURL: this.state.uri });
-    } catch (err) {
-      console.log(err);
+    if (!pickerResult.cancelled) {
+      this.uploadImage(pickerResult.uri);
     }
+  };
+
+  uploadImage = async (uri) => {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+
+    const ref = storage.ref().child(uuid.v4());
+    const snapshot = await ref.put(blob);
+    blob.close();
+    snapshot.ref.getDownloadURL().then((url) => {
+      this.setState({ photoURL: url });
+      auth.currentUser.updateProfile({
+        photoURL: url,
+      });
+    });
+    return await snapshot.ref.getDownloadURL();
   };
 }
 
