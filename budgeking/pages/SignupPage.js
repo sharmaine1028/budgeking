@@ -170,6 +170,7 @@ export default class SignupPage extends React.Component {
           db.collection("users").doc(res.user.uid).set({
             name: this.state.firstName,
             email: this.state.email,
+            password: this.state.password,
             budgetValue: 0.0,
             dateTo: new Date(),
             dateFrom: new Date(),
