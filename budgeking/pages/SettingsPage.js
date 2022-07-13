@@ -1,6 +1,6 @@
 import React from "react";
 import { BlackButton } from "../config/reusableButton";
-import { auth, db } from "../config/firebase";
+import { auth, db, storage } from "../config/firebase";
 import {
   Header,
   ImageTextInput,
@@ -24,6 +24,7 @@ import * as ImagePicker from "expo-image-picker";
 class SettingsPage extends React.Component {
   constructor() {
     super();
+
     this.state = {
       currDisplayName: auth.currentUser.displayName,
       displayName: "",
@@ -151,6 +152,7 @@ class SettingsPage extends React.Component {
 
   updateUserDisplayName = (val) => {
     try {
+      console.log(this.state.uri);
       if (this.state.displayName === "") {
         alert("Cannot be empty!");
         return;
