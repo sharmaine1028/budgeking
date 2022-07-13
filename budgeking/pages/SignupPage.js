@@ -10,7 +10,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import colours from "../config/colours";
 import { BlackButton, AddButton } from "../config/reusableButton";
 import { Footer, BrownTextInput } from "../config/reusableText";
-import { auth, db } from "../config/firebase";
+import { auth, db, storage } from "../config/firebase";
 import * as ImagePicker from "expo-image-picker";
 
 export default class SignupPage extends React.Component {
@@ -145,6 +145,39 @@ export default class SignupPage extends React.Component {
     }
   };
 
+  uploadUrl = async (uri, uid) => {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+
+    const fileRef = storage.ref(uid).child("profilePhoto");
+    const result = await fileRef
+      .put(blob)
+      .then((snapshot) => console.log("success"))
+      .catch((err) => console.log(error));
+
+    // Done with blob, close and release it
+    blob.close();
+
+    const url = await fileRef.getDownloadURL().then((url) => {
+      return url;
+    });
+
+    console.log(String(url));
+
+    return String(url);
+  };
+
   /**
    * Handles errors in filling up of fields.
    * Handles logic of updating firebase authentication and details in firestore
@@ -181,12 +214,27 @@ export default class SignupPage extends React.Component {
             uid: res.user.uid,
           });
 
-          // Update details in firebase authentication
-          res.user.updateProfile({
-            displayName: this.state.firstName,
-            photoURL: this.state.imageSource,
-          });
+          if (this.state.imageSource !== "") {
+            const downloadURL = this.uploadUrl(
+              this.state.imageSource,
+              res.user.uid
+            );
 
+            const filePath = storage
+              .ref(res.user.uid)
+              .child("profilePhoto").fullPath;
+
+            console.log("FilePath: " + filePath);
+            res.user.updateProfile({
+              displayName: this.state.firstName,
+              photoURL: filePath,
+            });
+          } else {
+            // Update details in firebase authentication
+            res.user.updateProfile({
+              displayName: this.state.firstName,
+            });
+          }
           // Alerts user to log in with new account
           alert("Log in with your new account");
 
