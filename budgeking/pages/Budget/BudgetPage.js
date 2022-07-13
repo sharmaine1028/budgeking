@@ -70,8 +70,10 @@ class BudgetPage extends React.Component {
                 separator="."
                 precision={2}
                 minValue={0}
-                onChangeValue={(val) => this.updateInputVal(val, "value")}
                 maxValue={9999999999999}
+                onChangeValue={(val) => {
+                  this.updateInputVal(val, "value");
+                }}
               />
             </View>
 

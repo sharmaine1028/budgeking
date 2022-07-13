@@ -37,6 +37,9 @@ class HomePage extends React.Component {
       .collection("users")
       .doc(auth.currentUser.uid)
       .collection("expense");
+    this.offTrackGoalsRef = db
+      .collection("active goals")
+      .where("sharingEmails", "array-contains", auth.currentUser.email);
     this.state = {
       name: auth.currentUser.displayName,
       email: auth.currentUser.email,
@@ -60,6 +63,7 @@ class HomePage extends React.Component {
         "November",
         "December",
       ],
+      offTrackGoals: [],
     };
   }
 
@@ -76,6 +80,9 @@ class HomePage extends React.Component {
   // calling budgetValue from firestore
   componentDidMount() {
     this.unsubscribe = this.fireStoreRef.onSnapshot(this.getCollection);
+    this.unsubscribeOffTrackGoals = this.offTrackGoalsRef.onSnapshot(
+      this.getOffTrackGoals
+    );
     this.callBudgetValue();
   }
 
@@ -91,6 +98,7 @@ class HomePage extends React.Component {
 
   componentWillUnmount() {
     this.unsubscribe();
+    this.unsubscribeOffTrackGoals();
   }
 
   getCollection = (querySnapshot) => {
@@ -437,6 +445,70 @@ class HomePage extends React.Component {
     );
   };
 
+  getOffTrackGoals = (querySnapshot) => {
+    try {
+      querySnapshot.forEach((doc) => {
+        if (this.isOffTrack(doc.data())) {
+          const newState = this.state.offTrackGoals.filter(
+            (item) => item.id !== doc.id
+          );
+          this.setState({
+            offTrackGoals: [...newState, { ...doc.data(), id: doc.id }],
+          });
+        } else {
+          const newState = this.state.offTrackGoals.filter(
+            (item) => item.id !== doc.id
+          );
+          this.setState({ offTrackGoals: [...newState] });
+        }
+      });
+    } catch {
+      (err) => console.log(err);
+    }
+  };
+
+  isOffTrack = (doc) => {
+    try {
+      const today = new Date();
+      const deadline = new Date(doc.deadline.seconds * 1000);
+      const dateCreated = new Date(doc.dateCreated.seconds * 1000);
+
+      if (deadline < today) {
+        return true;
+      }
+
+      // Get supposed amount based on frequency
+      const years = today.getFullYear() - dateCreated.getFullYear();
+      let supposedAmt;
+      if (doc.frequency === "Yearly") {
+        supposedAmt = doc.freqAmount * years;
+      } else if (doc.frequency === "Monthly") {
+        const months =
+          years * 12 + today.getMonth() - dateCreated.getMonth() <= 0
+            ? 0
+            : years * 12 + today.getMonth() - dateCreated.getMonth();
+        supposedAmt = doc.freqAmount * months;
+      } else if (doc.frequency === "Weekly") {
+        const msInWeek = 1000 * 60 * 60 * 24 * 7;
+        const weeks = Math.round(Math.abs(today - dateCreated) / msInWeek);
+        supposedAmt = doc.freqAmount * weeks;
+      } else {
+        const msInDay = 1000 * 3600 * 24;
+        const days = Math.round(Math.abs(today - dateCreated) / msInDay);
+        supposedAmt = doc.freqAmount * days;
+      }
+
+      // Compare supposed amount with curramount
+      if (doc.currSavingsAmt < supposedAmt) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch {
+      (err) => console.log(err);
+    }
+  };
+
   render() {
     const { navigation } = this.props;
     const pieData = this.putInTextToPie();
@@ -547,8 +619,9 @@ class HomePage extends React.Component {
               delimiter=","
               separator="."
               precision={2}
-              onChangeValue={(val) => this.updateInputVal(val, "budgetValue")}
+              minValue={0}
               maxValue={9999999999999}
+              onChangeValue={(val) => this.updateInputVal(val, "budgetValue")}
             />
             <TouchableOpacity onPress={this.inputBudgetFireStore()}>
               <Icon.Button
@@ -617,8 +690,8 @@ class HomePage extends React.Component {
               {renderLegend("others", "#E8E0CE")}
             </View>
           </View>
-          {/*
-          {offTrackGoals === undefined || offTrackGoals.length === 0 ? null : (
+
+          {this.state.offTrackGoals.length === 0 ? null : (
             <View style={styles.notifContainer}>
               <Text style={{ color: colours.darkgrey }}>Notifications</Text>
               <Divider
@@ -627,7 +700,7 @@ class HomePage extends React.Component {
                 width={0.5}
                 style={{ marginVertical: 3 }}
               />
-              {offTrackGoals.map((item) => (
+              {this.state.offTrackGoals.map((item) => (
                 <View key={item.id}>
                   <View style={{ padding: 10 }}>
                     <Text>Attention! Goal</Text>
@@ -646,7 +719,7 @@ class HomePage extends React.Component {
               ))}
             </View>
           )}
-              */}
+
           <View style={styles.lastRecordTitle}>
             <Header style={styles.lastRecordText} text={"Last records"} />
             <RedLine />
