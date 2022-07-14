@@ -176,7 +176,7 @@ function EditGoal({ route, navigation }) {
 
   const editGoal = () => {
     const finalData = data;
-    finalData.sharingEmails = [...sharingEmails, auth.currentUser.email];
+    finalData.sharingEmails = sharingEmails;
     finalData.deadline.setHours(23);
     finalData.deadline.setMinutes(59);
     finalData.deadline.setSeconds(59);
