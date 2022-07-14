@@ -311,19 +311,19 @@ function EditGoal({ route, navigation }) {
               </View>
             ))}
           </View>
-        </View>
-      )}
 
-      {data.isSharing && (
-        <NewGoalInput
-          title={"Add user's email to share the goal with"}
-          onChangeText={(val) => {
-            setEmail(val);
-          }}
-          value={email}
-          onSubmitEditing={onSubmitEmail}
-          onKeyPress={onTypingEmail}
-        />
+          {data.isSharing && (
+            <NewGoalInput
+              title={"Add user's email to share the goal with"}
+              onChangeText={(val) => {
+                setEmail(val);
+              }}
+              value={email}
+              onSubmitEditing={onSubmitEmail}
+              onKeyPress={onTypingEmail}
+            />
+          )}
+        </View>
       )}
 
       <View style={styles.beside}>
