@@ -69,7 +69,7 @@ class SettingsPage extends React.Component {
                       />
                     </View>
                     <BlackButton
-                      text={"Change"}
+                      text={"Verify"}
                       textStyle={styles.buttonTextStyle}
                       onPress={(val) => this.checkPassword(val)}
                     />
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   logout: {
-    width: 180,
+    marginTop: 20,
   },
   image: {
     width: 70,
