@@ -69,9 +69,7 @@ class GoalsPage extends React.Component {
             <Modal
               transparent={true}
               visible={this.state.showModal}
-              onRequestClose={() =>
-                this.setState({ showModal: forModalPresentationIOS })
-              }
+              onRequestClose={() => this.setState({ showModal: false })}
             >
               <View style={styles.modalView}>
                 <View style={styles.modal}>

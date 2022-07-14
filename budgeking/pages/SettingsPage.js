@@ -1,6 +1,6 @@
 import React from "react";
 import { BlackButton } from "../config/reusableButton";
-import { auth } from "../config/firebase";
+import { auth, db, storage } from "../config/firebase";
 import {
   Header,
   ImageTextInput,
@@ -8,28 +8,77 @@ import {
   WhiteTextInput,
 } from "../config/reusableText";
 import RedLine from "../config/reusablePart";
-import { StyleSheet, View, Image } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Image,
+  Modal,
+  Text,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import { AddButton } from "../config/reusableButton";
 import colours from "../config/colours";
 import * as ImagePicker from "expo-image-picker";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import uuid from "uuid";
 
 class SettingsPage extends React.Component {
   constructor() {
     super();
+
     this.state = {
       currDisplayName: auth.currentUser.displayName,
       displayName: "",
       password: "",
-      uri: auth.currentUser.photoURL,
+      photoURL: auth.currentUser.photoURL,
       displayNameEditable: false,
       passwordEditable: false,
+      showModal: false,
+      passwordConfirmation: "",
     };
   }
 
   render() {
     return (
       <View style={styles.container}>
+        {this.state.showModal && (
+          <View style={styles.modalView}>
+            <Modal
+              transparent={true}
+              visible={this.state.showModal}
+              onRequestClose={() => this.setState({ showModal: false })}
+            >
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                activeOpacity={1}
+                onPressOut={() => this.setState({ showModal: false })}
+              >
+                <View style={styles.modalView}>
+                  <View style={styles.modal}>
+                    <Text style={{ fontSize: 16, marginBottom: 10 }}>
+                      To verify it's you, enter your password:
+                    </Text>
+                    <View style={{ flexDirection: "row" }}>
+                      <TextInput
+                        value={this.state.passwordConfirmation}
+                        style={styles.modalTextInput}
+                        onChangeText={(val) =>
+                          this.updateInputVal(val, "passwordConfirmation")
+                        }
+                        secureTextEntry={true}
+                      />
+                    </View>
+                    <BlackButton
+                      text={"Change"}
+                      textStyle={styles.buttonTextStyle}
+                      onPress={(val) => this.checkPassword(val)}
+                    />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </Modal>
+          </View>
+        )}
         <Title text={"Profile"} />
         <RedLine />
         <View style={styles.beside}>
@@ -63,7 +112,7 @@ class SettingsPage extends React.Component {
 
         <Header text={"Change password"} />
         <ImageTextInput
-          placeholder={"At least 6 characters"}
+          placeholder={"********"}
           source={require("../assets/edit.jpg")}
           onPress={() => this.editPassword()}
           value={this.state.password}
@@ -98,10 +147,21 @@ class SettingsPage extends React.Component {
 
   editDisplayName = () => {
     this.setState({ displayNameEditable: true });
+
+    this.setState({ displayName: auth.currentUser.displayName });
   };
 
-  updateUserDisplayName = (props) => {
+  updateUserDisplayName = (val) => {
     try {
+      if (this.state.displayName === "") {
+        if (this.state.displayNameEditable === true) {
+          alert("Cannot be empty!");
+          return;
+        } else {
+          alert("No change to username made.");
+          return;
+        }
+      }
       auth.currentUser
         .updateProfile({
           displayName: `${this.state.displayName}`,
@@ -118,21 +178,46 @@ class SettingsPage extends React.Component {
   };
 
   editPassword = () => {
-    this.setState({ passwordEditable: true });
+    this.setState({ showModal: true });
   };
 
-  updateUserPassword = (props) => {
+  updateUserPassword = () => {
     try {
       auth.currentUser
         .updatePassword(`${this.state.password}`)
         .then((res) => {
           this.setState({ passwordEditable: false });
+          db.collection("users")
+            .doc(auth.currentUser.uid)
+            .update({ password: this.state.password });
           alert("Password updated!");
           this.setState({ password: "" });
         })
         .catch((err) => alert(err.message));
     } catch (error) {
       alert(error.message);
+    }
+  };
+
+  checkPassword = async () => {
+    const correctPassword = await db
+      .collection("users")
+      .doc(auth.currentUser.uid)
+      .get()
+      .then((doc) => doc.data().password)
+      .catch((err) => console.log(err));
+
+    if (this.state.passwordConfirmation !== correctPassword) {
+      alert("Wrong password inputted! ");
+      this.setState({ passwordEditable: true });
+      this.setState({ passwordConfirmation: "" });
+
+      return;
+    } else {
+      this.setState({ showModal: false });
+      this.setState({ passwordEditable: true });
+      this.setState({ password: correctPassword });
+      this.setState({ passwordConfirmation: "" });
     }
   };
 
@@ -146,7 +231,7 @@ class SettingsPage extends React.Component {
   };
 
   maybeRenderImage = () => {
-    if (!this.state.uri) {
+    if (!this.state.photoURL) {
       return (
         <Image
           style={styles.image}
@@ -155,24 +240,45 @@ class SettingsPage extends React.Component {
       );
     }
 
-    return <Image style={styles.image} source={{ uri: this.state.uri }} />;
+    return <Image style={styles.image} source={{ uri: this.state.photoURL }} />;
   };
 
   pickImage = async () => {
-    try {
-      let pickerResult = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
-        aspect: [1, 1],
-      });
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+    }).catch((err) => console.log(error));
 
-      if (!pickerResult.cancelled) {
-        this.setState({ uri: pickerResult.uri });
-      }
-
-      auth.currentUser.updateProfile({ photoURL: this.state.uri });
-    } catch (err) {
-      console.log(err);
+    if (!pickerResult.cancelled) {
+      this.uploadImage(pickerResult.uri);
     }
+  };
+
+  uploadImage = async (uri) => {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+
+    const ref = storage.ref().child(uuid.v4());
+    const snapshot = await ref.put(blob);
+    blob.close();
+    snapshot.ref.getDownloadURL().then((url) => {
+      this.setState({ photoURL: url });
+      auth.currentUser.updateProfile({
+        photoURL: url,
+      });
+    });
+    return await snapshot.ref.getDownloadURL();
   };
 }
 
@@ -215,6 +321,46 @@ const styles = StyleSheet.create({
     height: 70,
     borderRadius: 999,
     justifyContent: "flex-end",
+  },
+  modal: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+
+  modalTextInput: {
+    flex: 0.8,
+    borderRadius: 20,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#000",
+    backgroundColor: "#fff",
+    borderWidth: 0.8,
+    borderColor: "#251F47",
+    borderRadius: 5,
+    shadowColor: "#000",
+    marginVertical: 5,
+    shadowRadius: 1,
+    elevation: 8,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+  },
+
+  modalView: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

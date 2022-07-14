@@ -18,16 +18,6 @@ const firebaseConfig = {
   measurementId: "G-DM5GTRTK1C",
 };
 
-// const firebaseConfig = {
-//   apiKey: "AIzaSyBRt7jiOXsiVoKoMfWJ5VhrISnHZjPNf5c",
-//   authDomain: "budgeking2.firebaseapp.com",
-//   projectId: "budgeking2",
-//   storageBucket: "budgeking2.appspot.com",
-//   messagingSenderId: "629966382379",
-//   appId: "1:629966382379:web:1373c035b3d7b8a0be516e",
-//   measurementId: "G-LL42WC44RG",
-// };
-
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
