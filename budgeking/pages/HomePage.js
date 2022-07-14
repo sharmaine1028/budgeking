@@ -692,32 +692,36 @@ class HomePage extends React.Component {
           </View>
 
           {this.state.offTrackGoals.length === 0 ? null : (
-            <View style={styles.notifContainer}>
-              <Text style={{ color: colours.darkgrey }}>Notifications</Text>
-              <Divider
-                orientation="horizontal"
-                color={colours.darkgrey}
-                width={0.5}
-                style={{ marginVertical: 3 }}
-              />
-              {this.state.offTrackGoals.map((item) => (
-                <View key={item.id}>
-                  <View style={{ padding: 10 }}>
-                    <Text>Attention! Goal</Text>
-                    <Text style={{ color: colours.darkgrey }}>
-                      You went off track for a goal: Save for{" "}
-                      {item.goalDescription}
-                    </Text>
-                    <Divider
-                      orientation="horizontal"
-                      color={colours.darkgrey}
-                      width={0.5}
-                      style={{ marginVertical: 3 }}
-                    />
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate("Goal")}
+            >
+              <View style={styles.notifContainer}>
+                <Text style={{ color: colours.darkgrey }}>Notifications</Text>
+                <Divider
+                  orientation="horizontal"
+                  color={colours.darkgrey}
+                  width={0.5}
+                  style={{ marginVertical: 3 }}
+                />
+                {this.state.offTrackGoals.map((item) => (
+                  <View key={item.id}>
+                    <View style={{ padding: 10 }}>
+                      <Text>Attention! Goal</Text>
+                      <Text style={{ color: colours.darkgrey }}>
+                        You went off track for a goal: Save for{" "}
+                        {item.goalDescription}
+                      </Text>
+                      <Divider
+                        orientation="horizontal"
+                        color={colours.darkgrey}
+                        width={0.5}
+                        style={{ marginVertical: 3 }}
+                      />
+                    </View>
                   </View>
-                </View>
-              ))}
-            </View>
+                ))}
+              </View>
+            </TouchableOpacity>
           )}
 
           <View style={styles.lastRecordTitle}>
