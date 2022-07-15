@@ -13,14 +13,15 @@ import {
   BudgetInput,
   Title,
   Header,
-  ImageTextInput,
+  IconTextInput,
 } from "../../config/reusableText";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { auth, db } from "../../config/firebase";
+import { auth, db, storage } from "../../config/firebase";
 import { Picker } from "@react-native-picker/picker";
 import CurrencyInput from "react-native-currency-input";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 class BudgetPage extends React.Component {
   constructor() {
@@ -36,7 +37,7 @@ class BudgetPage extends React.Component {
       value: "0.00",
       category: "",
       notes: "",
-      photoURI: "",
+      photoURL: "",
       location: null,
       locationPicker: false,
       locationRegion: null,
@@ -47,7 +48,22 @@ class BudgetPage extends React.Component {
     return (
       <KeyboardAwareScrollView>
         <View style={styles.container}>
-          {this.budgetButtons()}
+          <View style={styles.tabContainer}>
+            <BlackButton
+              text={"Expense"}
+              style={styles.expenseButton}
+              textStyle={{ color: colours.black }}
+              onPress={() => {
+                this.setState({ budget: "Expense" });
+              }}
+            />
+            <BlackButton
+              text={"Income"}
+              style={styles.incomeButton}
+              textStyle={{ color: colours.black }}
+              onPress={() => this.setState({ budget: "Income" })}
+            />
+          </View>
 
           <Title text={this.state.budget} style={{ marginVertical: 5 }} />
 
@@ -70,15 +86,23 @@ class BudgetPage extends React.Component {
                 separator="."
                 precision={2}
                 minValue={0}
-                onChangeValue={(val) => this.updateInputVal(val, "value")}
                 maxValue={9999999999999}
+                onChangeValue={(val) => {
+                  this.updateInputVal(val, "value");
+                }}
               />
             </View>
 
             <View style={{ flex: 0.4 }}>
               <Header text={"Date"} />
-              <ImageTextInput
-                source={require("../../assets/calendar.png")}
+              <IconTextInput
+                icon={
+                  <MaterialCommunityIcons
+                    name="calendar-edit"
+                    size={24}
+                    color="black"
+                  />
+                }
                 onPress={() => this.showDatePicker()}
                 value={this.dateFormat()}
                 editable={false}
@@ -87,8 +111,15 @@ class BudgetPage extends React.Component {
 
             <View style={{ flex: 0.25 }}>
               <Header text={"Time"} />
-              <ImageTextInput
-                source={require("../../assets/clock.png")}
+
+              <IconTextInput
+                icon={
+                  <MaterialCommunityIcons
+                    name="clock-edit-outline"
+                    size={24}
+                    color="black"
+                  />
+                }
                 onPress={() => this.showTimePicker()}
                 value={this.timeFormat()}
                 editable={false}
@@ -127,7 +158,7 @@ class BudgetPage extends React.Component {
           <View style={styles.withImage}>
             <View>
               <Header text={"Attach photo"} />
-              {this.state.photoURI ? (
+              {this.state.photoURL ? (
                 <Text style={{ fontSize: 10 }}>Photo updated</Text>
               ) : null}
             </View>
@@ -159,7 +190,7 @@ class BudgetPage extends React.Component {
             <BlackButton
               text={"Add"}
               style={{ flexGrow: 0.5 }}
-              onPress={() => this.addToGoals()}
+              onPress={() => this.addToBudget()}
             />
             <BlackButton
               text={"Cancel"}
@@ -177,30 +208,6 @@ class BudgetPage extends React.Component {
     state[prop] = val;
     this.setState(state);
   }
-
-  /**
-   * Toggle between expense and income
-   */
-  budgetButtons = () => {
-    return (
-      <View style={styles.tabContainer}>
-        <BlackButton
-          text={"Expense"}
-          style={styles.expenseButton}
-          textStyle={{ color: colours.black }}
-          onPress={() => {
-            this.setState({ budget: "Expense" });
-          }}
-        />
-        <BlackButton
-          text={"Income"}
-          style={styles.incomeButton}
-          textStyle={{ color: colours.black }}
-          onPress={() => this.setState({ budget: "Income" })}
-        />
-      </View>
-    );
-  };
 
   /**
    * The below four functions handles logic for showing the date and time picker correctly
@@ -271,15 +278,38 @@ class BudgetPage extends React.Component {
    * Allows user to pick images from gallery
    */
   pickImage = async () => {
-    try {
-      let pickerResult = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
-      });
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+    }).catch((err) => console.log(error));
 
-      this.setState({ photoURI: pickerResult.uri });
-    } catch (err) {
-      console.log(err);
+    if (!pickerResult.cancelled) {
+      this.uploadImage(pickerResult.uri);
     }
+  };
+
+  uploadImage = async (uri) => {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+
+    const ref = storage.ref().child(uuid.v4());
+    const snapshot = await ref.put(blob);
+    blob.close();
+    snapshot.ref.getDownloadURL().then((url) => {
+      this.setState({ photoURL: url });
+    });
+    return await snapshot.ref.getDownloadURL();
   };
 
   /**
@@ -351,7 +381,7 @@ class BudgetPage extends React.Component {
   /**
    * Updates user's expenses or income in firebase and resets fields
    */
-  addToGoals = () => {
+  addToBudget = () => {
     // Error handling if user does not fill in necessary fields
     if (this.state.value === "0.00" || this.state.category === "") {
       alert("Please enter both value and category");
@@ -386,7 +416,7 @@ class BudgetPage extends React.Component {
       time: this.state.time,
       notes: this.state.notes,
       value: this.state.value,
-      photo: this.state.photoURI,
+      photoURL: this.state.photoURL,
       address: this.state.address,
       location: this.state.location,
       category: this.state.category,
@@ -411,7 +441,7 @@ class BudgetPage extends React.Component {
       value: "0.00",
       category: "",
       notes: "",
-      photoURI: "",
+      photoURL: "",
       location: null,
       locationPicker: false,
       locationRegion: null,

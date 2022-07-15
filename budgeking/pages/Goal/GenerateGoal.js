@@ -24,8 +24,10 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   const [isMenu, setIsMenu] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const sharingEmails = doc.sharingEmails.filter(
-    (item) => item !== auth.currentUser.email
+    (item) => item !== doc.createdByEmail
   );
+
+  useEffect(() => isOffTrack(), [doc.isOffTrack]);
 
   const getPercent = () => {
     const percent = (doc.currSavingsAmt / doc.target) * 100;
@@ -100,11 +102,12 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
 
   const isOffTrack = () => {
     const today = new Date();
-    const deadline = new Date(doc.deadline.seconds * 1000);
+    const deadline = doc.deadline;
     const dateCreated = new Date(doc.dateCreated.seconds * 1000);
 
     if (deadline < today) {
-      return true;
+      db.collection("active goals").doc(doc.id).update({ isOffTrack: true });
+      return;
     }
     // Get supposed amount based on frequency
     const years = today.getFullYear() - dateCreated.getFullYear();
@@ -129,9 +132,9 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
 
     // Compare supposed amount with curramount
     if (doc.currSavingsAmt < supposedAmt) {
-      doc.isOffTrack = true;
+      db.collection("active goals").doc(doc.id).update({ isOffTrack: true });
     } else {
-      doc.isOffTrack = false;
+      db.collection("active goals").doc(doc.id).update({ isOffTrack: false });
     }
   };
 
@@ -277,7 +280,13 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
                   style={{ flex: 0.1 }}
                 />
                 <Text style={{ flex: 0.8, paddingLeft: 30 }}>
-                  Goal shared with{" "}
+                  <Text style={{ fontWeight: "bold" }}>
+                    {doc.createdByEmail.slice(
+                      0,
+                      doc.createdByEmail.indexOf("@")
+                    )}
+                  </Text>{" "}
+                  shared the goal with{" "}
                   <Text
                     style={{
                       fontWeight: "bold",

@@ -10,8 +10,9 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import colours from "../config/colours";
 import { BlackButton, AddButton } from "../config/reusableButton";
 import { Footer, BrownTextInput } from "../config/reusableText";
-import { auth, db } from "../config/firebase";
+import { auth, db, storage } from "../config/firebase";
 import * as ImagePicker from "expo-image-picker";
+import uuid from "uuid";
 
 export default class SignupPage extends React.Component {
   constructor() {
@@ -20,8 +21,7 @@ export default class SignupPage extends React.Component {
       firstName: "",
       email: "",
       password: "",
-      imageSource: "",
-      uploading: false,
+      photoURL: "",
       isLoading: false,
       cameraPermission: false,
     };
@@ -70,7 +70,7 @@ export default class SignupPage extends React.Component {
         <BrownTextInput
           placeholder={"First name"}
           onChangeText={(val) => this.updateInputVal(val, "firstName")}
-          value={this.state.username}
+          value={this.state.firstName}
         />
         <BrownTextInput
           placeholder={"Password"}
@@ -110,7 +110,7 @@ export default class SignupPage extends React.Component {
    * @returns profile picture that users add, default picture otherwise
    */
   maybeRenderImage = () => {
-    if (this.state.imageSource === "") {
+    if (this.state.photoURL === "") {
       return (
         <Image
           style={styles.image}
@@ -119,9 +119,7 @@ export default class SignupPage extends React.Component {
       );
     }
 
-    return (
-      <Image style={styles.image} source={{ uri: this.state.imageSource }} />
-    );
+    return <Image style={styles.image} source={{ uri: this.state.photoURL }} />;
   };
 
   /**
@@ -141,8 +139,32 @@ export default class SignupPage extends React.Component {
     }).catch((err) => console.log(error));
 
     if (!pickerResult.cancelled) {
-      this.setState({ imageSource: pickerResult.uri });
+      this.uploadImage(pickerResult.uri);
     }
+  };
+
+  uploadImage = async (uri) => {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+
+    const ref = storage.ref().child(uuid.v4());
+    const snapshot = await ref.put(blob);
+    blob.close();
+    snapshot.ref.getDownloadURL().then((url) => {
+      this.setState({ photoURL: url });
+    });
+    return await snapshot.ref.getDownloadURL();
   };
 
   /**
@@ -170,6 +192,7 @@ export default class SignupPage extends React.Component {
           db.collection("users").doc(res.user.uid).set({
             name: this.state.firstName,
             email: this.state.email,
+            password: this.state.password,
             budgetValue: 0.0,
             budgetValueDaily: 0.0,
             dateTo: new Date(),
@@ -182,10 +205,9 @@ export default class SignupPage extends React.Component {
             uid: res.user.uid,
           });
 
-          // Update details in firebase authentication
           res.user.updateProfile({
             displayName: this.state.firstName,
-            photoURL: this.state.imageSource,
+            photoURL: this.state.photoURL,
           });
 
           // Alerts user to log in with new account
@@ -194,7 +216,7 @@ export default class SignupPage extends React.Component {
           // Reset state on sign up page
           this.setState({
             isLoading: false,
-            username: "",
+            firstName: "",
             email: "",
             password: "",
           });

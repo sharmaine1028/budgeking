@@ -97,6 +97,37 @@ export function ImageTextInput({
   );
 }
 
+export function IconTextInput({
+  value,
+  onPress,
+  icon,
+  placeholder,
+  editable,
+  onChangeText,
+  style,
+}) {
+  return (
+    <View
+      style={[
+        styles.whiteInput,
+        { flexDirection: "row", justifyContent: "space-between" },
+        style,
+      ]}
+    >
+      <TextInput
+        placeholder={placeholder}
+        style={{ flex: 1 }}
+        value={value}
+        editable={editable}
+        onChangeText={onChangeText}
+      />
+      <TouchableOpacity onPress={onPress} style={{ justifyContent: "center" }}>
+        {icon}
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 export function SmallTextInput({
   value,
   onPress,
