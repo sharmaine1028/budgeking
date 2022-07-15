@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BlackButton } from "../../config/reusableButton";
 import {
-  ImageTextInput,
+  IconTextInput,
   NewGoalInput,
   YesOrNo,
 } from "../../config/reusableText";
@@ -252,8 +252,14 @@ function EditGoal({ route, navigation }) {
 
       <View style={styles.newGoalInput}>
         <Text style={styles.newGoalTitle}>Deadline</Text>
-        <ImageTextInput
-          source={require("../../assets/calendar.png")}
+        <IconTextInput
+          icon={
+            <MaterialCommunityIcons
+              name="calendar-edit"
+              size={28}
+              color="black"
+            />
+          }
           onPress={() => showDatePicker()}
           value={dateFormat(data.deadline)}
           editable={false}

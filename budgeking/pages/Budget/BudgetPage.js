@@ -13,14 +13,15 @@ import {
   BudgetInput,
   Title,
   Header,
-  ImageTextInput,
+  IconTextInput,
 } from "../../config/reusableText";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { auth, db } from "../../config/firebase";
+import { auth, db, storage } from "../../config/firebase";
 import { Picker } from "@react-native-picker/picker";
 import CurrencyInput from "react-native-currency-input";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 class BudgetPage extends React.Component {
   constructor() {
@@ -36,7 +37,7 @@ class BudgetPage extends React.Component {
       value: "0.00",
       category: "",
       notes: "",
-      photoURI: "",
+      photoURL: "",
       location: null,
       locationPicker: false,
       locationRegion: null,
@@ -47,7 +48,22 @@ class BudgetPage extends React.Component {
     return (
       <KeyboardAwareScrollView>
         <View style={styles.container}>
-          {this.budgetButtons()}
+          <View style={styles.tabContainer}>
+            <BlackButton
+              text={"Expense"}
+              style={styles.expenseButton}
+              textStyle={{ color: colours.black }}
+              onPress={() => {
+                this.setState({ budget: "Expense" });
+              }}
+            />
+            <BlackButton
+              text={"Income"}
+              style={styles.incomeButton}
+              textStyle={{ color: colours.black }}
+              onPress={() => this.setState({ budget: "Income" })}
+            />
+          </View>
 
           <Title text={this.state.budget} style={{ marginVertical: 5 }} />
 
@@ -79,8 +95,14 @@ class BudgetPage extends React.Component {
 
             <View style={{ flex: 0.4 }}>
               <Header text={"Date"} />
-              <ImageTextInput
-                source={require("../../assets/calendar.png")}
+              <IconTextInput
+                icon={
+                  <MaterialCommunityIcons
+                    name="calendar-edit"
+                    size={24}
+                    color="black"
+                  />
+                }
                 onPress={() => this.showDatePicker()}
                 value={this.dateFormat()}
                 editable={false}
@@ -89,8 +111,15 @@ class BudgetPage extends React.Component {
 
             <View style={{ flex: 0.25 }}>
               <Header text={"Time"} />
-              <ImageTextInput
-                source={require("../../assets/clock.png")}
+
+              <IconTextInput
+                icon={
+                  <MaterialCommunityIcons
+                    name="clock-edit-outline"
+                    size={24}
+                    color="black"
+                  />
+                }
                 onPress={() => this.showTimePicker()}
                 value={this.timeFormat()}
                 editable={false}
@@ -179,30 +208,6 @@ class BudgetPage extends React.Component {
     state[prop] = val;
     this.setState(state);
   }
-
-  /**
-   * Toggle between expense and income
-   */
-  budgetButtons = () => {
-    return (
-      <View style={styles.tabContainer}>
-        <BlackButton
-          text={"Expense"}
-          style={styles.expenseButton}
-          textStyle={{ color: colours.black }}
-          onPress={() => {
-            this.setState({ budget: "Expense" });
-          }}
-        />
-        <BlackButton
-          text={"Income"}
-          style={styles.incomeButton}
-          textStyle={{ color: colours.black }}
-          onPress={() => this.setState({ budget: "Income" })}
-        />
-      </View>
-    );
-  };
 
   /**
    * The below four functions handles logic for showing the date and time picker correctly
@@ -436,7 +441,7 @@ class BudgetPage extends React.Component {
       value: "0.00",
       category: "",
       notes: "",
-      photoURI: "",
+      photoURL: "",
       location: null,
       locationPicker: false,
       locationRegion: null,
