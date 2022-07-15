@@ -10,20 +10,22 @@ import {
   ActivityIndicator,
   Dimensions,
   TouchableOpacity,
+  Modal,
+  TextInput,
 } from "react-native";
-import colours from "../config/colours";
-import { auth, db } from "../config/firebase";
-import RedLine from "../config/reusablePart";
-import { Header, Title, SmallTextInput } from "../config/reusableText";
+import colours from "../../config/colours";
+import { auth, db } from "../../config/firebase";
+import RedLine from "../../config/reusablePart";
+import { Header, Title, SmallTextInput } from "../../config/reusableText";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { PieChart } from "react-native-gifted-charts";
 import CurrencyInput, { TextWithCursor } from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { SmallBlackButton } from "../config/reusableButton";
+import { SmallBlackButton } from "../../config/reusableButton";
 import Icon from "react-native-vector-icons/AntDesign";
-import { GreyLine } from "../config/reusablePart";
-import { BlackButton } from "../config/reusableButton";
+import { GreyLine } from "../../config/reusablePart";
+import { BlackButton } from "../../config/reusableButton";
 import { Divider } from "react-native-elements";
 
 const wait = (timeout) => {
@@ -37,9 +39,9 @@ class HomePage extends React.Component {
       .collection("users")
       .doc(auth.currentUser.uid)
       .collection("expense");
-    this.offTrackGoalsRef = db
-      .collection("active goals")
-      .where("sharingEmails", "array-contains", auth.currentUser.email);
+    // this.offTrackGoalsRef = db
+    //   .collection("active goals")
+    //   .where("sharingEmails", "array-contains", auth.currentUser.email);
     this.state = {
       name: auth.currentUser.displayName,
       email: auth.currentUser.email,
@@ -47,6 +49,7 @@ class HomePage extends React.Component {
       timeUserWants: "monthly",
       budgetEditable: false,
       budgetValue: 0.0,
+      budgetValueDaily: 0.0,
       expenseArr: [],
       isLoading: true,
       monthNames: [
@@ -63,7 +66,7 @@ class HomePage extends React.Component {
         "November",
         "December",
       ],
-      offTrackGoals: [],
+      showBudgetValueModal: false,
     };
   }
 
@@ -73,16 +76,12 @@ class HomePage extends React.Component {
     this.setState(state);
   }
 
-  // editBudget = () => {
-  //   this.setState({ budgetEditable: true });
-  // };
-
   // calling budgetValue from firestore
   componentDidMount() {
     this.unsubscribe = this.fireStoreRef.onSnapshot(this.getCollection);
-    this.unsubscribeOffTrackGoals = this.offTrackGoalsRef.onSnapshot(
-      this.getOffTrackGoals
-    );
+    // this.unsubscribeOffTrackGoals = this.offTrackGoalsRef.onSnapshot(
+    //   this.getOffTrackGoals
+    // );
     this.callBudgetValue();
   }
 
@@ -91,14 +90,17 @@ class HomePage extends React.Component {
       .doc(auth.currentUser.uid)
       .get()
       .then((doc) => {
-        const { budgetValue } = doc.data();
-        this.setState({ budgetValue: budgetValue });
+        const { budgetValue, budgetValueDaily } = doc.data();
+        this.setState({
+          budgetValue: budgetValue,
+          budgetValueDaily: budgetValueDaily,
+        });
       });
   }
 
   componentWillUnmount() {
     this.unsubscribe();
-    this.unsubscribeOffTrackGoals();
+    // this.unsubscribeOffTrackGoals();
   }
 
   getCollection = (querySnapshot) => {
@@ -128,11 +130,18 @@ class HomePage extends React.Component {
     // console.log(auth.currentUser.uid)
   };
 
-  // budgetValue changing immediately when updateInputVal() without invoking tick
+  //input budgetvalue to firestore
   inputBudgetFireStore = () => {
     // console.log(this.state.budgetValue)
     db.collection("users").doc(auth.currentUser.uid).update({
       budgetValue: this.state.budgetValue,
+    });
+  };
+
+  inputBudgetDailyFireStore = () => {
+    // console.log(this.state.budgetValue)
+    db.collection("users").doc(auth.currentUser.uid).update({
+      budgetValueDaily: this.state.budgetValueDaily,
     });
   };
 
@@ -172,15 +181,15 @@ class HomePage extends React.Component {
   percentExpenseOutOfBudget() {
     if (this.addExpenses() == 0.0) {
       return 0;
-    } else if (this.state.budgetValue <= this.addExpenses()) {
+    } else if (this.whichBudgetValue() <= this.addExpenses()) {
       return 100;
     }
-    return (this.addExpenses() / this.state.budgetValue) * 100;
+    return (this.addExpenses() / this.whichBudgetValue()) * 100;
   }
 
   textBesideWalking() {
     var leftExceeded = "";
-    if (this.state.budgetValue <= this.addExpenses()) {
+    if (this.whichBudgetValue() <= this.addExpenses()) {
       leftExceeded += "Exceeded";
     } else {
       leftExceeded += "Left";
@@ -326,8 +335,16 @@ class HomePage extends React.Component {
   }
 
   leftAmount() {
-    const diff = this.state.budgetValue - this.addExpenses();
+    const diff = this.whichBudgetValue() - this.addExpenses();
     return diff.toFixed(2);
+  }
+
+  whichBudgetValue() {
+    if (this.state.timeUserWants == "monthly") {
+      return this.state.budgetValue;
+    } else {
+      return this.state.budgetValueDaily;
+    }
   }
 
   sortedArr(arr) {
@@ -439,75 +456,93 @@ class HomePage extends React.Component {
     );
   };
 
+  editBudgetValue = () => {
+    this.setState({ showBudgetValueModal: true });
+  };
+
+  updateBudgetVal(val) {
+    if (this.state.timeUserWants == "monthly") {
+      return this.updateInputVal(Math.abs(val), "budgetValue");
+    } else {
+      return this.updateInputVal(Math.abs(val), "budgetValueDaily");
+    }
+  }
+
+  changeBudgetValue() {
+    this.setState({ showBudgetValueModal: false });
+    this.inputBudgetFireStore();
+    this.inputBudgetDailyFireStore();
+  }
+
   renderNoRecords = () => {
     return (
       <Text style={{ alignSelf: "center", marginTop: 20 }}>No Records Yet</Text>
     );
   };
 
-  getOffTrackGoals = (querySnapshot) => {
-    try {
-      querySnapshot.forEach((doc) => {
-        if (this.isOffTrack(doc.data())) {
-          const newState = this.state.offTrackGoals.filter(
-            (item) => item.id !== doc.id
-          );
-          this.setState({
-            offTrackGoals: [...newState, { ...doc.data(), id: doc.id }],
-          });
-        } else {
-          const newState = this.state.offTrackGoals.filter(
-            (item) => item.id !== doc.id
-          );
-          this.setState({ offTrackGoals: [...newState] });
-        }
-      });
-    } catch {
-      (err) => console.log(err);
-    }
-  };
+  // getOffTrackGoals = (querySnapshot) => {
+  //   try {
+  //     querySnapshot.forEach((doc) => {
+  //       if (this.isOffTrack(doc.data())) {
+  //         const newState = this.state.offTrackGoals.filter(
+  //           (item) => item.id !== doc.id
+  //         );
+  //         this.setState({
+  //           offTrackGoals: [...newState, { ...doc.data(), id: doc.id }],
+  //         });
+  //       } else {
+  //         const newState = this.state.offTrackGoals.filter(
+  //           (item) => item.id !== doc.id
+  //         );
+  //         this.setState({ offTrackGoals: [...newState] });
+  //       }
+  //     });
+  //   } catch {
+  //     (err) => console.log(err);
+  //   }
+  // };
 
-  isOffTrack = (doc) => {
-    try {
-      const today = new Date();
-      const deadline = new Date(doc.deadline.seconds * 1000);
-      const dateCreated = new Date(doc.dateCreated.seconds * 1000);
+  // isOffTrack = (doc) => {
+  //   try {
+  //     const today = new Date();
+  //     const deadline = new Date(doc.deadline.seconds * 1000);
+  //     const dateCreated = new Date(doc.dateCreated.seconds * 1000);
 
-      if (deadline < today) {
-        return true;
-      }
+  //     if (deadline < today) {
+  //       return true;
+  //     }
 
-      // Get supposed amount based on frequency
-      const years = today.getFullYear() - dateCreated.getFullYear();
-      let supposedAmt;
-      if (doc.frequency === "Yearly") {
-        supposedAmt = doc.freqAmount * years;
-      } else if (doc.frequency === "Monthly") {
-        const months =
-          years * 12 + today.getMonth() - dateCreated.getMonth() <= 0
-            ? 0
-            : years * 12 + today.getMonth() - dateCreated.getMonth();
-        supposedAmt = doc.freqAmount * months;
-      } else if (doc.frequency === "Weekly") {
-        const msInWeek = 1000 * 60 * 60 * 24 * 7;
-        const weeks = Math.round(Math.abs(today - dateCreated) / msInWeek);
-        supposedAmt = doc.freqAmount * weeks;
-      } else {
-        const msInDay = 1000 * 3600 * 24;
-        const days = Math.round(Math.abs(today - dateCreated) / msInDay);
-        supposedAmt = doc.freqAmount * days;
-      }
+  //     // Get supposed amount based on frequency
+  //     const years = today.getFullYear() - dateCreated.getFullYear();
+  //     let supposedAmt;
+  //     if (doc.frequency === "Yearly") {
+  //       supposedAmt = doc.freqAmount * years;
+  //     } else if (doc.frequency === "Monthly") {
+  //       const months =
+  //         years * 12 + today.getMonth() - dateCreated.getMonth() <= 0
+  //           ? 0
+  //           : years * 12 + today.getMonth() - dateCreated.getMonth();
+  //       supposedAmt = doc.freqAmount * months;
+  //     } else if (doc.frequency === "Weekly") {
+  //       const msInWeek = 1000 * 60 * 60 * 24 * 7;
+  //       const weeks = Math.round(Math.abs(today - dateCreated) / msInWeek);
+  //       supposedAmt = doc.freqAmount * weeks;
+  //     } else {
+  //       const msInDay = 1000 * 3600 * 24;
+  //       const days = Math.round(Math.abs(today - dateCreated) / msInDay);
+  //       supposedAmt = doc.freqAmount * days;
+  //     }
 
-      // Compare supposed amount with curramount
-      if (doc.currSavingsAmt < supposedAmt) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch {
-      (err) => console.log(err);
-    }
-  };
+  //     // Compare supposed amount with curramount
+  //     if (doc.currSavingsAmt < supposedAmt) {
+  //       return true;
+  //     } else {
+  //       return false;
+  //     }
+  //   } catch {
+  //     (err) => console.log(err);
+  //   }
+  // };
 
   render() {
     const { navigation } = this.props;
@@ -540,6 +575,46 @@ class HomePage extends React.Component {
 
     return (
       <KeyboardAwareScrollView>
+        {this.state.showBudgetValueModal && (
+          <View style={styles.modalView}>
+            <Modal
+              transparent={true}
+              visible={this.state.showBudgetValueModal}
+              onRequestClose={() =>
+                this.setState({ showBudgetValueModal: forModalPresentationIOS })
+              }
+            >
+              <View style={styles.modalView}>
+                <View style={styles.modal}>
+                  <Text style={{ fontSize: 16, marginBottom: 10 }}>
+                    Change {this.state.timeUserWants} allowable budget {"\n"}
+                  </Text>
+
+                  <CurrencyInput
+                    style={styles.whiteInput}
+                    keyboardType="numeric"
+                    value={this.whichBudgetValue()}
+                    prefix="$"
+                    unit="$"
+                    delimiter=","
+                    separator="."
+                    precision={2}
+                    minValue={0}
+                    onChangeValue={(val) => this.updateBudgetVal(val)}
+                    maxValue={9999999999999}
+                  />
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => this.changeBudgetValue()}
+                  >
+                    <Text>Change</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </View>
+        )}
+
         <View style={styles.container}>
           {/* <Text>{this.addExpenses()}</Text>
           <Text>{this.percentExpenseOutOfBudget()}</Text> */}
@@ -579,7 +654,6 @@ class HomePage extends React.Component {
                 );
               }}
             />
-            {/* <View style={styles.dropdownTriangle} /> */}
           </View>
           <RedLine />
           <View
@@ -589,12 +663,9 @@ class HomePage extends React.Component {
           >
             <Image
               style={styles.logo}
-              source={require("../assets/home/walking.png")}
+              source={require("../../assets/home/walking.png")}
               resizeMethod={"resize"}
             />
-            <Text
-              style={styles.leftText}
-            >{`${this.textBesideWalking()}: $${this.leftAmount()}`}</Text>
           </View>
           <View style={styles.progressArea}>
             <View style={styles.progressBar}>
@@ -610,27 +681,29 @@ class HomePage extends React.Component {
               />
             </View>
 
-            <CurrencyInput
-              style={styles.whiteInput}
-              keyboardType="numeric"
-              value={this.state.budgetValue}
-              prefix="$"
-              unit="$"
-              delimiter=","
-              separator="."
-              precision={2}
-              minValue={0}
-              maxValue={9999999999999}
-              onChangeValue={(val) => this.updateInputVal(val, "budgetValue")}
-            />
-            <TouchableOpacity onPress={this.inputBudgetFireStore()}>
+            <TouchableOpacity
+              style={styles.raisedEffect}
+              onPress={() => this.editBudgetValue()}
+            >
+              <Text> ${this.whichBudgetValue()} </Text>
+            </TouchableOpacity>
+
+            {/* <TouchableOpacity onPress={() => this.editBudgetValue()}>
+              <Image
+                style={styles.logo}
+                source={require("../../assets/edit.jpg")}
+                resizeMethod={"resize"}
+              />
+            </TouchableOpacity> */}
+
+            {/* <TouchableOpacity onPress={this.inputBudgetFireStore()}>
               <Icon.Button
                 name="checkcircleo"
                 color={colours.black}
                 backgroundColor={"transparent"}
                 iconStyle={{ marginRight: 0 }}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             {/* <SmallBlackButton
               text="Done"
@@ -645,6 +718,9 @@ class HomePage extends React.Component {
               resizeMethod={"resize"}
             /> */}
           </View>
+          <Text
+            style={styles.leftText}
+          >{`${this.textBesideWalking()}: $${this.leftAmount()}`}</Text>
           <View style={styles.reportPieChart}>
             <Header
               text={`${"\n"} Categories (${this.textBesideCategories()} ${
@@ -691,34 +767,38 @@ class HomePage extends React.Component {
             </View>
           </View>
 
-          {this.state.offTrackGoals.length === 0 ? null : (
-            <View style={styles.notifContainer}>
-              <Text style={{ color: colours.darkgrey }}>Notifications</Text>
-              <Divider
-                orientation="horizontal"
-                color={colours.darkgrey}
-                width={0.5}
-                style={{ marginVertical: 3 }}
-              />
-              {this.state.offTrackGoals.map((item) => (
-                <View key={item.id}>
-                  <View style={{ padding: 10 }}>
-                    <Text>Attention! Goal</Text>
-                    <Text style={{ color: colours.darkgrey }}>
-                      You went off track for a goal: Save for{" "}
-                      {item.goalDescription}
-                    </Text>
-                    <Divider
-                      orientation="horizontal"
-                      color={colours.darkgrey}
-                      width={0.5}
-                      style={{ marginVertical: 3 }}
-                    />
+          {/* {this.state.offTrackGoals.length === 0 ? null : (
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate("Goal")}
+            >
+              <View style={styles.notifContainer}>
+                <Text style={{ color: colours.darkgrey }}>Notifications</Text>
+                <Divider
+                  orientation="horizontal"
+                  color={colours.darkgrey}
+                  width={0.5}
+                  style={{ marginVertical: 3 }}
+                />
+                {this.state.offTrackGoals.map((item) => (
+                  <View key={item.id}>
+                    <View style={{ padding: 10 }}>
+                      <Text>Attention! Goal</Text>
+                      <Text style={{ color: colours.darkgrey }}>
+                        You went off track for a goal: Save for{" "}
+                        {item.goalDescription}
+                      </Text>
+                      <Divider
+                        orientation="horizontal"
+                        color={colours.darkgrey}
+                        width={0.5}
+                        style={{ marginVertical: 3 }}
+                      />
+                    </View>
                   </View>
-                </View>
-              ))}
-            </View>
-          )}
+                ))}
+              </View>
+            </TouchableOpacity>
+          )} */}
 
           <View style={styles.lastRecordTitle}>
             <Header style={styles.lastRecordText} text={"Last records"} />
@@ -756,9 +836,9 @@ const styles = StyleSheet.create({
   },
   leftText: {
     // marginVertical: 10,
-    marginTop: 20,
+    // marginTop: 20,
     color: "#000",
-    fontWeight: "200",
+    fontWeight: "300",
   },
   totalSpentText: {
     textAlign: "center",
@@ -771,23 +851,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
   },
-  // changeLineHeightWeeklyBudget: {
-  //   lineHeight: 10,
-  // },
-  // dropdownTriangle: {
-  //   width: 0,
-  //   height: 0,
-  //   backgroundColor: 'transparent',
-  //   borderStyle: 'solid',
-  //   borderLeftWidth: 8,
-  //   borderRightWidth: 8,
-  //   borderBottomWidth: 16,
-  //   borderLeftColor: 'transparent',
-  //   borderRightColor: 'transparent',
-  //   borderBottomColor: colours.red,
-  //   transform: [{rotate: '180deg'}]
-  // },
-
   dropdownStyle: {
     width: "100%",
     height: 50,
@@ -818,7 +881,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-evenly",
-    //paddingTop: 10,
   },
   progressBar: {
     flex: 1,
@@ -828,11 +890,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#3F4243",
     borderColor: "#3F4243",
     borderRadius: 5,
+    marginBottom: 0,
   },
   logo: {
     bottom: 0,
-    width: 70,
-    height: 35,
+    width: 35,
+    height: 15,
     overflow: "visible",
     resizeMode: "contain",
     //borderWidth: 4
@@ -841,6 +904,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     paddingLeft: 20,
     borderColor: colours.red,
+    marginTop: 10,
   },
   whiteInput: {
     backgroundColor: "#fff",
@@ -904,6 +968,49 @@ const styles = StyleSheet.create({
     fontWeight: "200",
     marginRight: 10,
     marginBottom: 10,
+  },
+  modalView: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modal: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  modalButton: {
+    marginTop: 20,
+    borderRadius: 20,
+    padding: 10,
+    backgroundColor: colours.lightBrown,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  raisedEffect: {
+    // shadowColor: colours.black,
+    shadowOffset: { height: 1, width: 1 }, // IOS
+    shadowOpacity: 1, // IOS
+    // shadowRadius: 1, //IOS
+    backgroundColor: colours.white,
+    elevation: 2, // Android
+    // height: 50,
+    // width: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    borderRadius: 10,
   },
 });
 

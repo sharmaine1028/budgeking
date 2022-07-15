@@ -194,6 +194,7 @@ export default class SignupPage extends React.Component {
             email: this.state.email,
             password: this.state.password,
             budgetValue: 0.0,
+            budgetValueDaily: 0.0,
             dateTo: new Date(),
             dateFrom: new Date(),
             timeUserWants: "This Month",

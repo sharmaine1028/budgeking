@@ -2,24 +2,34 @@ import React from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import colours from "../config/colours";
-import { auth, db } from "../config/firebase";
+import colours from "../../config/colours";
+import { auth, db } from "../../config/firebase";
 
 class ReportsPage extends React.Component {
   constructor() {
     super();
-    this.fireStoreRef = db
+    this.ExpenseRef = db
       .collection("users")
       .doc(auth.currentUser.uid)
       .collection("expense");
+    this.IncomeRef = db
+      .collection("users")
+      .doc(auth.currentUser.uid)
+      .collection("income");
     this.state = {
       budgetValue: 0.0,
       expenseArr: [],
+      incomeArr: [],
     };
   }
 
   componentDidMount() {
-    this.unsubscribe = this.fireStoreRef.onSnapshot(this.getCollection);
+    this.unsubscribeExpenseRef = this.ExpenseRef.onSnapshot(
+      this.getCollectionExpense
+    );
+    this.unsubscribeIncomeRef = this.IncomeRef.onSnapshot(
+      this.getCollectionIncome
+    );
     this.callBudgetValue();
   }
 
@@ -34,32 +44,57 @@ class ReportsPage extends React.Component {
   }
 
   componentWillUnmount() {
-    this.unsubscribe();
+    this.unsubscribeExpenseRef();
+    this.unsubscribeIncomeRef();
   }
 
-  getCollection = (querySnapshot) => {
+  getCollectionExpense = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { value, category, date } = res.data();
+      const { notes, value, category, date } = res.data();
       expenseArrPush.push({
         key: res.id,
         value,
+        notes,
         category,
         date,
       });
     });
     this.setState({
       expenseArr: expenseArrPush,
-      isLoading: false,
     });
   };
 
-  addExpensesAllTime() {
+  getCollectionIncome = (querySnapshot) => {
+    const incomeArrPush = [];
+    querySnapshot.forEach((res) => {
+      const { category, date, notes, value } = res.data();
+      incomeArrPush.push({
+        key: res.id,
+        value,
+        category,
+        notes,
+        date,
+      });
+    });
+    this.setState({
+      incomeArr: incomeArrPush,
+    });
+  };
+
+  addExpensesIncomeAllTime(exIn) {
     let sum = 0;
-    this.state.expenseArr.map((item, i) => {
+    exIn.map((item, i) => {
       sum += item.value;
     });
     return sum.toFixed(2); //255.78
+  }
+
+  getOverallBalance() {
+    const diff =
+      this.addExpensesIncomeAllTime(this.state.incomeArr) -
+      this.addExpensesIncomeAllTime(this.state.expenseArr);
+    return diff.toFixed(2);
   }
 
   render() {
@@ -67,21 +102,20 @@ class ReportsPage extends React.Component {
 
     return (
       <KeyboardAwareScrollView>
-        {/* change to OVERALL BALANCE (total savings = total budget value - total spending) */}
-        {/* <View style={styles.reportBlocks}>
-          <Text style={styles.reportTitle}>OVERALL BALANCE</Text>
+        <View style={styles.reportBlocks}>
+          <Text style={styles.reportTitle}>OVERALL BALANCE/ TOTAL SAVINGS</Text>
           <Text
             style={styles.reportInText}
-          >{`$${this.state.budgetValue}`}</Text>
-        </View> */}
+          >{`$${this.getOverallBalance()}`}</Text>
+        </View>
         <TouchableOpacity
           style={styles.reportBlocks}
           onPress={() => navigation.navigate("Pie Chart View")}
         >
           <Text style={styles.reportTitle}>TOTAL SPENDING</Text>
-          <Text
-            style={styles.reportInText}
-          >{`$${this.addExpensesAllTime()}`}</Text>
+          <Text style={styles.reportInText}>{`$${this.addExpensesIncomeAllTime(
+            this.state.expenseArr
+          )}`}</Text>
         </TouchableOpacity>
       </KeyboardAwareScrollView>
     );

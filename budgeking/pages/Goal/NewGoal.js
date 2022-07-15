@@ -1,7 +1,7 @@
 import React from "react";
 import { BlackButton } from "../../config/reusableButton";
 import {
-  ImageTextInput,
+  IconTextInput,
   NewGoalInput,
   YesOrNo,
 } from "../../config/reusableText";
@@ -105,8 +105,14 @@ class NewGoal extends React.Component {
 
         <View style={styles.newGoalInput}>
           <Text style={styles.newGoalTitle}>Deadline</Text>
-          <ImageTextInput
-            source={require("../../assets/calendar.png")}
+          <IconTextInput
+            icon={
+              <MaterialCommunityIcons
+                name="calendar-edit"
+                size={28}
+                color="black"
+              />
+            }
             onPress={() => this.showDatePicker()}
             value={this.dateFormat()}
             editable={false}
@@ -377,9 +383,6 @@ class NewGoal extends React.Component {
       deadline.setMinutes(59);
       deadline.setSeconds(59);
 
-      const sharingEmails = this.state.sharingEmails;
-      sharingEmails.push(auth.currentUser.email);
-
       db.collection("active goals").doc().set({
         createdBy: auth.currentUser.uid,
         createdByEmail: auth.currentUser.email,
@@ -391,7 +394,7 @@ class NewGoal extends React.Component {
         deadline: deadline,
         notes: this.state.notes,
         isSharing: this.state.isSharing,
-        sharingEmails: sharingEmails,
+        sharingEmails: this.state.sharingEmails,
         currSavingsAmt: 0,
         isOffTrack: false,
       });

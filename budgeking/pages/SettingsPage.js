@@ -1,12 +1,7 @@
 import React from "react";
 import { BlackButton } from "../config/reusableButton";
 import { auth, db, storage } from "../config/firebase";
-import {
-  Header,
-  ImageTextInput,
-  Title,
-  WhiteTextInput,
-} from "../config/reusableText";
+import { Header, IconTextInput, Title } from "../config/reusableText";
 import RedLine from "../config/reusablePart";
 import {
   StyleSheet,
@@ -21,6 +16,7 @@ import { AddButton } from "../config/reusableButton";
 import colours from "../config/colours";
 import * as ImagePicker from "expo-image-picker";
 import uuid from "uuid";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 class SettingsPage extends React.Component {
   constructor() {
@@ -94,9 +90,15 @@ class SettingsPage extends React.Component {
           </TouchableOpacity>
         </View>
         <Header text={"Change username"} />
-        <ImageTextInput
+        <IconTextInput
           placeholder={this.state.currDisplayName}
-          source={require("../assets/edit.jpg")}
+          icon={
+            <MaterialCommunityIcons
+              name="square-edit-outline"
+              size={24}
+              color="black"
+            />
+          }
           onPress={() => this.editDisplayName()}
           value={this.state.displayName}
           onChangeText={(val) => this.updateInputVal(val, "displayName")}
@@ -111,9 +113,15 @@ class SettingsPage extends React.Component {
         />
 
         <Header text={"Change password"} />
-        <ImageTextInput
+        <IconTextInput
           placeholder={"********"}
-          source={require("../assets/edit.jpg")}
+          icon={
+            <MaterialCommunityIcons
+              name="square-edit-outline"
+              size={24}
+              color="black"
+            />
+          }
           onPress={() => this.editPassword()}
           value={this.state.password}
           onChangeText={(val) => this.updateInputVal(val, "password")}
@@ -313,9 +321,7 @@ const styles = StyleSheet.create({
   buttonTextStyle: {
     fontSize: 13,
   },
-  logout: {
-    marginTop: 20,
-  },
+  logout: { marginTop: 20 },
   image: {
     width: 70,
     height: 70,
