@@ -24,7 +24,7 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   const [isMenu, setIsMenu] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const sharingEmails = doc.sharingEmails.filter(
-    (item) => item !== auth.currentUser.email
+    (item) => item !== doc.createdByEmail
   );
 
   useEffect(() => isOffTrack(), [doc.isOffTrack]);
@@ -280,7 +280,13 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
                   style={{ flex: 0.1 }}
                 />
                 <Text style={{ flex: 0.8, paddingLeft: 30 }}>
-                  Goal shared with{" "}
+                  <Text style={{ fontWeight: "bold" }}>
+                    {doc.createdByEmail.slice(
+                      0,
+                      doc.createdByEmail.indexOf("@")
+                    )}
+                  </Text>{" "}
+                  shared the goal with{" "}
                   <Text
                     style={{
                       fontWeight: "bold",

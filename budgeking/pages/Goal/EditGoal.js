@@ -176,7 +176,7 @@ function EditGoal({ route, navigation }) {
 
   const editGoal = () => {
     const finalData = data;
-    finalData.sharingEmails = [...sharingEmails, auth.currentUser.email];
+    finalData.sharingEmails = sharingEmails;
     finalData.deadline.setHours(23);
     finalData.deadline.setMinutes(59);
     finalData.deadline.setSeconds(59);
@@ -317,19 +317,19 @@ function EditGoal({ route, navigation }) {
               </View>
             ))}
           </View>
-        </View>
-      )}
 
-      {data.isSharing && (
-        <NewGoalInput
-          title={"Add user's email to share the goal with"}
-          onChangeText={(val) => {
-            setEmail(val);
-          }}
-          value={email}
-          onSubmitEditing={onSubmitEmail}
-          onKeyPress={onTypingEmail}
-        />
+          {data.isSharing && (
+            <NewGoalInput
+              title={"Add user's email to share the goal with"}
+              onChangeText={(val) => {
+                setEmail(val);
+              }}
+              value={email}
+              onSubmitEditing={onSubmitEmail}
+              onKeyPress={onTypingEmail}
+            />
+          )}
+        </View>
       )}
 
       <View style={styles.beside}>
