@@ -10,6 +10,8 @@ import {
   ActivityIndicator,
   Dimensions,
   TouchableOpacity,
+  Modal,
+  TextInput,
 } from "react-native";
 import colours from "../../config/colours";
 import { auth, db } from "../../config/firebase";
@@ -71,10 +73,6 @@ class HomePage extends React.Component {
     this.setState(state);
   }
 
-  // editBudget = () => {
-  //   this.setState({ budgetEditable: true });
-  // };
-
   // calling budgetValue from firestore
   componentDidMount() {
     this.unsubscribe = this.fireStoreRef.onSnapshot(this.getCollection);
@@ -133,6 +131,13 @@ class HomePage extends React.Component {
     });
   };
 
+  inputBudgetDailyFireStore = () => {
+    // console.log(this.state.budgetValue)
+    db.collection("users").doc(auth.currentUser.uid).update({
+      budgetValueDaily: this.state.budgetValueDaily,
+    });
+  };
+
   // Scroll from top to refresh changes
   // const [refreshing, setRefreshing] = React.useState(false);
 
@@ -169,15 +174,15 @@ class HomePage extends React.Component {
   percentExpenseOutOfBudget() {
     if (this.addExpenses() == 0.0) {
       return 0;
-    } else if (this.state.budgetValue <= this.addExpenses()) {
+    } else if (this.whichBudgetValue() <= this.addExpenses()) {
       return 100;
     }
-    return (this.addExpenses() / this.state.budgetValue) * 100;
+    return (this.addExpenses() / this.whichBudgetValue()) * 100;
   }
 
   textBesideWalking() {
     var leftExceeded = "";
-    if (this.state.budgetValue <= this.addExpenses()) {
+    if (this.whichBudgetValue() <= this.addExpenses()) {
       leftExceeded += "Exceeded";
     } else {
       leftExceeded += "Left";
@@ -323,8 +328,16 @@ class HomePage extends React.Component {
   }
 
   leftAmount() {
-    const diff = this.state.budgetValue - this.addExpenses();
+    const diff = this.whichBudgetValue() - this.addExpenses();
     return diff.toFixed(2);
+  }
+
+  whichBudgetValue() {
+    if (this.state.timeUserWants == "monthly") {
+      return this.state.budgetValue;
+    } else {
+      return this.state.budgetValueDaily;
+    }
   }
 
   sortedArr(arr) {
@@ -436,6 +449,24 @@ class HomePage extends React.Component {
     );
   };
 
+  editBudgetValue = () => {
+    this.setState({ showBudgetValueModal: true });
+  };
+
+  updateBudgetVal(val) {
+    if (this.state.timeUserWants == "monthly") {
+      return this.updateInputVal(Math.abs(val), "budgetValue");
+    } else {
+      return this.updateInputVal(Math.abs(val), "budgetValueDaily");
+    }
+  }
+
+  changeBudgetValue() {
+    this.setState({ showBudgetValueModal: false });
+    this.inputBudgetFireStore();
+    this.inputBudgetDailyFireStore();
+  }
+
   renderNoRecords = () => {
     return (
       <Text style={{ alignSelf: "center", marginTop: 20 }}>No Records Yet</Text>
@@ -473,6 +504,46 @@ class HomePage extends React.Component {
 
     return (
       <KeyboardAwareScrollView>
+        {this.state.showBudgetValueModal && (
+          <View style={styles.modalView}>
+            <Modal
+              transparent={true}
+              visible={this.state.showBudgetValueModal}
+              onRequestClose={() =>
+                this.setState({ showBudgetValueModal: forModalPresentationIOS })
+              }
+            >
+              <View style={styles.modalView}>
+                <View style={styles.modal}>
+                  <Text style={{ fontSize: 16, marginBottom: 10 }}>
+                    Change {this.state.timeUserWants} allowable budget {"\n"}
+                  </Text>
+
+                  <CurrencyInput
+                    style={styles.whiteInput}
+                    keyboardType="numeric"
+                    value={this.whichBudgetValue()}
+                    prefix="$"
+                    unit="$"
+                    delimiter=","
+                    separator="."
+                    precision={2}
+                    minValue={0}
+                    onChangeValue={(val) => this.updateBudgetVal(val)}
+                    maxValue={9999999999999}
+                  />
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => this.changeBudgetValue()}
+                  >
+                    <Text>Change</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </View>
+        )}
+
         <View style={styles.container}>
           {/* <Text>{this.addExpenses()}</Text>
           <Text>{this.percentExpenseOutOfBudget()}</Text> */}
@@ -512,7 +583,6 @@ class HomePage extends React.Component {
                 );
               }}
             />
-            {/* <View style={styles.dropdownTriangle} /> */}
           </View>
           <RedLine />
           <View
@@ -540,26 +610,29 @@ class HomePage extends React.Component {
               />
             </View>
 
-            <CurrencyInput
-              style={styles.whiteInput}
-              keyboardType="numeric"
-              value={this.state.budgetValue}
-              prefix="$"
-              unit="$"
-              delimiter=","
-              separator="."
-              precision={2}
-              onChangeValue={(val) => this.updateInputVal(val, "budgetValue")}
-              maxValue={9999999999999}
-            />
-            <TouchableOpacity onPress={this.inputBudgetFireStore()}>
+            <TouchableOpacity
+              style={styles.raisedEffect}
+              onPress={() => this.editBudgetValue()}
+            >
+              <Text> ${this.whichBudgetValue()} </Text>
+            </TouchableOpacity>
+
+            {/* <TouchableOpacity onPress={() => this.editBudgetValue()}>
+              <Image
+                style={styles.logo}
+                source={require("../../assets/edit.jpg")}
+                resizeMethod={"resize"}
+              />
+            </TouchableOpacity> */}
+
+            {/* <TouchableOpacity onPress={this.inputBudgetFireStore()}>
               <Icon.Button
                 name="checkcircleo"
                 color={colours.black}
                 backgroundColor={"transparent"}
                 iconStyle={{ marginRight: 0 }}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             {/* <SmallBlackButton
               text="Done"
@@ -746,8 +819,8 @@ const styles = StyleSheet.create({
   },
   logo: {
     bottom: 0,
-    width: 70,
-    height: 35,
+    width: 35,
+    height: 15,
     overflow: "visible",
     resizeMode: "contain",
     //borderWidth: 4
@@ -820,6 +893,49 @@ const styles = StyleSheet.create({
     fontWeight: "200",
     marginRight: 10,
     marginBottom: 10,
+  },
+  modalView: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modal: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  modalButton: {
+    marginTop: 20,
+    borderRadius: 20,
+    padding: 10,
+    backgroundColor: colours.lightBrown,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  raisedEffect: {
+    // shadowColor: colours.black,
+    shadowOffset: { height: 1, width: 1 }, // IOS
+    shadowOpacity: 1, // IOS
+    // shadowRadius: 1, //IOS
+    backgroundColor: colours.white,
+    elevation: 2, // Android
+    // height: 50,
+    // width: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    borderRadius: 10,
   },
 });
 

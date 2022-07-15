@@ -103,7 +103,7 @@ class ReportsPage extends React.Component {
     return (
       <KeyboardAwareScrollView>
         <View style={styles.reportBlocks}>
-          <Text style={styles.reportTitle}>OVERALL BALANCE</Text>
+          <Text style={styles.reportTitle}>OVERALL BALANCE/ TOTAL SAVINGS</Text>
           <Text
             style={styles.reportInText}
           >{`$${this.getOverallBalance()}`}</Text>
