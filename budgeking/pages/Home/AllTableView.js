@@ -1,12 +1,12 @@
 import React from "react";
 import { StyleSheet, ScrollView, View, Text } from "react-native";
-import { Header, Title } from "../config/reusableText";
-import colours from "../config/colours";
+import { Header, Title } from "../../config/reusableText";
+import colours from "../../config/colours";
 import Icon from "react-native-vector-icons/AntDesign";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { auth, db } from "../config/firebase";
-import { BlackButton } from "../config/reusableButton";
-import { GreyLine } from "../config/reusablePart";
+import { auth, db } from "../../config/firebase";
+import { BlackButton } from "../../config/reusableButton";
+import { GreyLine } from "../../config/reusablePart";
 
 class AllTableView extends React.Component {
   constructor() {
