@@ -65,7 +65,7 @@ class SettingsPage extends React.Component {
                       />
                     </View>
                     <BlackButton
-                      text={"Change"}
+                      text={"Verify"}
                       textStyle={styles.buttonTextStyle}
                       onPress={(val) => this.checkPassword(val)}
                     />
