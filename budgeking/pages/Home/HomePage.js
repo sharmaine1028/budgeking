@@ -130,7 +130,7 @@ class HomePage extends React.Component {
     // console.log(auth.currentUser.uid)
   };
 
-  // budgetValue changing immediately when updateInputVal() without invoking tick
+  //input budgetvalue to firestore
   inputBudgetFireStore = () => {
     // console.log(this.state.budgetValue)
     db.collection("users").doc(auth.currentUser.uid).update({
