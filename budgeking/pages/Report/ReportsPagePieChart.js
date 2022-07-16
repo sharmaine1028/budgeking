@@ -349,7 +349,7 @@ class ReportsPagePieChart extends React.Component {
     var pieData = this.updatePieData();
     this.updatePieData().map((item, i) => {
       pieData[i]["text"] = "$";
-      pieData[i]["text"] += pieData[i]["value"];
+      pieData[i]["text"] += pieData[i]["value"].toFixed(2);
     });
     return pieData;
   }
