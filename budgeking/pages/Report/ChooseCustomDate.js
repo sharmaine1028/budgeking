@@ -134,13 +134,17 @@ class ChooseCustomDate extends React.Component {
                     height: 50,
                     marginBottom: 50,
                   }}
-                  textStyle={{ fontSize: 19 }}
+                  textStyle={{ fontSize: 17 }}
                 />
               )}
             />
           </View>
           <BlackButton
             text={"Confirm"}
+            style={{
+              marginTop: 30,
+            }}
+            textStyle={{ fontSize: 17 }}
             onPress={() => this.confirmBlackButton()}
           ></BlackButton>
         </View>
