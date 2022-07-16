@@ -5,6 +5,7 @@ import colours from "../../config/colours";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { auth, db } from "../../config/firebase";
 import { BlackButton } from "../../config/reusableButton";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // choose custom date
 
@@ -75,9 +76,11 @@ class ChooseCustomDate extends React.Component {
     return (
       <KeyboardAwareScrollView>
         <View style={styles.container}>
-          <Image
+          <MaterialCommunityIcons
+            name="calendar-edit"
+            size={100}
+            color="black"
             style={styles.logo}
-            source={require("../../assets/calendar.png")}
           />
           <View style={styles.datepicker}>
             <DatePicker
