@@ -1,14 +1,5 @@
-import React, { useState, Component } from "react";
-import {
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  View,
-  Image,
-  Button,
-} from "react-native";
+import React from "react";
+import { StyleSheet, View, Image } from "react-native";
 import DatePicker from "react-native-date-ranges";
 import colours from "../../config/colours";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
