@@ -70,7 +70,6 @@ class HomePage extends React.Component {
       ],
       showBudgetValueModal: false,
       offTrackGoals: [],
-      percent: this.percentExpenseOutOfBudget(),
     };
   }
 
@@ -189,6 +188,15 @@ class HomePage extends React.Component {
       return 100;
     }
     return (this.addExpenses() / this.whichBudgetValue()) * 100;
+  }
+
+  percentProfilePicture() {
+    if (this.addExpenses() == 0.0) {
+      return 0;
+    } else if (this.whichBudgetValue() <= this.addExpenses()) {
+      return 90;
+    }
+    return this.percentExpenseOutOfBudget() * 0.8;
   }
 
   textBesideWalking() {
@@ -662,7 +670,14 @@ class HomePage extends React.Component {
           <RedLine />
 
           <Image
-            style={styles.photoURLImage}
+            style={{
+              width: 30,
+              height: 30,
+              left: `${this.percentProfilePicture()}%`,
+              borderRadius: 9999,
+              justifyContent: "flex-end",
+              backgroundColor: colours.white,
+            }}
             source={{ uri: this.state.photoURL }}
           />
 
@@ -695,9 +710,11 @@ class HomePage extends React.Component {
               />
             </TouchableOpacity> */}
           </View>
+
           <Text
             style={styles.leftText}
           >{`${this.textBesideWalking()}: $${this.leftAmount()}`}</Text>
+
           <View style={styles.reportPieChart}>
             <Header
               text={`${"\n"} Categories (${this.textBesideCategories()} ${
@@ -796,6 +813,8 @@ class HomePage extends React.Component {
     );
   }
 }
+
+// const win = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   container: {
@@ -989,14 +1008,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderRadius: 10,
   },
-  photoURLImage: {
-    width: 30,
-    height: 30,
-    left: `${this.state.percent}px`,
-    borderRadius: 9999,
-    justifyContent: "flex-end",
-    backgroundColor: colours.white,
-  },
+  // photoURLImage: {
+  //   width: 30,
+  //   height: 30,
+  //   left: `${percent}`,
+  //   borderRadius: 9999,
+  //   justifyContent: "flex-end",
+  //   backgroundColor: colours.white,
+  // },
 });
 
 export default HomePage;
