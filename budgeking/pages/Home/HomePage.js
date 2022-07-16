@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  Easing,
 } from "react-native";
 import colours from "../../config/colours";
 import { auth, db } from "../../config/firebase";
@@ -45,6 +46,7 @@ class HomePage extends React.Component {
     this.state = {
       name: auth.currentUser.displayName,
       email: auth.currentUser.email,
+      photoURL: auth.currentUser.photoURL,
       timePeriod: ["Your monthly budget", "Your daily budget"],
       timeUserWants: "monthly",
       budgetEditable: false,
@@ -186,6 +188,15 @@ class HomePage extends React.Component {
       return 100;
     }
     return (this.addExpenses() / this.whichBudgetValue()) * 100;
+  }
+
+  percentProfilePicture() {
+    if (this.addExpenses() == 0.0) {
+      return 0;
+    } else if (this.whichBudgetValue() <= this.addExpenses()) {
+      return 90;
+    }
+    return this.percentExpenseOutOfBudget() * 0.8;
   }
 
   textBesideWalking() {
@@ -657,17 +668,19 @@ class HomePage extends React.Component {
             />
           </View>
           <RedLine />
-          <View
+
+          <Image
             style={{
-              flexDirection: "row",
+              width: 30,
+              height: 30,
+              left: `${this.percentProfilePicture()}%`,
+              borderRadius: 9999,
+              justifyContent: "flex-end",
+              backgroundColor: colours.white,
             }}
-          >
-            <Image
-              style={styles.logo}
-              source={require("../../assets/home/walking.png")}
-              resizeMethod={"resize"}
-            />
-          </View>
+            source={{ uri: this.state.photoURL }}
+          />
+
           <View style={styles.progressArea}>
             <View style={styles.progressBar}>
               <Animated.View
@@ -696,32 +709,12 @@ class HomePage extends React.Component {
                 resizeMethod={"resize"}
               />
             </TouchableOpacity> */}
-
-            {/* <TouchableOpacity onPress={this.inputBudgetFireStore()}>
-              <Icon.Button
-                name="checkcircleo"
-                color={colours.black}
-                backgroundColor={"transparent"}
-                iconStyle={{ marginRight: 0 }}
-              />
-            </TouchableOpacity> */}
-
-            {/* <SmallBlackButton
-              text="Done"
-              style={styles.smallBlackButton}
-              textStyle={styles.buttonTextStyle}
-              onPress={() => this.inputBudgetFireStore()}
-            /> */}
-
-            {/* <Image
-              style = {styles.logo}
-              source = {require("../assets/home/rip.png")}
-              resizeMethod={"resize"}
-            /> */}
           </View>
+
           <Text
             style={styles.leftText}
           >{`${this.textBesideWalking()}: $${this.leftAmount()}`}</Text>
+
           <View style={styles.reportPieChart}>
             <Header
               text={`${"\n"} Categories (${this.textBesideCategories()} ${
@@ -820,6 +813,8 @@ class HomePage extends React.Component {
     );
   }
 }
+
+// const win = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   container: {
@@ -1013,6 +1008,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderRadius: 10,
   },
+  // photoURLImage: {
+  //   width: 30,
+  //   height: 30,
+  //   left: `${percent}`,
+  //   borderRadius: 9999,
+  //   justifyContent: "flex-end",
+  //   backgroundColor: colours.white,
+  // },
 });
 
 export default HomePage;
