@@ -687,7 +687,11 @@ class HomePage extends React.Component {
                 style={[
                   StyleSheet.absoluteFill,
                   {
-                    backgroundColor: "#96D3FF",
+                    backgroundColor: `${
+                      this.addExpenses() <= this.whichBudgetValue()
+                        ? "#96D3FF"
+                        : colours.tomato
+                    }`,
                     width: `${this.percentExpenseOutOfBudget()}%`,
                     borderRadius: 5,
                   },
