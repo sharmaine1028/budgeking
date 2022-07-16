@@ -464,7 +464,7 @@ class ReportsPagePieChart extends React.Component {
     } else if (this.state.timeUserWants == "This Year") {
       dayText += new Date().getFullYear();
     } else {
-      console.log("hellloooo", this.state.dateTo);
+      // console.log("hellloooo", this.state.dateTo);
       dayText += this.dateFormat(this.state.dateFrom.seconds);
       dayText += " - ";
       dayText += this.dateFormat(this.state.dateTo.seconds);
@@ -517,10 +517,62 @@ class ReportsPagePieChart extends React.Component {
     });
   };
 
+  maybePieChart() {
+    const dummyPieData = [{ value: 100, color: colours.pieGrey }];
+    return (
+      <PieChart
+        data={dummyPieData}
+        donut
+        innerRadius={Dimensions.get("window").width * 0.2}
+        radius={Dimensions.get("window").width * 0.4}
+        centerLabelComponent={() => {
+          return (
+            <Text
+              style={styles.totalSpentText}
+            >{`Total Spent\n$${this.addExpenses()}`}</Text>
+          );
+        }}
+      />
+    );
+  }
+
+  definitelyPieChart() {
+    return (
+      <PieChart
+        style={styles.pie}
+        donut
+        innerRadius={Dimensions.get("window").width * 0.2}
+        // showText
+        textColor="black"
+        radius={Dimensions.get("window").width * 0.4}
+        textSize={15}
+        data={this.putInTextToPie()}
+        // focusOnPress
+        centerLabelComponent={() => {
+          return (
+            <Text
+              style={styles.totalSpentText}
+            >{`Total Spent\n$${this.addExpenses()}`}</Text>
+          );
+        }}
+      />
+    );
+  }
+
+  checkEmptyPieData() {
+    if (this.state.timeUserWants === "This Month") {
+      return this.getMonthlyData().length != 0;
+    } else if (this.state.timeUserWants == "Today") {
+      return this.getDailyData().length != 0;
+    } else if (this.state.timeUserWants == "This Year") {
+      return this.getYearlyData().length != 0;
+    } else {
+      return this.getCustomData().length != 0;
+    }
+  }
+
   render() {
     const { navigation } = this.props;
-
-    const pieData = this.putInTextToPie();
 
     const renderLegend = (text, color) => {
       return (
@@ -563,25 +615,9 @@ class ReportsPagePieChart extends React.Component {
               style={{ fontWeight: "500" }}
               text={`${"\n"}Categories (${this.textBesideCategories()} ${this.timeUserWantText()} Expenses)\n\n`}
             />
-
-            <PieChart
-              style={styles.pie}
-              donut
-              innerRadius={Dimensions.get("window").width * 0.2}
-              // showText
-              textColor="black"
-              radius={Dimensions.get("window").width * 0.4}
-              textSize={15}
-              data={pieData}
-              // focusOnPress
-              centerLabelComponent={() => {
-                return (
-                  <Text
-                    style={styles.totalSpentText}
-                  >{`Total Spent\n$${this.addExpenses()}`}</Text>
-                );
-              }}
-            />
+            {this.checkEmptyPieData()
+              ? this.definitelyPieChart()
+              : this.maybePieChart()}
 
             <View
               style={{

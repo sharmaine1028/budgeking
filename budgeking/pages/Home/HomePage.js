@@ -123,7 +123,7 @@ class HomePage extends React.Component {
       isLoading: false,
     });
 
-    console.log("pie", this.putInTextToPie());
+    // console.log("pie", this.addExpensesDaily() == 0);
     // console.log("piepushed =>", this.updatePieData())
     // console.log(auth.currentUser.displayName)
     // console.log(new Date().toLocaleDateString())
@@ -481,6 +481,59 @@ class HomePage extends React.Component {
     );
   };
 
+  maybePieChart() {
+    const dummyPieData = [{ value: 100, color: colours.pieGrey }];
+    return (
+      <PieChart
+        data={dummyPieData}
+        donut
+        innerRadius={Dimensions.get("window").width * 0.2}
+        radius={Dimensions.get("window").width * 0.4}
+        centerLabelComponent={() => {
+          return (
+            <Text
+              style={styles.totalSpentText}
+            >{`Total Spent\n$${this.addExpenses()}`}</Text>
+          );
+        }}
+      />
+    );
+  }
+
+  definitelyPieChart() {
+    return (
+      <PieChart
+        style={styles.pie}
+        donut
+        innerRadius={Dimensions.get("window").width * 0.2}
+        // showText
+        textColor="black"
+        radius={Dimensions.get("window").width * 0.4}
+        textSize={15}
+        // showTextBackground
+        // textBackgroundRadius = {26}
+        data={this.putInTextToPie()}
+        // focusOnPress={true}
+        // toggleFocusOnPress={true}
+        centerLabelComponent={() => {
+          return (
+            <Text
+              style={styles.totalSpentText}
+            >{`Total Spent\n$${this.addExpenses()}`}</Text>
+          );
+        }}
+      />
+    );
+  }
+
+  checkEmptyPieData() {
+    if (this.state.timeUserWants === "monthly") {
+      return this.getMonthlyData().length != 0;
+    } else {
+      return this.getDailyData().length != 0;
+    }
+  }
+
   editBudgetValue = () => {
     this.setState({ showBudgetValueModal: true });
   };
@@ -571,7 +624,6 @@ class HomePage extends React.Component {
 
   render() {
     const { navigation } = this.props;
-    const pieData = this.putInTextToPie();
 
     const renderLegend = (text, color) => {
       return (
@@ -735,29 +787,9 @@ class HomePage extends React.Component {
                 this.state.timeUserWants
               )} Expenses)\n\n`}
             />
-
-            <PieChart
-              style={styles.pie}
-              donut
-              innerRadius={Dimensions.get("window").width * 0.2}
-              // showText
-              textColor="black"
-              radius={Dimensions.get("window").width * 0.4}
-              textSize={15}
-              // showTextBackground
-              // textBackgroundRadius = {26}
-              data={pieData}
-              // focusOnPress={true}
-              // toggleFocusOnPress={true}
-              centerLabelComponent={() => {
-                return (
-                  <Text
-                    style={styles.totalSpentText}
-                  >{`Total Spent\n$${this.addExpenses()}`}</Text>
-                );
-              }}
-            />
-
+            {this.checkEmptyPieData()
+              ? this.definitelyPieChart()
+              : this.maybePieChart()}
             <View
               style={{
                 width: "100%",
