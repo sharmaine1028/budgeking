@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  Easing,
 } from "react-native";
 import colours from "../../config/colours";
 import { auth, db } from "../../config/firebase";
@@ -35,6 +36,7 @@ const wait = (timeout) => {
 class HomePage extends React.Component {
   constructor() {
     super();
+    this.animatedValue = new Animated.Value(0);
     this.fireStoreRef = db
       .collection("users")
       .doc(auth.currentUser.uid)
@@ -45,6 +47,7 @@ class HomePage extends React.Component {
     this.state = {
       name: auth.currentUser.displayName,
       email: auth.currentUser.email,
+      photoURL: auth.currentUser.photoURL,
       timePeriod: ["Your monthly budget", "Your daily budget"],
       timeUserWants: "monthly",
       budgetEditable: false,
@@ -83,6 +86,16 @@ class HomePage extends React.Component {
     //   this.getOffTrackGoals
     // );
     this.callBudgetValue();
+    this.animate();
+  }
+
+  animate() {
+    this.animatedValue.setValue(0);
+    Animated.timing(this.animatedValue, {
+      toValue: 1,
+      duration: 2000,
+      easing: Easing.linear,
+    }).start(() => this.animate());
   }
 
   callBudgetValue() {
@@ -565,6 +578,11 @@ class HomePage extends React.Component {
       );
     };
 
+    const marginLeft = this.animatedValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 300],
+    });
+
     if (this.state.isLoading) {
       return (
         <View style={styles.preloader}>
@@ -656,17 +674,17 @@ class HomePage extends React.Component {
             />
           </View>
           <RedLine />
-          <View
-            style={{
-              flexDirection: "row",
-            }}
-          >
-            <Image
-              style={styles.logo}
-              source={require("../../assets/home/walking.png")}
-              resizeMethod={"resize"}
-            />
-          </View>
+
+          <Animated.Image
+            style={styles.photoURLImage}
+            source={{ uri: this.state.photoURL }}
+          />
+
+          {/* <Image
+            style={styles.photoURLImage}
+            source={{ uri: this.state.photoURL }}
+          /> */}
+
           <View style={styles.progressArea}>
             <View style={styles.progressBar}>
               <Animated.View
@@ -695,28 +713,6 @@ class HomePage extends React.Component {
                 resizeMethod={"resize"}
               />
             </TouchableOpacity> */}
-
-            {/* <TouchableOpacity onPress={this.inputBudgetFireStore()}>
-              <Icon.Button
-                name="checkcircleo"
-                color={colours.black}
-                backgroundColor={"transparent"}
-                iconStyle={{ marginRight: 0 }}
-              />
-            </TouchableOpacity> */}
-
-            {/* <SmallBlackButton
-              text="Done"
-              style={styles.smallBlackButton}
-              textStyle={styles.buttonTextStyle}
-              onPress={() => this.inputBudgetFireStore()}
-            /> */}
-
-            {/* <Image
-              style = {styles.logo}
-              source = {require("../assets/home/rip.png")}
-              resizeMethod={"resize"}
-            /> */}
           </View>
           <Text
             style={styles.leftText}
@@ -1011,6 +1007,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     borderRadius: 10,
+  },
+  photoURLImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 9999,
+    justifyContent: "flex-end",
+    backgroundColor: colours.white,
   },
 });
 
