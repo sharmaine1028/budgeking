@@ -36,7 +36,6 @@ const wait = (timeout) => {
 class HomePage extends React.Component {
   constructor() {
     super();
-    this.animatedValue = new Animated.Value(0);
     this.fireStoreRef = db
       .collection("users")
       .doc(auth.currentUser.uid)
@@ -71,6 +70,7 @@ class HomePage extends React.Component {
       ],
       showBudgetValueModal: false,
       offTrackGoals: [],
+      percent: this.percentExpenseOutOfBudget(),
     };
   }
 
@@ -87,16 +87,6 @@ class HomePage extends React.Component {
       this.getOffTrackGoals
     );
     this.callBudgetValue();
-    this.animate();
-  }
-
-  animate() {
-    this.animatedValue.setValue(0);
-    Animated.timing(this.animatedValue, {
-      toValue: 1,
-      duration: 2000,
-      easing: Easing.linear,
-    }).start(() => this.animate());
   }
 
   callBudgetValue() {
@@ -579,11 +569,6 @@ class HomePage extends React.Component {
       );
     };
 
-    const marginLeft = this.animatedValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0, 300],
-    });
-
     if (this.state.isLoading) {
       return (
         <View style={styles.preloader}>
@@ -676,15 +661,10 @@ class HomePage extends React.Component {
           </View>
           <RedLine />
 
-          <Animated.Image
+          <Image
             style={styles.photoURLImage}
             source={{ uri: this.state.photoURL }}
           />
-
-          {/* <Image
-            style={styles.photoURLImage}
-            source={{ uri: this.state.photoURL }}
-          /> */}
 
           <View style={styles.progressArea}>
             <View style={styles.progressBar}>
@@ -1012,6 +992,7 @@ const styles = StyleSheet.create({
   photoURLImage: {
     width: 30,
     height: 30,
+    left: `${this.state.percent}px`,
     borderRadius: 9999,
     justifyContent: "flex-end",
     backgroundColor: colours.white,
