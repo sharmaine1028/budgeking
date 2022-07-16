@@ -354,6 +354,28 @@ class ReportsPagePieChart extends React.Component {
     return pieData;
   }
 
+  putExpenseBesideLegend(category) {
+    const pieText = this.putInTextToPie();
+    var text = "";
+    pieText.map((item, i) => {
+      if (category == pieText[i]["category"]) {
+        text += this.categoryFormat(category);
+        text += ", ";
+        text += pieText[i]["text"];
+        return text;
+      }
+    });
+    return text;
+  }
+
+  categoryFormat(category) {
+    if (category == "food and drinks") {
+      return "Food & Drinks";
+    } else {
+      return category.charAt(0).toUpperCase() + category.slice(1);
+    }
+  }
+
   getMonthlyData() {
     const currMonth = new Date().getMonth();
     const currYear = new Date().getFullYear();
@@ -478,13 +500,13 @@ class ReportsPagePieChart extends React.Component {
 
   timeUserWantText() {
     if (this.state.timeUserWants == "This Month") {
-      return "monthly";
+      return "Monthly";
     } else if (this.state.timeUserWants == "Today") {
-      return "daily";
+      return "Daily";
     } else if (this.state.timeUserWants == "This Year") {
-      return "yearly";
+      return "Yearly";
     } else {
-      return "custom";
+      return "Custom";
     }
   }
 
@@ -538,14 +560,15 @@ class ReportsPagePieChart extends React.Component {
           > */}
           <View style={styles.reportPieChart}>
             <Header
-              text={`${"\n"}Categories (${this.textBesideCategories()} ${this.timeUserWantText()} expenses)\n\n`}
+              style={{ fontWeight: "500" }}
+              text={`${"\n"}Categories (${this.textBesideCategories()} ${this.timeUserWantText()} Expenses)\n\n`}
             />
 
             <PieChart
               style={styles.pie}
               donut
               innerRadius={Dimensions.get("window").width * 0.2}
-              showText
+              // showText
               textColor="black"
               radius={Dimensions.get("window").width * 0.4}
               textSize={15}
@@ -567,13 +590,22 @@ class ReportsPagePieChart extends React.Component {
                 marginTop: 20,
               }}
             >
-              {renderLegend("food and drinks", "#177AD5")}
-              {renderLegend("transportation", "#79D2DE")}
-              {renderLegend("housing", "#F7D8B5")}
-              {renderLegend("shopping", "#8F80E4")}
-              {renderLegend("health", "#FB8875")}
-              {renderLegend("education", "#FDE74C")}
-              {renderLegend("others", "#E8E0CE")}
+              {renderLegend(
+                this.putExpenseBesideLegend("food and drinks"),
+                "#177AD5"
+              )}
+              {renderLegend(
+                this.putExpenseBesideLegend("transportation"),
+                "#79D2DE"
+              )}
+              {renderLegend(this.putExpenseBesideLegend("housing"), "#F7D8B5")}
+              {renderLegend(this.putExpenseBesideLegend("shopping"), "#8F80E4")}
+              {renderLegend(this.putExpenseBesideLegend("health"), "#FB8875")}
+              {renderLegend(
+                this.putExpenseBesideLegend("education"),
+                "#FDE74C"
+              )}
+              {renderLegend(this.putExpenseBesideLegend("others"), "#E8E0CE")}
             </View>
           </View>
 
