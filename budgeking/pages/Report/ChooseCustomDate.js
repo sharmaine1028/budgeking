@@ -7,6 +7,7 @@ import {
   TouchableHighlight,
   View,
   Image,
+  Button,
 } from "react-native";
 import DatePicker from "react-native-date-ranges";
 import colours from "../../config/colours";
@@ -123,6 +124,19 @@ class ChooseCustomDate extends React.Component {
               ButtonTextStyle={styles.blackButtonText}
               outFormat={"YYYY/MM/DD"}
               headFormat={"YYYY/MM/DD"}
+              customButton={(onConfirm) => (
+                <BlackButton
+                  onPress={onConfirm}
+                  primary
+                  text={"Save"}
+                  style={{
+                    flexGrow: 0.2,
+                    height: 50,
+                    marginBottom: 50,
+                  }}
+                  textStyle={{ fontSize: 19 }}
+                />
+              )}
             />
           </View>
           <BlackButton
