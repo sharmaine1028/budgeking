@@ -1,18 +1,11 @@
-import React, { useState, Component } from "react";
-import {
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  View,
-  Image,
-} from "react-native";
+import React from "react";
+import { StyleSheet, View, Image } from "react-native";
 import DatePicker from "react-native-date-ranges";
 import colours from "../../config/colours";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { auth, db } from "../../config/firebase";
 import { BlackButton } from "../../config/reusableButton";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // choose custom date
 
@@ -83,9 +76,11 @@ class ChooseCustomDate extends React.Component {
     return (
       <KeyboardAwareScrollView>
         <View style={styles.container}>
-          <Image
+          <MaterialCommunityIcons
+            name="calendar-edit"
+            size={100}
+            color="black"
             style={styles.logo}
-            source={require("../../assets/calendar.png")}
           />
           <View style={styles.datepicker}>
             <DatePicker
@@ -123,10 +118,27 @@ class ChooseCustomDate extends React.Component {
               ButtonTextStyle={styles.blackButtonText}
               outFormat={"YYYY/MM/DD"}
               headFormat={"YYYY/MM/DD"}
+              customButton={(onConfirm) => (
+                <BlackButton
+                  onPress={onConfirm}
+                  primary
+                  text={"Save"}
+                  style={{
+                    flexGrow: 0.2,
+                    height: 50,
+                    marginBottom: 50,
+                  }}
+                  textStyle={{ fontSize: 17 }}
+                />
+              )}
             />
           </View>
           <BlackButton
             text={"Confirm"}
+            style={{
+              marginTop: 30,
+            }}
+            textStyle={{ fontSize: 17 }}
             onPress={() => this.confirmBlackButton()}
           ></BlackButton>
         </View>
