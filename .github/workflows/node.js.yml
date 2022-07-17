@@ -15,7 +15,7 @@ jobs:
 
     defaults:
       run:
-      working-directory: "./budgeking"
+        working-directory: "./budgeking"
 
     strategy:
       matrix:
