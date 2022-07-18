@@ -9,7 +9,28 @@ on:
   pull_request:
     branches: ["main"]
 
+permissions:
+  actions: write
+  checks: write
+  contents: write
+  issues: write
+  pull-requests: write
+  statuses: write
+
 jobs:
+  danger:
+    name: Danger JS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Danger
+        uses: danger/danger-js@11.1.1
+        with:
+          args: "--dangerfile ./.github/workflows/dangerfile.js"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DANGER_DISABLE_TRANSPILATION: true
+
   build:
     runs-on: ubuntu-latest
 
