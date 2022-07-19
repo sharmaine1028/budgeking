@@ -43,13 +43,14 @@ class AllTableView extends React.Component {
   getCollectionExpense = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { notes, value, category, date } = res.data();
+      const { notes, value, category, date, time } = res.data();
       expenseArrPush.push({
         key: res.id,
         value,
         notes,
         category,
         date,
+        time,
       });
     });
     this.setState({
@@ -163,7 +164,7 @@ class AllTableView extends React.Component {
         <View style={styles.notesRow}>
           <Text style={styles.noteText}>{doc.notes}</Text>
           <Text style={styles.timeText}>
-            {this.timeFormat(doc.date.seconds)}
+            {this.timeFormat(doc.time.seconds)}
           </Text>
         </View>
       </View>

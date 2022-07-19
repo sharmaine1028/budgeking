@@ -109,12 +109,13 @@ class HomePage extends React.Component {
   getCollection = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { value, category, date } = res.data();
+      const { value, category, date, time } = res.data();
       expenseArrPush.push({
         key: res.id,
         value,
         category,
         date,
+        time,
       });
       // console.log(expenseArr, "+>", res.id, "=>", res.data());
     });
@@ -473,7 +474,7 @@ class HomePage extends React.Component {
         <View style={styles.notesRow}>
           <Text style={styles.noteText}>{doc.notes}</Text>
           <Text style={styles.timeText}>
-            {this.timeFormat(doc.date.seconds)}
+            {this.timeFormat(doc.time.seconds)}
           </Text>
         </View>
         <GreyLine />
