@@ -558,6 +558,27 @@ class HomePage extends React.Component {
     );
   };
 
+  renderLegend = (text, color) => {
+    return (
+      <View style={{ flexDirection: "row", marginBottom: 12 }}>
+        <View
+          style={{
+            height: 18,
+            width: 18,
+            marginRight: 10,
+            borderRadius: 4,
+            backgroundColor: color || "white",
+          }}
+        />
+        <Text style={{ color: "#444444", fontSize: 16 }}>{text || ""}</Text>
+      </View>
+    );
+  };
+
+  maybeLegend() {
+    return <View></View>;
+  }
+
   getOffTrackGoals = (querySnapshot) => {
     try {
       querySnapshot.forEach((doc) => {
@@ -625,22 +646,15 @@ class HomePage extends React.Component {
   render() {
     const { navigation } = this.props;
 
-    const renderLegend = (text, color) => {
-      return (
-        <View style={{ flexDirection: "row", marginBottom: 12 }}>
-          <View
-            style={{
-              height: 18,
-              width: 18,
-              marginRight: 10,
-              borderRadius: 4,
-              backgroundColor: color || "white",
-            }}
-          />
-          <Text style={{ color: "#444444", fontSize: 16 }}>{text || ""}</Text>
-        </View>
-      );
-    };
+    const legendArr = [
+      [this.putExpenseBesideLegend("food and drinks"), "#177AD5"],
+      [this.putExpenseBesideLegend("transportation"), "#79D2DE"],
+      [this.putExpenseBesideLegend("housing"), "#F7D8B5"],
+      [this.putExpenseBesideLegend("shopping"), "#8F80E4"],
+      [this.putExpenseBesideLegend("health"), "#FB8875"],
+      [this.putExpenseBesideLegend("education"), "#FDE74C"],
+      [this.putExpenseBesideLegend("others"), "#E8E0CE"],
+    ];
 
     if (this.state.isLoading) {
       return (
@@ -801,22 +815,11 @@ class HomePage extends React.Component {
                 marginTop: 20,
               }}
             >
-              {renderLegend(
-                this.putExpenseBesideLegend("food and drinks"),
-                "#177AD5"
-              )}
-              {renderLegend(
-                this.putExpenseBesideLegend("transportation"),
-                "#79D2DE"
-              )}
-              {renderLegend(this.putExpenseBesideLegend("housing"), "#F7D8B5")}
-              {renderLegend(this.putExpenseBesideLegend("shopping"), "#8F80E4")}
-              {renderLegend(this.putExpenseBesideLegend("health"), "#FB8875")}
-              {renderLegend(
-                this.putExpenseBesideLegend("education"),
-                "#FDE74C"
-              )}
-              {renderLegend(this.putExpenseBesideLegend("others"), "#E8E0CE")}
+              {this.checkEmptyPieData()
+                ? legendArr.map((legend) =>
+                    this.renderLegend(legend[0], legend[1])
+                  )
+                : this.maybeLegend()}
             </View>
           </View>
 
