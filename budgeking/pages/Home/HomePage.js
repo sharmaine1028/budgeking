@@ -109,9 +109,10 @@ class HomePage extends React.Component {
   getCollection = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { value, category, date, time } = res.data();
+      const { notes, value, category, date, time } = res.data();
       expenseArrPush.push({
         key: res.id,
+        notes,
         value,
         category,
         date,
