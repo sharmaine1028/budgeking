@@ -375,7 +375,13 @@ class HomePage extends React.Component {
   }
 
   sortedArr(arr) {
-    const sortedArr = arr.sort((a, b) => b.time.seconds - a.time.seconds);
+    let sortedArr = arr.sort((a, b) => {
+      if (this.dateFormat(a.date.seconds) == this.dateFormat(b.date.seconds)) {
+        return b.time.seconds - a.time.seconds;
+      } else {
+        return b.date.seconds - a.date.seconds;
+      }
+    });
     return sortedArr;
   }
 
@@ -394,7 +400,6 @@ class HomePage extends React.Component {
     return show3Ex;
   }
 
-  // locale date string????
   dateFormat = (seconds) => {
     const date = new Date(seconds * 1000);
     const [day, month, year] = [
@@ -429,7 +434,6 @@ class HomePage extends React.Component {
     }
   }
 
-  // locale time string????
   timeFormat(seconds) {
     var t = new Date(seconds * 1000);
     var hours = t.getHours();
