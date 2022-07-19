@@ -204,6 +204,7 @@ class SettingsPage extends React.Component {
         .catch((err) => alert(err.message));
     } catch (error) {
       alert(error.message);
+      this.setState({ password: "" });
     }
   };
 
