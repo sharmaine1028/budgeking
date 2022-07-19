@@ -109,12 +109,14 @@ class HomePage extends React.Component {
   getCollection = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { value, category, date } = res.data();
+      const { notes, value, category, date, time } = res.data();
       expenseArrPush.push({
         key: res.id,
+        notes,
         value,
         category,
         date,
+        time,
       });
       // console.log(expenseArr, "+>", res.id, "=>", res.data());
     });
@@ -373,7 +375,13 @@ class HomePage extends React.Component {
   }
 
   sortedArr(arr) {
-    const sortedArr = arr.sort((a, b) => b.date.seconds - a.date.seconds);
+    let sortedArr = arr.sort((a, b) => {
+      if (this.dateFormat(a.date.seconds) == this.dateFormat(b.date.seconds)) {
+        return b.time.seconds - a.time.seconds;
+      } else {
+        return b.date.seconds - a.date.seconds;
+      }
+    });
     return sortedArr;
   }
 
@@ -392,7 +400,6 @@ class HomePage extends React.Component {
     return show3Ex;
   }
 
-  // locale date string????
   dateFormat = (seconds) => {
     const date = new Date(seconds * 1000);
     const [day, month, year] = [
@@ -427,7 +434,6 @@ class HomePage extends React.Component {
     }
   }
 
-  // locale time string????
   timeFormat(seconds) {
     var t = new Date(seconds * 1000);
     var hours = t.getHours();
@@ -473,7 +479,7 @@ class HomePage extends React.Component {
         <View style={styles.notesRow}>
           <Text style={styles.noteText}>{doc.notes}</Text>
           <Text style={styles.timeText}>
-            {this.timeFormat(doc.date.seconds)}
+            {this.timeFormat(doc.time.seconds)}
           </Text>
         </View>
         <GreyLine />
