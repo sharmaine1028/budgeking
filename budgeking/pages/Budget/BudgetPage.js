@@ -104,7 +104,7 @@ class BudgetPage extends React.Component {
                   />
                 }
                 onPress={() => this.showDatePicker()}
-                value={this.dateFormat()}
+                value={dateFormat(this.state.date)}
                 editable={false}
               />
             </View>
@@ -121,7 +121,7 @@ class BudgetPage extends React.Component {
                   />
                 }
                 onPress={() => this.showTimePicker()}
-                value={this.timeFormat()}
+                value={timeFormat(this.state.time)}
                 editable={false}
               />
             </View>
@@ -234,46 +234,6 @@ class BudgetPage extends React.Component {
       time: value,
       timePicker: false,
     });
-  };
-
-  /**
-   * The below two functions ensure that date and time is
-   * formatted correctly.
-   */
-  dateFormat = () => {
-    const [day, month, year] = [
-      this.state.date.getDate(),
-      this.state.date.getMonth(),
-      this.state.date.getFullYear(),
-    ];
-
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
-    return day.toString() + " " + months[month] + " " + year.toString();
-  };
-
-  timeFormat = () => {
-    const [hour, minute] = [
-      this.state.time.getHours(),
-      this.state.time.getMinutes() < 10
-        ? "0" + this.state.time.getMinutes()
-        : this.state.time.getMinutes(),
-    ];
-
-    return hour.toString() + ":" + minute.toString();
   };
 
   /**
@@ -451,6 +411,44 @@ class BudgetPage extends React.Component {
     this.props.navigation.setParams({ address: "", location: null });
   };
 }
+
+/**
+ * The below two functions ensure that date and time is
+ * formatted correctly.
+ */
+export const dateFormat = (date) => {
+  const [day, month, year] = [
+    date.getDate(),
+    date.getMonth(),
+    date.getFullYear(),
+  ];
+
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  return day.toString() + " " + months[month] + " " + year.toString();
+};
+
+export const timeFormat = (time) => {
+  const [hour, minute] = [
+    time.getHours(),
+    time.getMinutes() < 10 ? "0" + time.getMinutes() : time.getMinutes(),
+  ];
+
+  return hour.toString() + ":" + minute.toString();
+};
 
 const styles = StyleSheet.create({
   container: {
