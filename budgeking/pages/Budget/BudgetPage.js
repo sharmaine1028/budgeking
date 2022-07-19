@@ -171,10 +171,12 @@ class BudgetPage extends React.Component {
           </View>
 
           <View style={styles.withImage}>
-            <View>
+            <View style={{ flex: 1 }}>
               <Header text="Add location" />
               {this.maybeLocation()}
-              <Text style={{ fontSize: 10 }}>{this.state.address}</Text>
+              <Text style={{ fontSize: 10 }} numberOfLines={1}>
+                {this.state.address}
+              </Text>
             </View>
             <TouchableOpacity onPress={() => this.showLocationPicker()}>
               <Image
