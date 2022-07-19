@@ -217,7 +217,7 @@ class ReportsPageTable extends React.Component {
   }
 
   sortedArr(arr) {
-    const sortedArr = arr.sort((a, b) => b.date.seconds - a.date.seconds);
+    const sortedArr = arr.sort((a, b) => b.time.seconds - a.time.seconds);
     return sortedArr;
   }
 
