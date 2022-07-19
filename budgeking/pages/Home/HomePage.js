@@ -70,6 +70,7 @@ class HomePage extends React.Component {
       ],
       showBudgetValueModal: false,
       offTrackGoals: [],
+      tempBudgetValue: 0.0,
     };
   }
 
@@ -553,9 +554,16 @@ class HomePage extends React.Component {
   }
 
   changeBudgetValue() {
-    this.setState({ showBudgetValueModal: false });
+    this.updateBudgetVal(this.state.tempBudgetValue);
+    this.updateInputVal(0.0, "tempBudgetValue");
     this.inputBudgetFireStore();
     this.inputBudgetDailyFireStore();
+    this.setState({ showBudgetValueModal: false });
+  }
+
+  notChangeBudgetValue() {
+    this.updateInputVal(0.0, "tempBudgetValue");
+    this.setState({ showBudgetValueModal: false });
   }
 
   renderNoRecords = () => {
@@ -681,33 +689,58 @@ class HomePage extends React.Component {
                 this.setState({ showBudgetValueModal: forModalPresentationIOS })
               }
             >
-              <View style={styles.modalView}>
-                <View style={styles.modal}>
-                  <Text style={{ fontSize: 16, marginBottom: 10 }}>
-                    Change {this.state.timeUserWants} allowable budget {"\n"}
-                  </Text>
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                activeOpacity={1}
+                onPressOut={() => this.notChangeBudgetValue()}
+              >
+                <View style={styles.modalView}>
+                  <View style={styles.modal}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        marginBottom: 10,
+                        fontWeight: "500",
+                      }}
+                    >
+                      Change {this.state.timeUserWants} allowable budget {"\n"}
+                    </Text>
 
-                  <CurrencyInput
-                    style={styles.whiteInput}
-                    keyboardType="numeric"
-                    value={this.whichBudgetValue()}
-                    prefix="$"
-                    unit="$"
-                    delimiter=","
-                    separator="."
-                    precision={2}
-                    minValue={0}
-                    onChangeValue={(val) => this.updateBudgetVal(val)}
-                    maxValue={9999999999999}
-                  />
-                  <TouchableOpacity
-                    style={styles.modalButton}
-                    onPress={() => this.changeBudgetValue()}
-                  >
-                    <Text>Change</Text>
-                  </TouchableOpacity>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        marginBottom: 10,
+                        textAlign: "center",
+                      }}
+                    >
+                      Please enter the new value for your{"\n"}
+                      {this.state.timeUserWants} allowable budget below. {"\n"}
+                    </Text>
+
+                    <CurrencyInput
+                      style={styles.whiteInput}
+                      keyboardType="numeric"
+                      value={this.state.tempBudgetValue}
+                      prefix="$"
+                      unit="$"
+                      delimiter=","
+                      separator="."
+                      precision={2}
+                      minValue={0}
+                      onChangeValue={(val) =>
+                        this.updateInputVal(Math.abs(val), "tempBudgetValue")
+                      }
+                      maxValue={9999999999999}
+                    />
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={() => this.changeBudgetValue()}
+                    >
+                      <Text>Change</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             </Modal>
           </View>
         )}
