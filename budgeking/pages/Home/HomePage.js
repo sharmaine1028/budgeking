@@ -549,8 +549,14 @@ class HomePage extends React.Component {
 
   changeBudgetValue() {
     this.updateBudgetVal(this.state.tempBudgetValue);
+    this.updateInputVal(0.0, "tempBudgetValue");
     this.inputBudgetFireStore();
     this.inputBudgetDailyFireStore();
+    this.setState({ showBudgetValueModal: false });
+  }
+
+  notChangeBudgetValue() {
+    this.updateInputVal(0.0, "tempBudgetValue");
     this.setState({ showBudgetValueModal: false });
   }
 
@@ -666,9 +672,7 @@ class HomePage extends React.Component {
               <TouchableOpacity
                 style={{ flex: 1 }}
                 activeOpacity={1}
-                onPressOut={() =>
-                  this.setState({ showBudgetValueModal: false })
-                }
+                onPressOut={() => this.notChangeBudgetValue()}
               >
                 <View style={styles.modalView}>
                   <View style={styles.modal}>
