@@ -61,13 +61,14 @@ class AllTableView extends React.Component {
   getCollectionIncome = (querySnapshot) => {
     const incomeArrPush = [];
     querySnapshot.forEach((res) => {
-      const { category, date, notes, value } = res.data();
+      const { category, date, notes, value, time } = res.data();
       incomeArrPush.push({
         key: res.id,
         value,
         category,
         notes,
         date,
+        time,
       });
     });
     this.setState({
