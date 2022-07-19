@@ -70,6 +70,7 @@ class HomePage extends React.Component {
       ],
       showBudgetValueModal: false,
       offTrackGoals: [],
+      tempBudgetValue: 0.0,
     };
   }
 
@@ -109,12 +110,14 @@ class HomePage extends React.Component {
   getCollection = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { value, category, date } = res.data();
+      const { notes, value, category, date, time } = res.data();
       expenseArrPush.push({
         key: res.id,
+        notes,
         value,
         category,
         date,
+        time,
       });
       // console.log(expenseArr, "+>", res.id, "=>", res.data());
     });
@@ -373,7 +376,13 @@ class HomePage extends React.Component {
   }
 
   sortedArr(arr) {
-    const sortedArr = arr.sort((a, b) => b.date.seconds - a.date.seconds);
+    let sortedArr = arr.sort((a, b) => {
+      if (this.dateFormat(a.date.seconds) == this.dateFormat(b.date.seconds)) {
+        return b.time.seconds - a.time.seconds;
+      } else {
+        return b.date.seconds - a.date.seconds;
+      }
+    });
     return sortedArr;
   }
 
@@ -392,7 +401,6 @@ class HomePage extends React.Component {
     return show3Ex;
   }
 
-  // locale date string????
   dateFormat = (seconds) => {
     const date = new Date(seconds * 1000);
     const [day, month, year] = [
@@ -427,7 +435,6 @@ class HomePage extends React.Component {
     }
   }
 
-  // locale time string????
   timeFormat(seconds) {
     var t = new Date(seconds * 1000);
     var hours = t.getHours();
@@ -473,7 +480,7 @@ class HomePage extends React.Component {
         <View style={styles.notesRow}>
           <Text style={styles.noteText}>{doc.notes}</Text>
           <Text style={styles.timeText}>
-            {this.timeFormat(doc.date.seconds)}
+            {this.timeFormat(doc.time.seconds)}
           </Text>
         </View>
         <GreyLine />
@@ -547,9 +554,16 @@ class HomePage extends React.Component {
   }
 
   changeBudgetValue() {
-    this.setState({ showBudgetValueModal: false });
+    this.updateBudgetVal(this.state.tempBudgetValue);
+    this.updateInputVal(0.0, "tempBudgetValue");
     this.inputBudgetFireStore();
     this.inputBudgetDailyFireStore();
+    this.setState({ showBudgetValueModal: false });
+  }
+
+  notChangeBudgetValue() {
+    this.updateInputVal(0.0, "tempBudgetValue");
+    this.setState({ showBudgetValueModal: false });
   }
 
   renderNoRecords = () => {
@@ -557,6 +571,27 @@ class HomePage extends React.Component {
       <Text style={{ alignSelf: "center", marginTop: 20 }}>No Records Yet</Text>
     );
   };
+
+  renderLegend = (text, color) => {
+    return (
+      <View style={{ flexDirection: "row", marginBottom: 12 }}>
+        <View
+          style={{
+            height: 18,
+            width: 18,
+            marginRight: 10,
+            borderRadius: 4,
+            backgroundColor: color || "white",
+          }}
+        />
+        <Text style={{ color: "#444444", fontSize: 16 }}>{text || ""}</Text>
+      </View>
+    );
+  };
+
+  maybeLegend() {
+    return <View></View>;
+  }
 
   getOffTrackGoals = (querySnapshot) => {
     try {
@@ -625,22 +660,15 @@ class HomePage extends React.Component {
   render() {
     const { navigation } = this.props;
 
-    const renderLegend = (text, color) => {
-      return (
-        <View style={{ flexDirection: "row", marginBottom: 12 }}>
-          <View
-            style={{
-              height: 18,
-              width: 18,
-              marginRight: 10,
-              borderRadius: 4,
-              backgroundColor: color || "white",
-            }}
-          />
-          <Text style={{ color: "#444444", fontSize: 16 }}>{text || ""}</Text>
-        </View>
-      );
-    };
+    const legendArr = [
+      [this.putExpenseBesideLegend("food and drinks"), "#177AD5"],
+      [this.putExpenseBesideLegend("transportation"), "#79D2DE"],
+      [this.putExpenseBesideLegend("housing"), "#F7D8B5"],
+      [this.putExpenseBesideLegend("shopping"), "#8F80E4"],
+      [this.putExpenseBesideLegend("health"), "#FB8875"],
+      [this.putExpenseBesideLegend("education"), "#FDE74C"],
+      [this.putExpenseBesideLegend("others"), "#E8E0CE"],
+    ];
 
     if (this.state.isLoading) {
       return (
@@ -661,33 +689,58 @@ class HomePage extends React.Component {
                 this.setState({ showBudgetValueModal: forModalPresentationIOS })
               }
             >
-              <View style={styles.modalView}>
-                <View style={styles.modal}>
-                  <Text style={{ fontSize: 16, marginBottom: 10 }}>
-                    Change {this.state.timeUserWants} allowable budget {"\n"}
-                  </Text>
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                activeOpacity={1}
+                onPressOut={() => this.notChangeBudgetValue()}
+              >
+                <View style={styles.modalView}>
+                  <View style={styles.modal}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        marginBottom: 10,
+                        fontWeight: "500",
+                      }}
+                    >
+                      Change {this.state.timeUserWants} allowable budget {"\n"}
+                    </Text>
 
-                  <CurrencyInput
-                    style={styles.whiteInput}
-                    keyboardType="numeric"
-                    value={this.whichBudgetValue()}
-                    prefix="$"
-                    unit="$"
-                    delimiter=","
-                    separator="."
-                    precision={2}
-                    minValue={0}
-                    onChangeValue={(val) => this.updateBudgetVal(val)}
-                    maxValue={9999999999999}
-                  />
-                  <TouchableOpacity
-                    style={styles.modalButton}
-                    onPress={() => this.changeBudgetValue()}
-                  >
-                    <Text>Change</Text>
-                  </TouchableOpacity>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        marginBottom: 10,
+                        textAlign: "center",
+                      }}
+                    >
+                      Please enter the new value for your{"\n"}
+                      {this.state.timeUserWants} allowable budget below. {"\n"}
+                    </Text>
+
+                    <CurrencyInput
+                      style={styles.whiteInput}
+                      keyboardType="numeric"
+                      value={this.state.tempBudgetValue}
+                      prefix="$"
+                      unit="$"
+                      delimiter=","
+                      separator="."
+                      precision={2}
+                      minValue={0}
+                      onChangeValue={(val) =>
+                        this.updateInputVal(Math.abs(val), "tempBudgetValue")
+                      }
+                      maxValue={9999999999999}
+                    />
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={() => this.changeBudgetValue()}
+                    >
+                      <Text>Change</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             </Modal>
           </View>
         )}
@@ -801,22 +854,11 @@ class HomePage extends React.Component {
                 marginTop: 20,
               }}
             >
-              {renderLegend(
-                this.putExpenseBesideLegend("food and drinks"),
-                "#177AD5"
-              )}
-              {renderLegend(
-                this.putExpenseBesideLegend("transportation"),
-                "#79D2DE"
-              )}
-              {renderLegend(this.putExpenseBesideLegend("housing"), "#F7D8B5")}
-              {renderLegend(this.putExpenseBesideLegend("shopping"), "#8F80E4")}
-              {renderLegend(this.putExpenseBesideLegend("health"), "#FB8875")}
-              {renderLegend(
-                this.putExpenseBesideLegend("education"),
-                "#FDE74C"
-              )}
-              {renderLegend(this.putExpenseBesideLegend("others"), "#E8E0CE")}
+              {this.checkEmptyPieData()
+                ? legendArr.map((legend) =>
+                    this.renderLegend(legend[0], legend[1])
+                  )
+                : this.maybeLegend()}
             </View>
           </View>
 

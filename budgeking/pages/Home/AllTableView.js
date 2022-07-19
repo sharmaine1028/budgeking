@@ -43,13 +43,14 @@ class AllTableView extends React.Component {
   getCollectionExpense = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { notes, value, category, date } = res.data();
+      const { notes, value, category, date, time } = res.data();
       expenseArrPush.push({
         key: res.id,
         value,
         notes,
         category,
         date,
+        time,
       });
     });
     this.setState({
@@ -60,13 +61,14 @@ class AllTableView extends React.Component {
   getCollectionIncome = (querySnapshot) => {
     const incomeArrPush = [];
     querySnapshot.forEach((res) => {
-      const { category, date, notes, value } = res.data();
+      const { category, date, notes, value, time } = res.data();
       incomeArrPush.push({
         key: res.id,
         value,
         category,
         notes,
         date,
+        time,
       });
     });
     this.setState({
@@ -74,7 +76,6 @@ class AllTableView extends React.Component {
     });
   };
 
-  // locale date string????
   dateFormat = (seconds) => {
     const date = new Date(seconds * 1000);
     const [day, month, year] = [
@@ -109,7 +110,6 @@ class AllTableView extends React.Component {
     }
   }
 
-  // locale time string????
   timeFormat(seconds) {
     var t = new Date(seconds * 1000);
     // console.log("t", t.getHours());
@@ -127,7 +127,13 @@ class AllTableView extends React.Component {
   }
 
   sortedArr(arr) {
-    const sortedArr = arr.sort((a, b) => b.date.seconds - a.date.seconds);
+    let sortedArr = arr.sort((a, b) => {
+      if (this.dateFormat(a.date.seconds) == this.dateFormat(b.date.seconds)) {
+        return b.time.seconds - a.time.seconds;
+      } else {
+        return b.date.seconds - a.date.seconds;
+      }
+    });
     return sortedArr;
   }
 
@@ -163,7 +169,7 @@ class AllTableView extends React.Component {
         <View style={styles.notesRow}>
           <Text style={styles.noteText}>{doc.notes}</Text>
           <Text style={styles.timeText}>
-            {this.timeFormat(doc.date.seconds)}
+            {this.timeFormat(doc.time.seconds)}
           </Text>
         </View>
       </View>
