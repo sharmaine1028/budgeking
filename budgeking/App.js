@@ -313,7 +313,12 @@ function MyTabs() {
       <Tab.Screen
         name="Settings"
         component={SettingsPage}
-        options={{ headerRight: () => Help("sharmaine") }}
+        options={{
+          headerRight: () =>
+            Help(
+              "1. Change your profile picture by tapping on the current profile picture and choosing a new picture.\n\n2. Click on edit button beside your current username. Now, you can key in the new username in the textbox. Click 'Change' button to update your username.\n\n3. Click on edit button beside the asterisks. Key in your current password in the pop-up window to verify it is you. Click on 'Verify' button. Now, your current password is unmasked and you can key in the new password in the textbox. Click 'Change' button to update your password.\n\n4. 'Log out' button logs you out of your account and takes you back to Login page."
+            ),
+        }}
       />
     </Tab.Navigator>
   );
