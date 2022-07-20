@@ -121,7 +121,7 @@ class GoalsPage extends React.Component {
                 editItem={this.editGoal}
               />
             ))
-          : this.renderNoGoals()}
+          : renderNoGoals()}
 
         <Title text={"Long-term goals"} />
         {this.state.longTermGoals.length !== 0
@@ -268,18 +268,15 @@ class GoalsPage extends React.Component {
       this.editGoal(id, time, data);
     }
   };
-
-  renderNoGoals = () => {
-    return (
-      <Text
-        style={[styles.goalTagline, { alignSelf: "center", marginTop: 20 }]}
-      >
-        No Goals yet
-      </Text>
-    );
-  };
 }
 
+export const renderNoGoals = () => {
+  return (
+    <Text style={[styles.goalTagline, { alignSelf: "center", marginTop: 20 }]}>
+      No Goals yet
+    </Text>
+  );
+};
 const styles = StyleSheet.create({
   button: { flexGrow: 0.5, height: 40 },
   buttonContainer: {

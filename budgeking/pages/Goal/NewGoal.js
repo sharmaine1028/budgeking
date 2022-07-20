@@ -5,7 +5,13 @@ import {
   NewGoalInput,
   YesOrNo,
 } from "../../config/reusableText";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import colours from "../../config/colours";

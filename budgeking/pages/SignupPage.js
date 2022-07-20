@@ -5,6 +5,7 @@ import {
   StatusBar,
   ActivityIndicator,
   Image,
+  Platform,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import colours from "../config/colours";

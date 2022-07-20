@@ -1,0 +1,250 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`goal renders correctly with data 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#e3dad5",
+      "borderRadius": 15,
+      "marginVertical": 5,
+      "padding": 10,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "fontSize": 15,
+            "fontWeight": "400",
+            "lineHeight": 15,
+            "marginVertical": 5,
+          },
+          Object {
+            "fontWeight": "bold",
+          },
+        ]
+      }
+    >
+      Save for apples
+    </Text>
+    <View
+      collapsable={false}
+    >
+      <View
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <Text />
+      </View>
+      <Modal
+        hardwareAccelerated={false}
+        onRequestClose={[Function]}
+        supportedOrientations={
+          Array [
+            "portrait",
+            "portrait-upside-down",
+            "landscape",
+            "landscape-left",
+            "landscape-right",
+          ]
+        }
+        transparent={true}
+        visible={false}
+      />
+    </View>
+  </View>
+  <Text
+    style={
+      Object {
+        "color": "#6C757D",
+        "fontSize": 12,
+        "marginBottom": 10,
+      }
+    }
+  >
+    You're on track to save $
+    0.42
+     
+    daily
+  </Text>
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "marginVertical": 5,
+        "paddingLeft": 10,
+      }
+    }
+  >
+    <Text />
+    <View
+      style={
+        Object {
+          "flex": 0.85,
+          "paddingLeft": 30,
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "backgroundColor": "#3F4243",
+              "borderColor": "#3F4243",
+              "borderRadius": 5,
+              "flex": 1,
+              "flexDirection": "row",
+              "height": 10,
+            },
+          ]
+        }
+      >
+        <View
+          collapsable={false}
+          style={
+            Object {
+              "backgroundColor": "#96D3FF",
+              "borderRadius": 5,
+              "bottom": 0,
+              "left": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+              "width": "50%",
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#6C757D",
+              "fontSize": 12,
+              "marginBottom": 10,
+            }
+          }
+        >
+          $
+          5.00
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#6C757D",
+              "fontSize": 12,
+              "marginBottom": 10,
+            }
+          }
+        >
+          $
+          10.00
+        </Text>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "borderBottomColor": "#E0E0E0",
+        "borderBottomWidth": 2,
+        "marginVertical": 3,
+      }
+    }
+  />
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "marginVertical": 5,
+        "paddingLeft": 10,
+      }
+    }
+  >
+    <Text />
+    <Text
+      style={
+        Object {
+          "flex": 0.3,
+          "paddingLeft": 30,
+        }
+      }
+    >
+       Deadline 
+    </Text>
+    <Text
+      style={
+        Object {
+          "flex": 0.55,
+        }
+      }
+    >
+      31 Aug 2022
+    </Text>
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "opacity": 1,
+        }
+      }
+    >
+      <Text />
+    </View>
+  </View>
+</View>
+`;
+
+exports[`goal renders no goals yet if empty database 1`] = `
+<Text
+  style={
+    Array [
+      undefined,
+      Object {
+        "alignSelf": "center",
+        "marginTop": 20,
+      },
+    ]
+  }
+>
+  No Goals yet
+</Text>
+`;

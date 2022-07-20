@@ -5,6 +5,7 @@ import {
   StatusBar,
   Image,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { auth, db } from "../config/firebase";
 import { BlackButton } from "../config/reusableButton";
