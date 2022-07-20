@@ -66,27 +66,53 @@ function GoalsAll() {
       <Stack.Screen
         name="Goals"
         component={GoalsPage}
-        options={{ headerLeft: false, headerRight: () => Help("sharmaine") }}
+        options={{
+          headerLeft: false,
+          headerRight: () =>
+            Help(
+              "1. Add new goals to achieve. Goals are categorised into short-term and long-term.\n\n 2. Once a goal is added, you can edit and delete your goal or add to your savings to complete the goal by clicking on the 3-dotted icon (...), which will then take you to separate pages to fulfill your request. \n\n3. Blue progress bar shows how far you are from your target savings amount.\n\n4. Click on the dropdown arrow to view more details of your goal. \n\n5. Goal box will turn red if your goal deadline has passed. \n\n6. Show goal history shows past goals you have completed."
+            ),
+        }}
       />
       <Stack.Screen
         name="New Goal"
         component={NewGoal}
-        options={{ headerRight: () => Help("sharmaine") }}
+        options={{
+          headerRight: () =>
+            Help(
+              "1. Add a goal description and target savings amount. \n\n2. Click on 'Select' dropdown and choose how often you want to save. Then, choose the goal deadline. Frequency amount (amount you have to save) will be automatically displayed beside '$' sign. \n\n4. You can write any notes regarding your goal. \n\n5. If you want to share your goal with someone else, choose 'Yes'. Then, enter the email of user you want to share with. (Note: The user must have signed up on budgeking as well.)\n\n6. Click 'Add' to add the goal and 'Cancel' to go back to Goals page."
+            ),
+        }}
       />
       <Stack.Screen
         name="Goal History"
         component={GoalHistory}
-        options={{ headerRight: () => Help("sharmaine") }}
+        options={{
+          headerRight: () =>
+            Help(
+              "Goal history shows an archive all of your past completed goals. For each goal, you can click on dropdown arrow to view the goal's details."
+            ),
+        }}
       />
       <Stack.Screen
         name="Edit Goal"
         component={EditGoal}
-        options={{ headerRight: () => Help("sharmaine") }}
+        options={{
+          headerRight: () =>
+            Help(
+              "Add on, remove or edit any details of the goal you have created."
+            ),
+        }}
       />
       <Stack.Screen
         name="Save to Goal"
         component={SaveToGoal}
-        options={{ headerRight: () => Help("sharmaine") }}
+        options={{
+          headerRight: () =>
+            Help(
+              "1. 'Target' shows the goal's target savings amount.\n\n2. 'Current Savings' shows how much you have saved towards your goal. \n\n3. Under, 'Add to Savings', key in the amount of money you want to save towards completion of your goal. Amount cannot be more than what is left towards your target amount."
+            ),
+        }}
       />
     </Stack.Navigator>
   );
@@ -106,12 +132,23 @@ function BudgetAll() {
       <Stack.Screen
         name="Budget"
         component={BudgetPage}
-        options={{ headerLeft: false, headerRight: () => Help("sharmaine") }}
+        options={{
+          headerLeft: false,
+          headerRight: () =>
+            Help(
+              "1. Toggle between 'Expense' and 'Income' button to input in data for your expenses or income.\n\n2. Input value spent, date and time, category and notes (optional).\n\n3. Attach a photo of your receipt and add a location by clicking on the camera icon and location icon repectively. (optional) \n\n4. Click 'Add' to add to budget. You can see details of what you added in Home Page under 'Last records' for a quick glance. \n\n5. Click on 'Cancel' to remove all details keyed in currently and start over."
+            ),
+        }}
       />
       <Stack.Screen
         name="Location Search"
         component={LocationSearch}
-        options={{ headerRight: () => Help("sharmaine") }}
+        options={{
+          headerRight: () =>
+            Help(
+              "1. In the 'Search' bar, search for your desired location by inputting in the name of your desired location. Or, you can click on 'Current location' to get your approximate current location. \n\n2. Choose the option that is most fitting to the location you want. \n\n3. Click on the tick button to confirm your location and go back to Budget Page."
+            ),
+        }}
       />
     </Stack.Navigator>
   );
@@ -142,17 +179,32 @@ function ReportsPageAll() {
       <Stack.Screen
         name="Pie Chart View"
         component={ReportsPagePieChart}
-        options={{ headerRight: () => Help("me") }}
+        options={{
+          headerRight: () =>
+            Help(
+              "1. Scroll down to see the dropdown box. Then, select the time period to filter your expenses by. \n\n2. Pie chart will change to show expenses broken down by category according to the time period you selected. Read the legends for the categories and amount of spent for each category. \n\n 3. 'Show more' button navigates to 'Table View' where you can see more detailed logs of expenses and income filtered by the current time period you have selected."
+            ),
+        }}
       />
       <Stack.Screen
         name="Custom Date"
         component={ChooseCustomDate}
-        options={{ headerRight: () => Help("me") }}
+        options={{
+          headerRight: () =>
+            Help(
+              "1. Click on 'Choose custom date' to choose custom dates for the time period to filter expenses and income by. \n\n2. Select a start date and an end date on the calendar for the custom time period. \n\n3. Click on 'Save' button. \n\n4. Check the dates chosen are correct and click on 'Confirm' button to confirm your choice and go back to 'Pie Chart View'."
+            ),
+        }}
       />
       <Stack.Screen
         name="Table View"
         component={ReportsPageTable}
-        options={{ headerRight: () => Help("me") }}
+        options={{
+          headerRight: () =>
+            Help(
+              "All records are sorted in chronological order. You can toggle between red 'Expenses' button and green 'Income' button to view details of all your expenses and income of the time period you have filtered this by."
+            ),
+        }}
       />
     </Stack.Navigator>
   );
