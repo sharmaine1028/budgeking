@@ -1,5 +1,21 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`goal renders correctly if empty database 1`] = `
+<Text
+  style={
+    Array [
+      undefined,
+      Object {
+        "alignSelf": "center",
+        "marginTop": 20,
+      },
+    ]
+  }
+>
+  No Goals yet
+</Text>
+`;
+
 exports[`goal renders correctly with data 1`] = `
 <View
   style={
@@ -231,20 +247,4 @@ exports[`goal renders correctly with data 1`] = `
     </View>
   </View>
 </View>
-`;
-
-exports[`goal renders no goals yet if empty database 1`] = `
-<Text
-  style={
-    Array [
-      undefined,
-      Object {
-        "alignSelf": "center",
-        "marginTop": 20,
-      },
-    ]
-  }
->
-  No Goals yet
-</Text>
 `;

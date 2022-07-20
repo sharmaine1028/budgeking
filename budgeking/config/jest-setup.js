@@ -8,3 +8,8 @@ jest.mock("@react-navigation/native", () => {
     }),
   };
 });
+
+window.addEventListener = jest.fn();
+window.attachEvent = jest.fn();
+window.alert = jest.fn();
+jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper");

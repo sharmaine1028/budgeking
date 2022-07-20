@@ -4,7 +4,7 @@ import GenerateGoal from "../pages/Goal/GenerateGoal";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
-test("goal renders no goals yet if empty database", () => {
+test("goal renders correctly if empty database", async () => {
   const goals = [];
   const tree = renderer.create(
     goals.length !== 0
@@ -23,7 +23,7 @@ test("goal renders no goals yet if empty database", () => {
   expect(tree).toMatchSnapshot();
 });
 
-test("goal renders correctly with data", () => {
+test("goal renders correctly with data", async () => {
   const Stack = createStackNavigator();
   const MockNavigator = (
     <NavigationContainer>
