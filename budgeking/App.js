@@ -27,7 +27,7 @@ const Tab = createBottomTabNavigator();
 
 LogBox.ignoreAllLogs();
 
-function MyStack() {
+export function MyStack() {
   return (
     <Stack.Navigator
       initialRouteName="Login"
@@ -40,7 +40,7 @@ function MyStack() {
   );
 }
 
-function GoalsAll() {
+export function GoalsAll() {
   return (
     <Stack.Navigator
       initialRouteName="Goals"
@@ -64,7 +64,7 @@ function GoalsAll() {
   );
 }
 
-function BudgetAll() {
+export function BudgetAll() {
   return (
     <Stack.Navigator
       initialRouteName="Budget"
@@ -85,7 +85,7 @@ function BudgetAll() {
   );
 }
 
-function ReportsPageAll() {
+export function ReportsPageAll() {
   return (
     <Stack.Navigator
       initialRouteName="Report"
@@ -109,7 +109,7 @@ function ReportsPageAll() {
   );
 }
 
-function HomePageAll() {
+export function HomePageAll() {
   return (
     <Stack.Navigator
       initialRouteName="Home"
@@ -158,7 +158,7 @@ const screenOptions = (route, color) => {
   return <MaterialCommunityIcons name={iconName} color={color} size={28} />;
 };
 
-function MyTabs() {
+export function MyTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({

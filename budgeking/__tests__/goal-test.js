@@ -1,6 +1,8 @@
 import { renderNoGoals } from "../pages/Goal/GoalsPage";
 import renderer from "react-test-renderer";
 import GenerateGoal from "../pages/Goal/GenerateGoal";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 
 test("goal renders no goals yet if empty database", () => {
   const goals = [];
@@ -21,7 +23,15 @@ test("goal renders no goals yet if empty database", () => {
   expect(tree).toMatchSnapshot();
 });
 
-test("goal renders correctly", () => {
+test("goal renders correctly with data", () => {
+  const Stack = createStackNavigator();
+  const MockNavigator = (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="MockedScreen" component={GenerateGoal} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
   const goals = [
     (item = {
       id: 0,
@@ -40,6 +50,17 @@ test("goal renders correctly", () => {
       target: 10,
     }),
   ];
+
+  jest.mock("@react-navigation/native", () => {
+    const actualNav = jest.requireActual("@react-navigation/native");
+    return {
+      ...actualNav,
+      useNavigation: () => ({
+        navigate: jest.fn(),
+        dispatch: jest.fn(),
+      }),
+    };
+  });
   const tree = renderer
     .create(
       goals.length !== 0
