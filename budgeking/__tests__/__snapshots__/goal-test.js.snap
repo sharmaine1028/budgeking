@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`goal renders no goals yet if empty database 1`] = `
+<Text
+  style={
+    Array [
+      undefined,
+      Object {
+        "alignSelf": "center",
+        "marginTop": 20,
+      },
+    ]
+  }
+>
+  No Goals yet
+</Text>
+`;
