@@ -30,9 +30,10 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   useEffect(() => isOffTrack(), [doc.isOffTrack]);
 
   const getPercent = () => {
-    const percent = (doc.currSavingsAmt / doc.target) * 100;
     try {
-      if (percent > 100) {
+      const percent = (doc.currSavingsAmt / doc.target) * 100;
+
+      if (percent >= 100) {
         return "100%";
       } else {
         return (doc.currSavingsAmt / doc.target) * 100 + "%";
