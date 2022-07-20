@@ -29,20 +29,6 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
 
   useEffect(() => isOffTrack(), [doc.isOffTrack]);
 
-  const getPercent = () => {
-    try {
-      const percent = (doc.currSavingsAmt / doc.target) * 100;
-
-      if (percent >= 100) {
-        return "100%";
-      } else {
-        return (doc.currSavingsAmt / doc.target) * 100 + "%";
-      }
-    } catch {
-      (err) => console.log(err);
-    }
-  };
-
   const dateFormat = () => {
     const date = doc.deadline;
     const [day, month, year] = [
@@ -222,8 +208,12 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
                 StyleSheet.absoluteFill,
                 {
                   backgroundColor: "#96D3FF",
-                  width: getPercent(),
-                  // width: (doc.currSavingsAmt / doc.target) * 100 + "%",
+                  width: `${
+                    (doc.currSavingsAmt / doc.target) * 100 >= 100
+                      ? "100%"
+                      : (doc.currSavingsAmt / doc.target) * 100 + "%"
+                  }`,
+
                   borderRadius: 5,
                 },
               ]}
