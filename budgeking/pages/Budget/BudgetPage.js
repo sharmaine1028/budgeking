@@ -23,6 +23,7 @@ import { auth, db, storage } from "../../config/firebase";
 import { Picker } from "@react-native-picker/picker";
 import CurrencyInput from "react-native-currency-input";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import uuid from "uuid";
 
 class BudgetPage extends React.Component {
   constructor() {
