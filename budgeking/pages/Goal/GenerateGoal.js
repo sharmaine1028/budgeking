@@ -156,13 +156,14 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
           onRequestClose={() => hideMenu(doc.id)}
         >
           <MenuItem
-            onPress={() =>
+            onPress={() => {
               navigation.navigate("Edit Goal", {
                 doc: doc,
                 time: time,
                 editItem: editItem,
-              })
-            }
+              });
+              setIsMenu(false);
+            }}
           >
             Edit
           </MenuItem>
@@ -174,11 +175,19 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
                 time: time,
                 saveItem: saveItem,
               });
+              setIsMenu(false);
             }}
           >
             Save
           </MenuItem>
-          <MenuItem onPress={() => deleteGoal(doc.id)}>Delete</MenuItem>
+          <MenuItem
+            onPress={() => {
+              deleteGoal(doc.id);
+              setIsMenu(false);
+            }}
+          >
+            Delete
+          </MenuItem>
         </Menu>
       </View>
 
