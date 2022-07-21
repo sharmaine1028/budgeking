@@ -23,7 +23,6 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { PieChart } from "react-native-gifted-charts";
 import CurrencyInput, { TextWithCursor } from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { SmallBlackButton } from "../../config/reusableButton";
 import Icon from "react-native-vector-icons/AntDesign";
 import { GreyLine } from "../../config/reusablePart";
 import { BlackButton } from "../../config/reusableButton";
@@ -401,42 +400,6 @@ class HomePage extends React.Component {
     return show3Ex;
   }
 
-  generate3ExpensesLR = (doc) => {
-    // console.log("docs", doc);
-    return (
-      <View key={doc.key} style={styles.row}>
-        <View style={styles.dateRow}>
-          <Icon.Button
-            name="arrowright"
-            size={20}
-            color={colours.tomato}
-            backgroundColor={"transparent"}
-            iconStyle={{ marginLeft: 5, marginRight: 0 }}
-          />
-          <Header
-            text={`${dateFormat(doc.date.seconds)}`}
-            style={{ fontWeight: "bold", marginTop: 12 }}
-          />
-        </View>
-
-        <View style={styles.categoryRow}>
-          <Header
-            text={categoryFormat(doc.category)}
-            style={styles.expenseCategory}
-          />
-
-          <Text style={styles.valueText}>{`$${doc.value}`}</Text>
-        </View>
-
-        <View style={styles.notesRow}>
-          <Text style={styles.noteText}>{doc.notes}</Text>
-          <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
-        </View>
-        <GreyLine />
-      </View>
-    );
-  };
-
   maybePieChart() {
     const dummyPieData = [{ value: 100, color: colours.pieGrey }];
     return (
@@ -514,12 +477,6 @@ class HomePage extends React.Component {
     this.updateInputVal(0.0, "tempBudgetValue");
     this.setState({ showBudgetValueModal: false });
   }
-
-  renderNoRecords = () => {
-    return (
-      <Text style={{ alignSelf: "center", marginTop: 20 }}>No Records Yet</Text>
-    );
-  };
 
   renderLegend = (text, color) => {
     return (
@@ -849,8 +806,8 @@ class HomePage extends React.Component {
             <RedLine />
             {/* console.log(this.state.expenseArr.length) */}
             {this.state.expenseArr.length !== 0
-              ? this.show3Expenses().map((doc) => this.generate3ExpensesLR(doc))
-              : this.renderNoRecords()}
+              ? this.show3Expenses().map((doc) => generate3ExpensesLR(doc))
+              : renderNoRecords()}
             <BlackButton
               text={"Show more"}
               style={{ flexGrow: 0.5, marginTop: 10, marginBottom: 10 }}
@@ -905,7 +862,7 @@ export function timeFormat(seconds) {
   var t = new Date(seconds * 1000);
   var hours = t.getHours();
   var minutes = t.getMinutes();
-  var newFormat = t.getHours() > 12 ? "PM" : "AM";
+  var newFormat = t.getHours() >= 12 ? "PM" : "AM";
 
   hours = hours % 12;
 
@@ -915,6 +872,47 @@ export function timeFormat(seconds) {
   var formatted = hours + ":" + minutes + " " + newFormat;
   return formatted;
 }
+
+export const renderNoRecords = () => {
+  return (
+    <Text style={{ alignSelf: "center", marginTop: 20 }}>No Records Yet</Text>
+  );
+};
+
+export const generate3ExpensesLR = (doc) => {
+  return (
+    <View key={doc.key} style={styles.row}>
+      <View style={styles.dateRow}>
+        <Icon.Button
+          name="arrowright"
+          size={20}
+          color={colours.tomato}
+          backgroundColor={"transparent"}
+          iconStyle={{ marginLeft: 5, marginRight: 0 }}
+        />
+        <Header
+          text={`${doc.date.seconds ? dateFormat(doc.date.seconds) : ""}`}
+          style={{ fontWeight: "bold", marginTop: 12 }}
+        />
+      </View>
+
+      <View style={styles.categoryRow}>
+        <Header
+          text={categoryFormat(doc.category)}
+          style={styles.expenseCategory}
+        />
+
+        <Text style={styles.valueText}>{`$${doc.value}`}</Text>
+      </View>
+
+      <View style={styles.notesRow}>
+        <Text style={styles.noteText}>{doc.notes}</Text>
+        <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
+      </View>
+      <GreyLine />
+    </View>
+  );
+};
 
 // const win = Dimensions.get('window')
 const styles = StyleSheet.create({

@@ -8,6 +8,7 @@ import { auth, db } from "../../config/firebase";
 import { BlackButton } from "../../config/reusableButton";
 import { GreyLine } from "../../config/reusablePart";
 import { dateFormat, categoryFormat, timeFormat } from "../Home/HomePage";
+import { renderNoRecords } from "../Home/HomePage";
 
 class ReportsPageTable extends React.Component {
   constructor() {
@@ -258,15 +259,9 @@ class ReportsPageTable extends React.Component {
         this.generateExpensesIncome(doc)
       );
     } else {
-      return this.renderNoRecords();
+      return renderNoRecords();
     }
   }
-
-  renderNoRecords = () => {
-    return (
-      <Text style={{ alignSelf: "center", marginTop: 20 }}>No Records Yet</Text>
-    );
-  };
 
   noRecordsFound = () => {
     return (

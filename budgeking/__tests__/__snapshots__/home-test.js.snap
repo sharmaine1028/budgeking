@@ -1,0 +1,490 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Table view renders no records yet if empty database 1`] = `
+<Text
+  style={
+    Object {
+      "alignSelf": "center",
+      "marginTop": 20,
+    }
+  }
+>
+  No Records Yet
+</Text>
+`;
+
+exports[`expenses renders correctly with data 1`] = `
+Array [
+  <View
+    style={
+      Object {
+        "borderRadius": 10,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+        }
+      }
+    >
+      <View
+        accessible={true}
+        focusable={false}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "backgroundColor": "transparent",
+              "borderRadius": 5,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "flex-start",
+                "padding": 8,
+              },
+              Object {
+                "backgroundColor": "transparent",
+                "borderRadius": 5,
+              },
+              undefined,
+            ]
+          }
+        >
+          <Text />
+        </View>
+      </View>
+      <Text
+        style={
+          Array [
+            Object {
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 15,
+              "marginVertical": 5,
+            },
+            Object {
+              "fontWeight": "bold",
+              "marginTop": 12,
+            },
+          ]
+        }
+      >
+        21 Jul 2022
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignContent": "flex-start",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 15,
+              "marginVertical": 5,
+            },
+            Object {
+              "marginLeft": 10,
+              "marginTop": 1,
+            },
+          ]
+        }
+      >
+        Food & Drinks
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#413E3E",
+            "marginRight": 10,
+            "marginTop": 1,
+            "textAlign": "right",
+          }
+        }
+      >
+        $10.5
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignContent": "flex-end",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "fontWeight": "200",
+            "marginBottom": 10,
+            "marginLeft": 10,
+          }
+        }
+      >
+        
+      </Text>
+      <Text
+        style={
+          Object {
+            "fontWeight": "200",
+            "marginBottom": 10,
+            "marginRight": 10,
+          }
+        }
+      >
+        1:40 PM
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "borderBottomColor": "#E0E0E0",
+          "borderBottomWidth": 2,
+          "marginVertical": 3,
+        }
+      }
+    />
+  </View>,
+  <View
+    style={
+      Object {
+        "borderRadius": 10,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+        }
+      }
+    >
+      <View
+        accessible={true}
+        focusable={false}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "backgroundColor": "transparent",
+              "borderRadius": 5,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "flex-start",
+                "padding": 8,
+              },
+              Object {
+                "backgroundColor": "transparent",
+                "borderRadius": 5,
+              },
+              undefined,
+            ]
+          }
+        >
+          <Text />
+        </View>
+      </View>
+      <Text
+        style={
+          Array [
+            Object {
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 15,
+              "marginVertical": 5,
+            },
+            Object {
+              "fontWeight": "bold",
+              "marginTop": 12,
+            },
+          ]
+        }
+      >
+        18 Jul 2022
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignContent": "flex-start",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 15,
+              "marginVertical": 5,
+            },
+            Object {
+              "marginLeft": 10,
+              "marginTop": 1,
+            },
+          ]
+        }
+      >
+        Health
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#413E3E",
+            "marginRight": 10,
+            "marginTop": 1,
+            "textAlign": "right",
+          }
+        }
+      >
+        $60
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignContent": "flex-end",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "fontWeight": "200",
+            "marginBottom": 10,
+            "marginLeft": 10,
+          }
+        }
+      >
+        Annual detailed checkup
+      </Text>
+      <Text
+        style={
+          Object {
+            "fontWeight": "200",
+            "marginBottom": 10,
+            "marginRight": 10,
+          }
+        }
+      >
+        5:31 AM
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "borderBottomColor": "#E0E0E0",
+          "borderBottomWidth": 2,
+          "marginVertical": 3,
+        }
+      }
+    />
+  </View>,
+  <View
+    style={
+      Object {
+        "borderRadius": 10,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+        }
+      }
+    >
+      <View
+        accessible={true}
+        focusable={false}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "backgroundColor": "transparent",
+              "borderRadius": 5,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "flex-start",
+                "padding": 8,
+              },
+              Object {
+                "backgroundColor": "transparent",
+                "borderRadius": 5,
+              },
+              undefined,
+            ]
+          }
+        >
+          <Text />
+        </View>
+      </View>
+      <Text
+        style={
+          Array [
+            Object {
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 15,
+              "marginVertical": 5,
+            },
+            Object {
+              "fontWeight": "bold",
+              "marginTop": 12,
+            },
+          ]
+        }
+      >
+        20 Jun 2021
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignContent": "flex-start",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 15,
+              "marginVertical": 5,
+            },
+            Object {
+              "marginLeft": 10,
+              "marginTop": 1,
+            },
+          ]
+        }
+      >
+        Health
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#413E3E",
+            "marginRight": 10,
+            "marginTop": 1,
+            "textAlign": "right",
+          }
+        }
+      >
+        $12.78
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignContent": "flex-end",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "fontWeight": "200",
+            "marginBottom": 10,
+            "marginLeft": 10,
+          }
+        }
+      >
+        Uniqlo 
+      </Text>
+      <Text
+        style={
+          Object {
+            "fontWeight": "200",
+            "marginBottom": 10,
+            "marginRight": 10,
+          }
+        }
+      >
+        11:18 AM
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "borderBottomColor": "#E0E0E0",
+          "borderBottomWidth": 2,
+          "marginVertical": 3,
+        }
+      }
+    />
+  </View>,
+]
+`;
