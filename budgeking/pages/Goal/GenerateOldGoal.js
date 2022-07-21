@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -11,24 +11,12 @@ import { GreyLine } from "../../config/reusablePart";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Header } from "../../config/reusableText";
 import colours from "../../config/colours";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { db } from "../../config/firebase";
 import { Ionicons } from "@expo/vector-icons";
 import { Menu, MenuItem } from "react-native-material-menu";
 
 function GenerateOldGoal({ doc, deleteItem }) {
-  const navigation = useNavigation();
   const [showMore, setShowMore] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-
-  const getPercent = () => {
-    const percent = (doc.currSavingsAmt / doc.target) * 100;
-    if (percent > 100) {
-      return "100%";
-    } else {
-      return (doc.currSavingsAmt / doc.target) * 100 + "%";
-    }
-  };
 
   const dateFormat = (seconds) => {
     const date = new Date(seconds * 1000);
@@ -132,8 +120,7 @@ function GenerateOldGoal({ doc, deleteItem }) {
                           StyleSheet.absoluteFill,
                           {
                             backgroundColor: "#96D3FF",
-                            width: getPercent(),
-                            // width: (doc.currSavingsAmt / doc.target) * 100 + "%",
+                            width: "100%",
                             borderRadius: 5,
                           },
                         ]}
@@ -180,7 +167,13 @@ function GenerateOldGoal({ doc, deleteItem }) {
                           style={{ flex: 0.1 }}
                         />
                         <Text style={{ flex: 0.8, paddingLeft: 30 }}>
-                          Goal shared with{" "}
+                          <Text style={{ fontWeight: "bold" }}>
+                            {doc.createdByEmail.slice(
+                              0,
+                              doc.createdByEmail.indexOf("@")
+                            )}
+                          </Text>{" "}
+                          shared the goal with{" "}
                           <Text
                             style={{
                               fontWeight: "bold",
@@ -188,10 +181,11 @@ function GenerateOldGoal({ doc, deleteItem }) {
                               flexWrap: "wrap",
                             }}
                           >
-                            {doc.sharingEmails.map(
-                              (email) =>
-                                email.slice(0, email.indexOf("@")) + " "
-                            )}
+                            {doc.sharingEmails
+                              .map((email) =>
+                                email.slice(0, email.indexOf("@"))
+                              )
+                              .join(", ")}
                           </Text>
                         </Text>
                       </View>

@@ -12,10 +12,11 @@
   },
   "dependencies": {
     "@react-native-community/datetimepicker": "6.1.2",
+    "@react-native-community/masked-view": "^0.1.11",
     "@react-native-picker/picker": "2.4.0",
     "@react-navigation/bottom-tabs": "^6.3.1",
-    "@react-navigation/native": "^6.0.10",
-    "@react-navigation/stack": "^6.2.1",
+    "@react-navigation/native": "^6.0.11",
+    "@react-navigation/stack": "^6.2.2",
     "base-64": "^1.0.0",
     "expo": "~45.0.0",
     "expo-image-picker": "~13.1.1",
@@ -46,6 +47,7 @@
     "react-native-mask-text": "^0.7.0",
     "react-native-material-dropdown": "^0.11.1",
     "react-native-material-menu": "^2.0.0",
+    "react-native-safe-area-context": "^3.4.1",
     "react-native-screens": "~3.11.1",
     "react-native-select-dropdown": "^2.0.3",
     "react-native-svg": "^12.3.0",
@@ -54,19 +56,29 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@testing-library/react-native": "^10.1.1",
     "danger": "^11.1.1",
     "jest": "^27.5.1",
     "react-test-renderer": "^17.0.2"
   },
   "jest": {
     "preset": "jest-expo",
-    "testEnvironment": "jsdom",
     "setupFiles": [
       "./config/jest-setup.js"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|radio-buttons-react-native|@expo|react-native-vector-icons)"
-    ]
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|radio-buttons-react-native|react-native-material-menu| react-native-keyboard-aware-scroll-view)"
+    ],
+    "collectCoverage": false,
+    "collectCoverageFrom": [
+      "./pages/Budget/**",
+      "./pages/Goal/**"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "lines": 90
+      }
+    }
   },
   "private": true
 }

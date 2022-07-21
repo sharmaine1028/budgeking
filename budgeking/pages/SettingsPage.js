@@ -155,7 +155,6 @@ class SettingsPage extends React.Component {
 
   editDisplayName = () => {
     this.setState({ displayNameEditable: true });
-
     this.setState({ displayName: auth.currentUser.displayName });
   };
 
