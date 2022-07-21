@@ -9,12 +9,11 @@ import {
 } from "react-native";
 import { GreyLine } from "../../config/reusablePart";
 import { Menu, MenuItem } from "react-native-material-menu";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Header } from "../../config/reusableText";
 import colours from "../../config/colours";
 import { useNavigation } from "@react-navigation/native";
 import { auth, db } from "../../config/firebase";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   const navigation = useNavigation();
@@ -91,13 +90,16 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
     ]);
   };
 
-  const isOffTrack = () => {
+  const isOffTrack = async () => {
     const today = new Date();
     const deadline = doc.deadline;
     const dateCreated = new Date(doc.dateCreated.seconds * 1000);
 
     if (deadline < today) {
-      db.collection("active goals").doc(doc.id).update({ isOffTrack: true });
+      await db
+        .collection("active goals")
+        .doc(doc.id)
+        .update({ isOffTrack: true });
       return;
     }
     // Get supposed amount based on frequency
@@ -123,9 +125,15 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
 
     // Compare supposed amount with curramount
     if (doc.currSavingsAmt < supposedAmt) {
-      db.collection("active goals").doc(doc.id).update({ isOffTrack: true });
+      await db
+        .collection("active goals")
+        .doc(doc.id)
+        .update({ isOffTrack: true });
     } else {
-      db.collection("active goals").doc(doc.id).update({ isOffTrack: false });
+      await db
+        .collection("active goals")
+        .doc(doc.id)
+        .update({ isOffTrack: false });
     }
   };
 

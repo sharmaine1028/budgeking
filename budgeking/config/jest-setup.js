@@ -13,3 +13,5 @@ window.addEventListener = jest.fn();
 window.attachEvent = jest.fn();
 window.alert = jest.fn();
 jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper");
+Date.now = jest.fn(() => 1503187200000);
+jest.mock("@expo/vector-icons");

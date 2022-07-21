@@ -440,7 +440,7 @@ export const dateFormat = (date) => {
     "Dec",
   ];
 
-  return day.toString() + " " + months[month - 1] + " " + year.toString();
+  return day.toString() + " " + months[month] + " " + year.toString();
 };
 
 export const timeFormat = (time) => {

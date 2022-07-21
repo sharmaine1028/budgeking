@@ -33,7 +33,7 @@ describe("Testing react navigation in login and sign up page", () => {
 
     const loginButton = await screen.findByText("Login");
 
-    fireEvent(loginButton, "press");
+    fireEvent.press(loginButton);
 
     const signUpButton = await screen.findByText("Sign up");
 

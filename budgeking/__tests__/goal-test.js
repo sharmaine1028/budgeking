@@ -1,11 +1,12 @@
 import { renderNoGoals } from "../pages/Goal/GoalsPage";
-import renderer from "react-test-renderer";
+import TestRenderer, { act } from "react-test-renderer";
+import { View } from "react-native";
 import GenerateGoal from "../pages/Goal/GenerateGoal";
 
-test("goal renders correctly if empty database", () => {
-  const goals = [];
-  const tree = renderer
-    .create(
+test("goal renders correctly if empty database", async () => {
+  try {
+    const goals = [];
+    const tree = TestRenderer.create(
       goals.length !== 0
         ? goals.map((doc) => (
             <GenerateGoal
@@ -18,12 +19,14 @@ test("goal renders correctly if empty database", () => {
             />
           ))
         : renderNoGoals()
-    )
-    .toJSON();
-  expect(tree).toMatchSnapshot();
+    ).toJSON();
+    expect(tree).toMatchSnapshot();
+  } catch (e) {
+    console.log(e);
+  }
 });
 
-test("goal renders correctly with data", () => {
+test("goal renders correctly with data", async () => {
   const goals = [
     (item = {
       id: 0,
@@ -42,15 +45,16 @@ test("goal renders correctly with data", () => {
       target: 10,
     }),
   ];
-
-  const tree = renderer
-    .create(
-      goals.length !== 0
-        ? goals.map((doc) => (
-            <GenerateGoal key={doc.id} doc={doc} time={"short term"} />
-          ))
-        : renderNoGoals()
-    )
-    .toJSON();
-  expect(tree).toMatchSnapshot();
+  try {
+    const tree = TestRenderer.create(
+      <View>
+        {goals.map((doc) => (
+          <GenerateGoal key={doc.id} doc={doc} time={"short term"} />
+        ))}
+      </View>
+    ).toJSON();
+    expect(tree).toMatchSnapshot();
+  } catch (e) {
+    console.log(e);
+  }
 });

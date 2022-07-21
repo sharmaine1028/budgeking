@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -11,13 +11,10 @@ import { GreyLine } from "../../config/reusablePart";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Header } from "../../config/reusableText";
 import colours from "../../config/colours";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { db } from "../../config/firebase";
 import { Ionicons } from "@expo/vector-icons";
 import { Menu, MenuItem } from "react-native-material-menu";
 
 function GenerateOldGoal({ doc, deleteItem }) {
-  const navigation = useNavigation();
   const [showMore, setShowMore] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
