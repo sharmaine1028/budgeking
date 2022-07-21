@@ -11,22 +11,20 @@ import {
   Dimensions,
   TouchableOpacity,
   Modal,
-  TextInput,
-  Easing,
 } from "react-native";
 import colours from "../../config/colours";
 import { auth, db } from "../../config/firebase";
 import RedLine from "../../config/reusablePart";
-import { Header, Title, SmallTextInput } from "../../config/reusableText";
+import { Header, Title } from "../../config/reusableText";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { PieChart } from "react-native-gifted-charts";
 import CurrencyInput, { TextWithCursor } from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Icon from "react-native-vector-icons/AntDesign";
 import { GreyLine } from "../../config/reusablePart";
 import { BlackButton } from "../../config/reusableButton";
 import { Divider } from "react-native-elements";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
@@ -895,12 +893,12 @@ export const generate3ExpensesLR = (doc) => {
   return (
     <View key={doc.key} style={styles.row}>
       <View style={styles.dateRow}>
-        <Icon.Button
-          name="arrowright"
+        <MaterialCommunityIcons
+          name="arrow-right"
           size={20}
           color={colours.tomato}
           backgroundColor={"transparent"}
-          iconStyle={{ marginLeft: 5, marginRight: 0 }}
+          style={{ marginLeft: 5, marginRight: 5, marginTop: 7 }}
         />
         <Header
           text={`${doc.date.seconds ? dateFormat(doc.date.seconds) : ""}`}

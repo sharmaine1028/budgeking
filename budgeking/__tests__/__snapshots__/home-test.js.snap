@@ -16,48 +16,6 @@ Array [
         }
       }
     >
-      <View
-        accessible={true}
-        focusable={false}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Array [
-            Object {
-              "overflow": "hidden",
-            },
-            Object {
-              "backgroundColor": "transparent",
-              "borderRadius": 5,
-            },
-          ]
-        }
-      >
-        <View
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "flex-start",
-                "padding": 8,
-              },
-              Object {
-                "backgroundColor": "transparent",
-                "borderRadius": 5,
-              },
-              undefined,
-            ]
-          }
-        >
-          <Text />
-        </View>
-      </View>
       <Text
         style={
           Array [
@@ -173,48 +131,6 @@ Array [
         }
       }
     >
-      <View
-        accessible={true}
-        focusable={false}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Array [
-            Object {
-              "overflow": "hidden",
-            },
-            Object {
-              "backgroundColor": "transparent",
-              "borderRadius": 5,
-            },
-          ]
-        }
-      >
-        <View
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "flex-start",
-                "padding": 8,
-              },
-              Object {
-                "backgroundColor": "transparent",
-                "borderRadius": 5,
-              },
-              undefined,
-            ]
-          }
-        >
-          <Text />
-        </View>
-      </View>
       <Text
         style={
           Array [
@@ -330,48 +246,6 @@ Array [
         }
       }
     >
-      <View
-        accessible={true}
-        focusable={false}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Array [
-            Object {
-              "overflow": "hidden",
-            },
-            Object {
-              "backgroundColor": "transparent",
-              "borderRadius": 5,
-            },
-          ]
-        }
-      >
-        <View
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "flex-start",
-                "padding": 8,
-              },
-              Object {
-                "backgroundColor": "transparent",
-                "borderRadius": 5,
-              },
-              undefined,
-            ]
-          }
-        >
-          <Text />
-        </View>
-      </View>
       <Text
         style={
           Array [
