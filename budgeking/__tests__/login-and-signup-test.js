@@ -1,11 +1,20 @@
 import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { render, screen, fireEvent } from "@testing-library/react-native";
+import {
+  render,
+  screen,
+  fireEvent,
+  cleanup,
+  act,
+} from "@testing-library/react-native";
 
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
 
-import { MyStack } from "../App";
+import App, { MyStack } from "../App";
+jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper");
+
+afterEach(cleanup);
 
 describe("Testing react navigation in login and sign up page", () => {
   test("Login page renders correctly", async () => {
@@ -23,20 +32,14 @@ describe("Testing react navigation in login and sign up page", () => {
   });
 
   test("Clicking on sign up link takes you to sign up page", async () => {
-    const component = (
-      <NavigationContainer>
-        <MyStack />
-      </NavigationContainer>
-    );
-
-    render(component);
-
+    render(<App />);
     const signUpLink = await screen.findByText("Sign up");
+    expect(signUpLink).toBeTruthy();
 
-    fireEvent(signUpLink, "press");
+    act(() => {
+      fireEvent(signUpLink, "onPress");
 
-    const signUpfield = await screen.findByText("First name");
-
-    expect(signUpfield).toBeTruthy();
+      expect(screen.toJSON()).toMatchSnapshot();
+    });
   });
 });
