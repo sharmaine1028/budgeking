@@ -176,6 +176,8 @@ class GoalsPage extends React.Component {
   moveToInactive = (id, data) => {
     db.collection("inactive goals").doc(id).set({
       createdBy: data.createdBy,
+      createdByEmail: data.createdByEmail,
+      dateCreated: data.dateCreated,
       goalDescription: data.goalDescription,
       target: data.target,
       frequency: data.frequency,
