@@ -11,11 +11,11 @@ import {
   Text,
   TouchableOpacity,
   Platform,
+  TextInput,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import colours from "../../config/colours";
-import { TextInput } from "react-native-gesture-handler";
 import CurrencyInput from "react-native-currency-input";
 import { auth, db } from "../../config/firebase";
 import { MaterialCommunityIcons } from "@expo/vector-icons";

@@ -15,3 +15,4 @@ window.alert = jest.fn();
 jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper");
 Date.now = jest.fn(() => 1503187200000);
 jest.mock("@expo/vector-icons");
+jest.mock("react-native-keyboard-aware-scroll-view");

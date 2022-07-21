@@ -31,12 +31,12 @@ describe("Testing react navigation in login and sign up page", () => {
 
     render(component);
 
-    const loginButton = await screen.findByText("Login");
+    const signUpLink = await screen.findByText("Sign up");
 
-    fireEvent.press(loginButton);
+    fireEvent(signUpLink, "press");
 
-    const signUpButton = await screen.findByText("Sign up");
+    const signUpfield = await screen.findByText("First name");
 
-    expect(signUpButton).toBeTruthy();
+    expect(signUpfield).toBeTruthy();
   });
 });
