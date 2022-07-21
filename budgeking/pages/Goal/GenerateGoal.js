@@ -9,12 +9,11 @@ import {
 } from "react-native";
 import { GreyLine } from "../../config/reusablePart";
 import { Menu, MenuItem } from "react-native-material-menu";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Header } from "../../config/reusableText";
 import colours from "../../config/colours";
 import { useNavigation } from "@react-navigation/native";
 import { auth, db } from "../../config/firebase";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   const navigation = useNavigation();
@@ -28,15 +27,6 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
   );
 
   useEffect(() => isOffTrack(), [doc.isOffTrack]);
-
-  const getPercent = () => {
-    const percent = (doc.currSavingsAmt / doc.target) * 100;
-    if (percent > 100) {
-      return "100%";
-    } else {
-      return (doc.currSavingsAmt / doc.target) * 100 + "%";
-    }
-  };
 
   const dateFormat = () => {
     const date = doc.deadline;
@@ -100,13 +90,16 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
     ]);
   };
 
-  const isOffTrack = () => {
+  const isOffTrack = async () => {
     const today = new Date();
     const deadline = doc.deadline;
     const dateCreated = new Date(doc.dateCreated.seconds * 1000);
 
     if (deadline < today) {
-      db.collection("active goals").doc(doc.id).update({ isOffTrack: true });
+      await db
+        .collection("active goals")
+        .doc(doc.id)
+        .update({ isOffTrack: true });
       return;
     }
     // Get supposed amount based on frequency
@@ -132,9 +125,15 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
 
     // Compare supposed amount with curramount
     if (doc.currSavingsAmt < supposedAmt) {
-      db.collection("active goals").doc(doc.id).update({ isOffTrack: true });
+      await db
+        .collection("active goals")
+        .doc(doc.id)
+        .update({ isOffTrack: true });
     } else {
-      db.collection("active goals").doc(doc.id).update({ isOffTrack: false });
+      await db
+        .collection("active goals")
+        .doc(doc.id)
+        .update({ isOffTrack: false });
     }
   };
 
@@ -165,13 +164,14 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
           onRequestClose={() => hideMenu(doc.id)}
         >
           <MenuItem
-            onPress={() =>
+            onPress={() => {
               navigation.navigate("Edit Goal", {
                 doc: doc,
                 time: time,
                 editItem: editItem,
-              })
-            }
+              });
+              setIsMenu(false);
+            }}
           >
             Edit
           </MenuItem>
@@ -183,11 +183,19 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
                 time: time,
                 saveItem: saveItem,
               });
+              setIsMenu(false);
             }}
           >
             Save
           </MenuItem>
-          <MenuItem onPress={() => deleteGoal(doc.id)}>Delete</MenuItem>
+          <MenuItem
+            onPress={() => {
+              deleteGoal(doc.id);
+              setIsMenu(false);
+            }}
+          >
+            Delete
+          </MenuItem>
         </Menu>
       </View>
 
@@ -217,8 +225,12 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
                 StyleSheet.absoluteFill,
                 {
                   backgroundColor: "#96D3FF",
-                  width: getPercent(),
-                  // width: (doc.currSavingsAmt / doc.target) * 100 + "%",
+                  width: `${
+                    (doc.currSavingsAmt / doc.target) * 100 >= 100
+                      ? "100%"
+                      : (doc.currSavingsAmt / doc.target) * 100 + "%"
+                  }`,
+
                   borderRadius: 5,
                 },
               ]}

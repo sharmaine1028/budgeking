@@ -8,3 +8,22 @@ jest.mock("@react-navigation/native", () => {
     }),
   };
 });
+
+window.addEventListener = jest.fn();
+window.attachEvent = jest.fn();
+window.alert = jest.fn();
+
+jest.mock("@expo/vector-icons");
+
+jest.mock("react-native-keyboard-aware-scroll-view");
+
+jest.mock(
+  "react-native/Libraries/Components/Touchable/TouchableOpacity",
+  () => "TouchableOpacity"
+);
+
+jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper");
+
+const fakeNavigation = {
+  navigate: jest.fn(),
+};

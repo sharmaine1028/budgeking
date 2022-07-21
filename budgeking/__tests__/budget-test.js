@@ -3,7 +3,7 @@ import { dateFormat, timeFormat } from "../pages/Budget/BudgetPage";
 // Date Format
 test("date formats correctly", () => {
   const date = new Date(2022, 11, 12);
-  expect(dateFormat(date)).toBe("12 Nov 2022");
+  expect(dateFormat(date)).toBe("12 Dec 2022");
 });
 
 // Time Format

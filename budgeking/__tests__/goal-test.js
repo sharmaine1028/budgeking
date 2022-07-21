@@ -1,37 +1,32 @@
 import { renderNoGoals } from "../pages/Goal/GoalsPage";
-import renderer from "react-test-renderer";
+import TestRenderer, { act } from "react-test-renderer";
+import { View } from "react-native";
 import GenerateGoal from "../pages/Goal/GenerateGoal";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
 
-test("goal renders no goals yet if empty database", () => {
-  const goals = [];
-  const tree = renderer.create(
-    goals.length !== 0
-      ? goals.map((doc) => (
-          <GenerateGoal
-            key={doc.id}
-            doc={doc}
-            time={"short term"}
-            deleteItem={this.deleteGoal}
-            saveItem={this.saveToGoal}
-            editItem={this.editGoal}
-          />
-        ))
-      : renderNoGoals()
-  );
-  expect(tree).toMatchSnapshot();
+test("goal renders correctly if empty database", async () => {
+  try {
+    const goals = [];
+    const tree = TestRenderer.create(
+      goals.length !== 0
+        ? goals.map((doc) => (
+            <GenerateGoal
+              key={doc.id}
+              doc={doc}
+              time={"short term"}
+              deleteItem={this.deleteGoal}
+              saveItem={this.saveToGoal}
+              editItem={this.editGoal}
+            />
+          ))
+        : renderNoGoals()
+    ).toJSON();
+    expect(tree).toMatchSnapshot();
+  } catch (e) {
+    console.log(e);
+  }
 });
 
-test("goal renders correctly with data", () => {
-  const Stack = createStackNavigator();
-  const MockNavigator = (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="MockedScreen" component={GenerateGoal} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
+test("goal renders correctly with data", async () => {
   const goals = [
     (item = {
       id: 0,
@@ -50,25 +45,16 @@ test("goal renders correctly with data", () => {
       target: 10,
     }),
   ];
-
-  jest.mock("@react-navigation/native", () => {
-    const actualNav = jest.requireActual("@react-navigation/native");
-    return {
-      ...actualNav,
-      useNavigation: () => ({
-        navigate: jest.fn(),
-        dispatch: jest.fn(),
-      }),
-    };
-  });
-  const tree = renderer
-    .create(
-      goals.length !== 0
-        ? goals.map((doc) => (
-            <GenerateGoal key={doc.id} doc={doc} time={"short term"} />
-          ))
-        : renderNoGoals()
-    )
-    .toJSON();
-  expect(tree).toMatchSnapshot();
+  try {
+    const tree = TestRenderer.create(
+      <View>
+        {goals.map((doc) => (
+          <GenerateGoal key={doc.id} doc={doc} time={"short term"} />
+        ))}
+      </View>
+    ).toJSON();
+    expect(tree).toMatchSnapshot();
+  } catch (e) {
+    console.log(e);
+  }
 });

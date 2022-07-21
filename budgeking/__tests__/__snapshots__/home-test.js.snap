@@ -1,18 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Table view renders no records yet if empty database 1`] = `
-<Text
-  style={
-    Object {
-      "alignSelf": "center",
-      "marginTop": 20,
-    }
-  }
->
-  No Records Yet
-</Text>
-`;
-
 exports[`expenses renders correctly with data 1`] = `
 Array [
   <View
@@ -487,4 +474,17 @@ Array [
     />
   </View>,
 ]
+`;
+
+exports[`table view renders no records yet if empty database 1`] = `
+<Text
+  style={
+    Object {
+      "alignSelf": "center",
+      "marginTop": 20,
+    }
+  }
+>
+  No Records Yet
+</Text>
 `;
