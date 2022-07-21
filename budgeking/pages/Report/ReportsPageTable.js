@@ -7,8 +7,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { auth, db } from "../../config/firebase";
 import { BlackButton } from "../../config/reusableButton";
 import { GreyLine } from "../../config/reusablePart";
-
-// dateFormat, timeFormat() to localdatestring() and localtimestring()
+import { dateFormat, categoryFormat, timeFormat } from "../Home/HomePage";
 
 class ReportsPageTable extends React.Component {
   constructor() {
@@ -166,58 +165,9 @@ class ReportsPageTable extends React.Component {
     return customArray;
   }
 
-  dateFormat = (seconds) => {
-    const date = new Date(seconds * 1000);
-    const [day, month, year] = [
-      date.getDate(),
-      date.getMonth(),
-      date.getFullYear(),
-    ];
-
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
-    return day.toString() + " " + months[month] + " " + year.toString();
-  };
-
-  categoryFormat(category) {
-    if (category == "food and drinks") {
-      return "Food & Drinks";
-    } else {
-      return category.charAt(0).toUpperCase() + category.slice(1);
-    }
-  }
-
-  timeFormat(seconds) {
-    var t = new Date(seconds * 1000);
-    var hours = t.getHours();
-    var minutes = t.getMinutes();
-    var newFormat = t.getHours() > 12 ? "PM" : "AM";
-
-    hours = hours % 12;
-
-    hours = hours != 0 ? hours : 12;
-
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-    var formatted = hours + ":" + minutes + " " + newFormat;
-    return formatted;
-  }
-
   sortedArr(arr) {
     let sortedArr = arr.sort((a, b) => {
-      if (this.dateFormat(a.date.seconds) == this.dateFormat(b.date.seconds)) {
+      if (dateFormat(a.date.seconds) == dateFormat(b.date.seconds)) {
         return b.time.seconds - a.time.seconds;
       } else {
         return b.date.seconds - a.date.seconds;
@@ -240,7 +190,7 @@ class ReportsPageTable extends React.Component {
             iconStyle={{ marginLeft: 5, marginRight: 0 }}
           />
           <Header
-            text={`${this.dateFormat(doc.date.seconds)}`}
+            text={`${dateFormat(doc.date.seconds)}`}
             style={{ fontWeight: "bold", marginTop: 12 }}
           />
         </View>
@@ -248,7 +198,7 @@ class ReportsPageTable extends React.Component {
 
         <View style={styles.categoryRow}>
           <Header
-            text={this.categoryFormat(doc.category)}
+            text={categoryFormat(doc.category)}
             style={styles.expenseCategory}
           />
 
@@ -257,9 +207,7 @@ class ReportsPageTable extends React.Component {
 
         <View style={styles.notesRow}>
           <Text style={styles.noteText}>{doc.notes}</Text>
-          <Text style={styles.timeText}>
-            {this.timeFormat(doc.time.seconds)}
-          </Text>
+          <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
         </View>
       </View>
     );

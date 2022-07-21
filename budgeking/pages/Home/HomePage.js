@@ -293,7 +293,7 @@ class HomePage extends React.Component {
     var text = "";
     pieText.map((item, i) => {
       if (category == pieText[i]["category"]) {
-        text += this.categoryFormat(category);
+        text += categoryFormat(category);
         text += ", ";
         text += pieText[i]["text"];
         return text;
@@ -377,7 +377,7 @@ class HomePage extends React.Component {
 
   sortedArr(arr) {
     let sortedArr = arr.sort((a, b) => {
-      if (this.dateFormat(a.date.seconds) == this.dateFormat(b.date.seconds)) {
+      if (dateFormat(a.date.seconds) == dateFormat(b.date.seconds)) {
         return b.time.seconds - a.time.seconds;
       } else {
         return b.date.seconds - a.date.seconds;
@@ -401,55 +401,6 @@ class HomePage extends React.Component {
     return show3Ex;
   }
 
-  dateFormat = (seconds) => {
-    const date = new Date(seconds * 1000);
-    const [day, month, year] = [
-      date.getDate(),
-      date.getMonth(),
-      date.getFullYear(),
-    ];
-
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
-    return day.toString() + " " + months[month] + " " + year.toString();
-  };
-
-  categoryFormat(category) {
-    if (category == "food and drinks") {
-      return "Food & Drinks";
-    } else {
-      return category.charAt(0).toUpperCase() + category.slice(1);
-    }
-  }
-
-  timeFormat(seconds) {
-    var t = new Date(seconds * 1000);
-    var hours = t.getHours();
-    var minutes = t.getMinutes();
-    var newFormat = t.getHours() > 12 ? "PM" : "AM";
-
-    hours = hours % 12;
-
-    hours = hours != 0 ? hours : 12;
-
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-    var formatted = hours + ":" + minutes + " " + newFormat;
-    return formatted;
-  }
-
   generate3ExpensesLR = (doc) => {
     // console.log("docs", doc);
     return (
@@ -463,14 +414,14 @@ class HomePage extends React.Component {
             iconStyle={{ marginLeft: 5, marginRight: 0 }}
           />
           <Header
-            text={`${this.dateFormat(doc.date.seconds)}`}
+            text={`${dateFormat(doc.date.seconds)}`}
             style={{ fontWeight: "bold", marginTop: 12 }}
           />
         </View>
 
         <View style={styles.categoryRow}>
           <Header
-            text={this.categoryFormat(doc.category)}
+            text={categoryFormat(doc.category)}
             style={styles.expenseCategory}
           />
 
@@ -479,9 +430,7 @@ class HomePage extends React.Component {
 
         <View style={styles.notesRow}>
           <Text style={styles.noteText}>{doc.notes}</Text>
-          <Text style={styles.timeText}>
-            {this.timeFormat(doc.time.seconds)}
-          </Text>
+          <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
         </View>
         <GreyLine />
       </View>
@@ -840,7 +789,7 @@ class HomePage extends React.Component {
           <View style={styles.reportPieChart}>
             <Header
               style={{ fontWeight: "500" }}
-              text={`${"\n"} Categories (${this.textBesideCategories()} ${this.categoryFormat(
+              text={`${"\n"} Categories (${this.textBesideCategories()} ${categoryFormat(
                 this.state.timeUserWants
               )} Expenses)\n\n`}
             />
@@ -915,8 +864,59 @@ class HomePage extends React.Component {
   }
 }
 
-// const win = Dimensions.get('window')
+// export to test
+export const dateFormat = (seconds) => {
+  const date = new Date(seconds * 1000);
+  const [day, month, year] = [
+    date.getDate(),
+    date.getMonth(),
+    date.getFullYear(),
+  ];
 
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  return day.toString() + " " + months[month] + " " + year.toString();
+};
+
+// export to test
+export function categoryFormat(category) {
+  if (category == "food and drinks") {
+    return "Food & Drinks";
+  } else {
+    return category.charAt(0).toUpperCase() + category.slice(1);
+  }
+}
+
+// export to test
+export function timeFormat(seconds) {
+  var t = new Date(seconds * 1000);
+  var hours = t.getHours();
+  var minutes = t.getMinutes();
+  var newFormat = t.getHours() > 12 ? "PM" : "AM";
+
+  hours = hours % 12;
+
+  hours = hours != 0 ? hours : 12;
+
+  minutes = minutes < 10 ? "0" + minutes : minutes;
+  var formatted = hours + ":" + minutes + " " + newFormat;
+  return formatted;
+}
+
+// const win = Dimensions.get('window')
 const styles = StyleSheet.create({
   container: {
     flex: 1,
