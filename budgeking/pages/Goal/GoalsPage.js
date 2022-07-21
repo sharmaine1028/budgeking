@@ -135,7 +135,7 @@ class GoalsPage extends React.Component {
                 editItem={this.editGoal}
               />
             ))
-          : this.renderNoGoals()}
+          : renderNoGoals()}
       </KeyboardAwareScrollView>
     );
   }
