@@ -21,15 +21,6 @@ function GenerateOldGoal({ doc, deleteItem }) {
   const [showMore, setShowMore] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
-  const getPercent = () => {
-    const percent = (doc.currSavingsAmt / doc.target) * 100;
-    if (percent > 100) {
-      return "100%";
-    } else {
-      return (doc.currSavingsAmt / doc.target) * 100 + "%";
-    }
-  };
-
   const dateFormat = (seconds) => {
     const date = new Date(seconds * 1000);
     const [day, month, year] = [
@@ -132,8 +123,7 @@ function GenerateOldGoal({ doc, deleteItem }) {
                           StyleSheet.absoluteFill,
                           {
                             backgroundColor: "#96D3FF",
-                            width: getPercent(),
-                            // width: (doc.currSavingsAmt / doc.target) * 100 + "%",
+                            width: "100%",
                             borderRadius: 5,
                           },
                         ]}
@@ -180,7 +170,13 @@ function GenerateOldGoal({ doc, deleteItem }) {
                           style={{ flex: 0.1 }}
                         />
                         <Text style={{ flex: 0.8, paddingLeft: 30 }}>
-                          Goal shared with{" "}
+                          <Text style={{ fontWeight: "bold" }}>
+                            {doc.createdByEmail.slice(
+                              0,
+                              doc.createdByEmail.indexOf("@")
+                            )}
+                          </Text>{" "}
+                          shared the goal with{" "}
                           <Text
                             style={{
                               fontWeight: "bold",
@@ -188,10 +184,11 @@ function GenerateOldGoal({ doc, deleteItem }) {
                               flexWrap: "wrap",
                             }}
                           >
-                            {doc.sharingEmails.map(
-                              (email) =>
-                                email.slice(0, email.indexOf("@")) + " "
-                            )}
+                            {doc.sharingEmails
+                              .map((email) =>
+                                email.slice(0, email.indexOf("@"))
+                              )
+                              .join(", ")}
                           </Text>
                         </Text>
                       </View>
