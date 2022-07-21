@@ -186,7 +186,7 @@ class GoalsPage extends React.Component {
       notes: data.notes,
       isSharing: data.isSharing,
       sharingEmails: data.sharingEmails,
-      currSavingsAmt: data.currSavingsAmt,
+      currSavingsAmt: data.target,
     });
   };
 

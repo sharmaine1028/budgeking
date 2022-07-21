@@ -40,9 +40,17 @@ class HomePage extends React.Component {
       .collection("users")
       .doc(auth.currentUser.uid)
       .collection("expense");
-    this.offTrackGoalsRef = db
-      .collection("active goals")
-      .where("sharingEmails", "array-contains", auth.currentUser.email);
+    this.activeGoalsRef = db.collection("active goals");
+    this.activeGoalsOri = this.activeGoalsRef.where(
+      "createdBy",
+      "==",
+      auth.currentUser.uid
+    );
+    this.activeGoalsShared = this.activeGoalsRef.where(
+      "sharingEmails",
+      "array-contains",
+      auth.currentUser.email
+    );
     this.state = {
       name: auth.currentUser.displayName,
       email: auth.currentUser.email,
@@ -83,7 +91,10 @@ class HomePage extends React.Component {
   // calling budgetValue from firestore
   componentDidMount() {
     this.unsubscribe = this.fireStoreRef.onSnapshot(this.getCollection);
-    this.unsubscribeOffTrackGoals = this.offTrackGoalsRef.onSnapshot(
+    this.unsubscribeActiveGoalsOri = this.activeGoalsOri.onSnapshot(
+      this.getOffTrackGoals
+    );
+    this.unsubscribeActiveGoalsShared = this.activeGoalsShared.onSnapshot(
       this.getOffTrackGoals
     );
     this.callBudgetValue();
@@ -104,7 +115,8 @@ class HomePage extends React.Component {
 
   componentWillUnmount() {
     this.unsubscribe();
-    this.unsubscribeOffTrackGoals();
+    this.unsubscribeActiveGoalsOri();
+    this.unsubscribeActiveGoalsShared();
   }
 
   getCollection = (querySnapshot) => {
