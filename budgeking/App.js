@@ -338,14 +338,14 @@ export function MyTabs() {
           headerShown: false,
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Goal"
         component={GoalsAll}
         options={{
           tabBarHideOnKeyboard: true,
           headerShown: false,
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Budget"
         component={BudgetAll}
