@@ -488,23 +488,6 @@ class HomePage extends React.Component {
     this.setState({ showBudgetValueModal: false });
   }
 
-  renderLegend = (text, color) => {
-    return (
-      <View style={{ flexDirection: "row", marginBottom: 12 }}>
-        <View
-          style={{
-            height: 18,
-            width: 18,
-            marginRight: 10,
-            borderRadius: 4,
-            backgroundColor: color || "white",
-          }}
-        />
-        <Text style={{ color: "#444444", fontSize: 16 }}>{text || ""}</Text>
-      </View>
-    );
-  };
-
   maybeLegend() {
     return <View></View>;
   }
@@ -771,9 +754,7 @@ class HomePage extends React.Component {
               }}
             >
               {this.checkEmptyPieData()
-                ? legendArr.map((legend) =>
-                    this.renderLegend(legend[0], legend[1])
-                  )
+                ? legendArr.map((legend) => renderLegend(legend[0], legend[1]))
                 : this.maybeLegend()}
             </View>
           </View>
@@ -920,6 +901,23 @@ export const generate3ExpensesLR = (doc) => {
         <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
       </View>
       <GreyLine />
+    </View>
+  );
+};
+
+export const renderLegend = (text, color) => {
+  return (
+    <View style={{ flexDirection: "row", marginBottom: 12 }}>
+      <View
+        style={{
+          height: 18,
+          width: 18,
+          marginRight: 10,
+          borderRadius: 4,
+          backgroundColor: color || "white",
+        }}
+      />
+      <Text style={{ color: "#444444", fontSize: 16 }}>{text || ""}</Text>
     </View>
   );
 };
