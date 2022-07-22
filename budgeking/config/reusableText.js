@@ -14,6 +14,14 @@ function reusableText(props) {
   return <div></div>;
 }
 
+export const ChangeUsername = () => {
+  return <Header text={"Change username"} />;
+};
+
+export const ChangePassword = () => {
+  return <Header text={"Change password"} />;
+};
+
 export function Footer({ onPress, text, desc }) {
   return (
     <View style={styles.footerView}>

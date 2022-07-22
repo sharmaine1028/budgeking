@@ -17,6 +17,7 @@ import colours from "../config/colours";
 import * as ImagePicker from "expo-image-picker";
 import uuid from "uuid";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { ChangeUsername, ChangePassword } from "../config/reusableText";
 
 class SettingsPage extends React.Component {
   constructor() {
@@ -89,7 +90,7 @@ class SettingsPage extends React.Component {
             </View>
           </TouchableOpacity>
         </View>
-        <Header text={"Change username"} />
+        <ChangeUsername />
         <IconTextInput
           placeholder={this.state.currDisplayName}
           icon={
@@ -112,7 +113,7 @@ class SettingsPage extends React.Component {
           onPress={(val) => this.updateUserDisplayName(val)}
         />
 
-        <Header text={"Change password"} />
+        <ChangePassword />
         <IconTextInput
           placeholder={"********"}
           icon={
