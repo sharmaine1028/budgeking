@@ -223,7 +223,6 @@ class AllTableView extends React.Component {
           <Text style={styles.noteText}>{doc.notes}</Text>
           <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
         </View>
-
         <GreyLine />
         <View style={styles.dateRow}>
           <Image

@@ -7,9 +7,14 @@ import { auth, db } from "../../config/firebase";
 import { BlackButton } from "../../config/reusableButton";
 import { GreyLine } from "../../config/reusablePart";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Image } from "react-native";
 
 // dateFormat, timeFormat() to localdatestring() and localtimestring()
+=======
+import { dateFormat, categoryFormat, timeFormat } from "../Home/HomePage";
+import { renderNoRecords } from "../Home/HomePage";
+>>>>>>> origin
 =======
 import { dateFormat, categoryFormat, timeFormat } from "../Home/HomePage";
 import { renderNoRecords } from "../Home/HomePage";
