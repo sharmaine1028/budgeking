@@ -103,51 +103,6 @@ class ReportsPageTable extends React.Component {
     });
   };
 
-  getMonthlyData(doc) {
-    const currMonth = new Date().getMonth();
-    const currYear = new Date().getFullYear();
-    // console.log("currmonth", currMonth)
-    const arrayTimeConverted = doc;
-    const monthlyArray = [];
-    arrayTimeConverted.map((item, i) => {
-      const dateItem = arrayTimeConverted[i]["date"];
-      // console.log("dateitem", dateItem)
-      if (
-        dateItem.toDate().getMonth() == currMonth &&
-        dateItem.toDate().getFullYear() == currYear
-      ) {
-        monthlyArray.push(arrayTimeConverted[i]);
-      }
-    });
-    return monthlyArray;
-  }
-
-  getDailyData(doc) {
-    const currDate = new Date().toLocaleDateString();
-    const arrayTimeConverted = doc;
-    const dailyArray = [];
-    arrayTimeConverted.map((item, i) => {
-      const dateItem = arrayTimeConverted[i]["date"];
-      if (dateItem.toDate().toLocaleDateString() == currDate) {
-        dailyArray.push(arrayTimeConverted[i]);
-      }
-    });
-    return dailyArray;
-  }
-
-  getYearlyData(doc) {
-    const currYear = new Date().getFullYear();
-    const arrayTimeConverted = doc;
-    const yearlyArray = [];
-    arrayTimeConverted.map((item, i) => {
-      const dateItem = arrayTimeConverted[i]["date"];
-      if (dateItem.toDate().getFullYear() == currYear) {
-        yearlyArray.push(arrayTimeConverted[i]);
-      }
-    });
-    return yearlyArray;
-  }
-
   getCustomData(doc) {
     // console.log("dateto", this.state.dateTo.seconds);
     // console.log("datef", this.state.dateFrom.seconds);
@@ -215,11 +170,11 @@ class ReportsPageTable extends React.Component {
 
   whichExpense() {
     if (this.state.timeUserWants === "This Month") {
-      return this.getMonthlyData(this.state.expenseArr);
+      return getMonthlyData(this.state.expenseArr);
     } else if (this.state.timeUserWants == "Today") {
-      return this.getDailyData(this.state.expenseArr);
+      return getDailyData(this.state.expenseArr);
     } else if (this.state.timeUserWants == "This Year") {
-      return this.getYearlyData(this.state.expenseArr);
+      return getYearlyData(this.state.expenseArr);
     } else {
       return this.getCustomData(this.state.expenseArr);
     }
@@ -227,11 +182,11 @@ class ReportsPageTable extends React.Component {
 
   whichIncome() {
     if (this.state.timeUserWants === "This Month") {
-      return this.getMonthlyData(this.state.incomeArr);
+      return getMonthlyData(this.state.incomeArr);
     } else if (this.state.timeUserWants == "Today") {
-      return this.getDailyData(this.state.incomeArr);
+      return getDailyData(this.state.incomeArr);
     } else if (this.state.timeUserWants == "This Year") {
-      return this.getYearlyData(this.state.incomeArr);
+      return getYearlyData(this.state.incomeArr);
     } else {
       return this.getCustomData(this.state.incomeArr);
     }
@@ -314,6 +269,50 @@ class ReportsPageTable extends React.Component {
       </View>
     );
   }
+}
+
+export function getMonthlyData(doc) {
+  const currMonth = new Date().getTime() / 1000;
+  const currYear = new Date().getFullYear().toString();
+  const arrayTimeConverted = doc;
+  const monthlyArray = [];
+  arrayTimeConverted.map((item, i) => {
+    const dateItem = arrayTimeConverted[i]["date"];
+    if (
+      dateFormat(dateItem.seconds).slice(-8, -5) ==
+        dateFormat(currMonth).slice(-8, -5) &&
+      dateFormat(dateItem.seconds).slice(-4) == currYear
+    ) {
+      monthlyArray.push(arrayTimeConverted[i]);
+    }
+  });
+  return monthlyArray;
+}
+
+export function getDailyData(doc) {
+  const currDate = new Date().getTime() / 1000;
+  const arrayTimeConverted = doc;
+  const dailyArray = [];
+  arrayTimeConverted.map((item, i) => {
+    const dateItem = arrayTimeConverted[i]["date"];
+    if (dateFormat(dateItem.seconds) == dateFormat(currDate)) {
+      dailyArray.push(arrayTimeConverted[i]);
+    }
+  });
+  return dailyArray;
+}
+
+export function getYearlyData(doc) {
+  const currYear = new Date().getFullYear().toString();
+  const arrayTimeConverted = doc;
+  const yearlyArray = [];
+  arrayTimeConverted.map((item, i) => {
+    const dateItem = arrayTimeConverted[i]["date"];
+    if (dateFormat(dateItem.seconds).slice(-4) == currYear) {
+      yearlyArray.push(arrayTimeConverted[i]);
+    }
+  });
+  return yearlyArray;
 }
 
 const styles = StyleSheet.create({

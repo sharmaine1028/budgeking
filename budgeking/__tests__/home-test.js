@@ -113,6 +113,7 @@ test("expenses renders correctly with data", async () => {
   }
 });
 
+// renderLegend
 test("pie chart renders legend correctly", async () => {
   const legend = [
     ["Food & Drinks", "#177AD5"],

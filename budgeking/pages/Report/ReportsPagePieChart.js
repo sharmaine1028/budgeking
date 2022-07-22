@@ -5,8 +5,6 @@ import {
   View,
   ActivityIndicator,
   Dimensions,
-  RefreshControl,
-  ScrollView,
 } from "react-native";
 import colours from "../../config/colours";
 import { auth, db } from "../../config/firebase";
@@ -17,12 +15,11 @@ import { BlackButton } from "../../config/reusableButton";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { dateFormat, categoryFormat, renderLegend } from "../Home/HomePage";
-
-// **************custom date choosing - chart only changes after refreshing (idk how to refresh)
-
-// const wait = (timeout) => {
-//   return new Promise((resolve) => setTimeout(resolve, timeout));
-// };
+import {
+  getMonthlyData,
+  getDailyData,
+  getYearlyData,
+} from "../Report/ReportsPageTable";
 
 class ReportsPagePieChart extends React.Component {
   constructor() {
@@ -57,11 +54,6 @@ class ReportsPagePieChart extends React.Component {
       // setRefreshing: false,
     };
   }
-
-  // onRefresh = () => {
-  //   this.setState({ setRefreshing: true });
-  //   wait(2000).then(() => this.setState({ setRefreshing: false }));
-  // };
 
   updateInputVal(val, prop) {
     const state = this.state;
@@ -118,21 +110,6 @@ class ReportsPagePieChart extends React.Component {
     this.inputCustExpenseFireStore();
   }
 
-  // update pie chart based on update on dateTo and dateFrom
-  // componentDidUpdate(prevProps) {
-  //   console.log("componentdidupdatedateto", this.state.dateTo);
-  //   console.log("componentdidupdatedatef", this.state.dateFrom);
-  //   if (
-  //     this.props.dateFrom !== prevProps.dateFrom ||
-  //     this.props.dateTo !== prevProps.dateTo
-  //   ) {
-  //     this.fetchData(this.props.dateTo);
-  //     this.fetchData(this.props.dateFrom);
-  //   }
-  //   console.log("componentdidupdatedateto", this.state.dateTo);
-  //   console.log("componentdidupdatedatef", this.state.dateFrom);
-  // }
-
   getCollection = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
@@ -184,7 +161,7 @@ class ReportsPagePieChart extends React.Component {
 
   addExpensesMonthly() {
     let sum = 0;
-    this.getMonthlyData().map((item, i) => {
+    getMonthlyData(this.state.expenseArr).map((item, i) => {
       sum += item.value;
     });
     return sum.toFixed(2);
@@ -192,7 +169,7 @@ class ReportsPagePieChart extends React.Component {
 
   addExpensesDaily() {
     let sum = 0;
-    this.getDailyData().map((item, i) => {
+    getDailyData(this.state.expenseArr).map((item, i) => {
       sum += item.value;
     });
     return sum.toFixed(2);
@@ -200,7 +177,7 @@ class ReportsPagePieChart extends React.Component {
 
   addExpensesYearly() {
     let sum = 0;
-    this.getYearlyData().map((item, i) => {
+    getYearlyData(this.state.expenseArr).map((item, i) => {
       sum += item.value;
     });
     return sum.toFixed(2);
@@ -236,7 +213,7 @@ class ReportsPagePieChart extends React.Component {
       { category: "education", value: 0, color: "#FDE74C" },
       { category: "others", value: 0, color: "#E8E0CE" },
     ];
-    this.getMonthlyData().map((item, i) => {
+    getMonthlyData(this.state.expenseArr).map((item, i) => {
       if (item.category == "food and drinks") {
         pieDataPush[0]["value"] += item.value;
       } else if (item.category == "transportation") {
@@ -266,7 +243,7 @@ class ReportsPagePieChart extends React.Component {
       { category: "education", value: 0, color: "#FDE74C" },
       { category: "others", value: 0, color: "#E8E0CE" },
     ];
-    this.getDailyData().map((item, i) => {
+    getDailyData(this.state.expenseArr).map((item, i) => {
       if (item.category == "food and drinks") {
         pieDataPush[0]["value"] += item.value;
       } else if (item.category == "transportation") {
@@ -296,7 +273,7 @@ class ReportsPagePieChart extends React.Component {
       { category: "education", value: 0, color: "#FDE74C" },
       { category: "others", value: 0, color: "#E8E0CE" },
     ];
-    this.getYearlyData().map((item, i) => {
+    getYearlyData(this.state.expenseArr).map((item, i) => {
       if (item.category == "food and drinks") {
         pieDataPush[0]["value"] += item.value;
       } else if (item.category == "transportation") {
@@ -367,51 +344,6 @@ class ReportsPagePieChart extends React.Component {
       }
     });
     return text;
-  }
-
-  getMonthlyData() {
-    const currMonth = new Date().getMonth();
-    const currYear = new Date().getFullYear();
-    // console.log("currmonth", currMonth)
-    const expenseArrayTimeConverted = this.state.expenseArr;
-    const monthlyExpenseArray = [];
-    expenseArrayTimeConverted.map((item, i) => {
-      const dateItem = expenseArrayTimeConverted[i]["date"];
-      // console.log("dateitem", dateItem)
-      if (
-        dateItem.toDate().getMonth() == currMonth &&
-        dateItem.toDate().getFullYear() == currYear
-      ) {
-        monthlyExpenseArray.push(expenseArrayTimeConverted[i]);
-      }
-    });
-    return monthlyExpenseArray;
-  }
-
-  getDailyData() {
-    const currDate = new Date().toLocaleDateString();
-    const expenseArrayTimeConverted = this.state.expenseArr;
-    const dailyExpenseArray = [];
-    expenseArrayTimeConverted.map((item, i) => {
-      const dateItem = expenseArrayTimeConverted[i]["date"];
-      if (dateItem.toDate().toLocaleDateString() == currDate) {
-        dailyExpenseArray.push(expenseArrayTimeConverted[i]);
-      }
-    });
-    return dailyExpenseArray;
-  }
-
-  getYearlyData() {
-    const currYear = new Date().getFullYear();
-    const expenseArrayTimeConverted = this.state.expenseArr;
-    const yearlyExpenseArray = [];
-    expenseArrayTimeConverted.map((item, i) => {
-      const dateItem = expenseArrayTimeConverted[i]["date"];
-      if (dateItem.toDate().getFullYear() == currYear) {
-        yearlyExpenseArray.push(expenseArrayTimeConverted[i]);
-      }
-    });
-    return yearlyExpenseArray;
   }
 
   getCustomData() {
@@ -528,11 +460,11 @@ class ReportsPagePieChart extends React.Component {
 
   checkEmptyPieData() {
     if (this.state.timeUserWants === "This Month") {
-      return this.getMonthlyData().length != 0;
+      return getMonthlyData(this.state.expenseArr).length != 0;
     } else if (this.state.timeUserWants == "Today") {
-      return this.getDailyData().length != 0;
+      return getDailyData(this.state.expenseArr).length != 0;
     } else if (this.state.timeUserWants == "This Year") {
-      return this.getYearlyData().length != 0;
+      return getYearlyData(this.state.expenseArr).length != 0;
     } else {
       return this.getCustomData().length != 0;
     }
