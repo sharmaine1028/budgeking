@@ -70,6 +70,7 @@ export default class SignupPage extends React.Component {
         />
         <BrownTextInput
           placeholder={"First name"}
+          maxLength={15}
           onChangeText={(val) => this.updateInputVal(val, "firstName")}
           value={this.state.firstName}
         />
