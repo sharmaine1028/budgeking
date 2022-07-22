@@ -1,11 +1,22 @@
 import React from "react";
-import { StyleSheet, ScrollView, View, Text } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  Linking,
+} from "react-native";
 import { Header, Title } from "../../config/reusableText";
 import colours from "../../config/colours";
 import Icon from "react-native-vector-icons/AntDesign";
 import { auth, db } from "../../config/firebase";
 import { BlackButton } from "../../config/reusableButton";
 import { GreyLine } from "../../config/reusablePart";
+import { Image } from "react-native";
+
+// dateFormat, timeFormat() to localdatestring() and localtimestring()
+
 import { dateFormat, categoryFormat, timeFormat } from "../Home/HomePage";
 import { renderNoRecords } from "../Home/HomePage";
 
@@ -70,7 +81,8 @@ class ReportsPageTable extends React.Component {
   getCollectionExpense = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { notes, value, category, date, time } = res.data();
+      const { notes, value, category, date, time, photoURL, address } =
+        res.data();
       expenseArrPush.push({
         key: res.id,
         value,
@@ -78,6 +90,8 @@ class ReportsPageTable extends React.Component {
         category,
         date,
         time,
+        photoURL,
+        address,
       });
     });
     this.setState({
@@ -88,7 +102,8 @@ class ReportsPageTable extends React.Component {
   getCollectionIncome = (querySnapshot) => {
     const incomeArrPush = [];
     querySnapshot.forEach((res) => {
-      const { category, date, notes, value, time } = res.data();
+      const { category, date, notes, value, time, photoURL, address } =
+        res.data();
       incomeArrPush.push({
         key: res.id,
         value,
@@ -96,6 +111,8 @@ class ReportsPageTable extends React.Component {
         notes,
         date,
         time,
+        photoURL,
+        address,
       });
     });
     this.setState({
@@ -131,6 +148,23 @@ class ReportsPageTable extends React.Component {
     return sortedArr;
   }
 
+  generatePhotoAttached(doc) {
+    return (
+      <View>
+        <TouchableOpacity>
+          <Text
+            onPress={() => {
+              Linking.openURL(doc.photoURL);
+            }}
+            style={{ marginTop: 5, fontWeight: "300", fontSize: 14 }}
+          >
+            Click here to view
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   generateExpensesIncome = (doc) => {
     return (
       <View key={doc.key} style={styles.row}>
@@ -148,6 +182,14 @@ class ReportsPageTable extends React.Component {
             text={`${dateFormat(doc.date.seconds)}`}
             style={{ fontWeight: "bold", marginTop: 12 }}
           />
+
+          <View style={{ flex: 1, justifyContent: "center" }}>
+            <Text
+              style={[styles.timeText, { alignSelf: "flex-end", marginTop: 8 }]}
+            >
+              {timeFormat(doc.time.seconds)}
+            </Text>
+          </View>
         </View>
         <GreyLine />
 
@@ -160,9 +202,41 @@ class ReportsPageTable extends React.Component {
           <Text style={styles.valueText}>{`$${doc.value}`}</Text>
         </View>
 
-        <View style={styles.notesRow}>
-          <Text style={styles.noteText}>{doc.notes}</Text>
-          <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
+        {doc.notes ? (
+          <View style={styles.notesRow}>
+            <Text style={styles.noteText}>{doc.notes}</Text>
+          </View>
+        ) : (
+          <View style={{ marginBottom: 5 }} />
+        )}
+        <GreyLine />
+        <View style={styles.dateRow}>
+          <Image
+            source={require("../../assets/addphoto.png")}
+            style={styles.image}
+          />
+          {doc.photoURL != "" ? (
+            this.generatePhotoAttached(doc)
+          ) : (
+            <Text style={{ marginTop: 5, fontWeight: "300", fontSize: 14 }}>
+              No photo attached
+            </Text>
+          )}
+        </View>
+        <View style={[styles.dateRow, { marginBottom: 5 }]}>
+          <Image
+            source={require("../../assets/location.png")}
+            style={styles.image}
+          />
+          {doc.address != "" ? (
+            <Text style={{ marginTop: 8, fontSize: 14, color: colours.black }}>
+              {doc.address}
+            </Text>
+          ) : (
+            <Text style={{ marginTop: 8, fontWeight: "300", fontSize: 14 }}>
+              No location
+            </Text>
+          )}
         </View>
       </View>
     );
@@ -381,6 +455,40 @@ const styles = StyleSheet.create({
     fontWeight: "200",
     marginRight: 10,
     marginBottom: 10,
+  },
+  image: {
+    width: 20,
+    height: 20,
+    margin: 5,
+    marginLeft: 20,
+    overflow: "visible",
+    resizeMode: "contain",
+  },
+  logo: {
+    paddingLeft: 310,
+    margin: 5,
+  },
+  modal: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  modalView: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

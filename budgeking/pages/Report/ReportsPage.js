@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import colours from "../../config/colours";
 import { auth, db } from "../../config/firebase";
@@ -127,7 +133,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginTop: 20,
     height: 100,
-    width: 400,
+    width: Dimensions.get("window").width * 0.95,
     borderWidth: 0,
     alignSelf: "center",
   },
