@@ -6,7 +6,7 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  Modal,
+  Linking
 } from "react-native";
 import { Header, Title } from "../../config/reusableText";
 import colours from "../../config/colours";
@@ -17,7 +17,6 @@ import { GreyLine } from "../../config/reusablePart";
 import { dateFormat, categoryFormat, timeFormat } from "../Home/HomePage";
 import { renderNoRecords } from "../Home/HomePage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Linking } from "react-native";
 
 class AllTableView extends React.Component {
   constructor() {
@@ -122,37 +121,11 @@ class AllTableView extends React.Component {
             onPress={() => {
               Linking.openURL(doc.photoURL);
             }}
-            style={{ marginTop: 8, fontWeight: "300", fontSize: 14 }}
+            style={{ marginTop: 5, fontWeight: "300", fontSize: 14 }}
           >
             Click here to view
           </Text>
         </TouchableOpacity>
-
-        {/* <View style={styles.modalView}>
-          <Modal visible={this.state.showModal}>
-            <View style={styles.modalView}>
-              <View style={styles.modal}>
-                <TouchableOpacity onPress={() => this.toggleModalFalse()}>
-                  <MaterialCommunityIcons
-                    name="close-circle"
-                    size={30}
-                    color="black"
-                    style={styles.logo}
-                  />
-                </TouchableOpacity>
-
-                <Image
-                  style={{
-                    // resizeMode: "contain",
-                    width: 350,
-                    height: 350,
-                  }}
-                  source={{ uri: doc.photoURL }}
-                />
-              </View>
-            </View>
-          </Modal>
-        </View> */}
       </View>
     );
   }
@@ -174,6 +147,14 @@ class AllTableView extends React.Component {
             text={`${dateFormat(doc.date.seconds)}`}
             style={{ fontWeight: "bold", marginTop: 12 }}
           />
+
+          <View style={{ flex: 1, justifyContent: "center" }}>
+            <Text
+              style={[styles.timeText, { alignSelf: "flex-end", marginTop: 8 }]}
+            >
+              {timeFormat(doc.time.seconds)}
+            </Text>
+          </View>
         </View>
         <GreyLine />
 
@@ -186,10 +167,13 @@ class AllTableView extends React.Component {
           <Text style={styles.valueText}>{`$${doc.value}`}</Text>
         </View>
 
-        <View style={styles.notesRow}>
-          <Text style={styles.noteText}>{doc.notes}</Text>
-          <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
-        </View>
+        {doc.notes ? (
+          <View style={styles.notesRow}>
+            <Text style={styles.noteText}>{doc.notes}</Text>
+          </View>
+        ) : (
+          <View style={{ marginBottom: 5 }} />
+        )}
         <GreyLine />
         <View style={styles.dateRow}>
           <Image
@@ -199,12 +183,12 @@ class AllTableView extends React.Component {
           {doc.photoURL != "" ? (
             this.generatePhotoAttached(doc)
           ) : (
-            <Text style={{ marginTop: 8, fontWeight: "300", fontSize: 14 }}>
+            <Text style={{ marginTop: 5, fontWeight: "300", fontSize: 14 }}>
               No photo attached
             </Text>
           )}
         </View>
-        <View style={styles.dateRow}>
+        <View style={[styles.dateRow, { marginBottom: 5 }]}>
           <Image
             source={require("../../assets/location.png")}
             style={styles.image}
@@ -330,6 +314,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignContent: "flex-start",
     justifyContent: "space-between",
+    marginTop: 10,
   },
   notesRow: {
     flexDirection: "row",
