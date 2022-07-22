@@ -26,7 +26,9 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
     (item) => item !== doc.createdByEmail
   );
 
-  useEffect(() => isOffTrack(), [doc.isOffTrack]);
+  useEffect(() => {
+    isOffTrack();
+  }, [doc.isOffTrack]);
 
   const dateFormat = () => {
     const date = doc.deadline;
@@ -100,7 +102,6 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
         .collection("active goals")
         .doc(doc.id)
         .update({ isOffTrack: true });
-      return;
     }
     // Get supposed amount based on frequency
     const years = today.getFullYear() - dateCreated.getFullYear();
