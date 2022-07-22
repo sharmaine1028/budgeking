@@ -16,6 +16,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { BlackButton } from "../../config/reusableButton";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { dateFormat, categoryFormat } from "../Home/HomePage";
 
 // **************custom date choosing - chart only changes after refreshing (idk how to refresh)
 
@@ -359,21 +360,13 @@ class ReportsPagePieChart extends React.Component {
     var text = "";
     pieText.map((item, i) => {
       if (category == pieText[i]["category"]) {
-        text += this.categoryFormat(category);
+        text += categoryFormat(category);
         text += ", ";
         text += pieText[i]["text"];
         return text;
       }
     });
     return text;
-  }
-
-  categoryFormat(category) {
-    if (category == "food and drinks") {
-      return "Food & Drinks";
-    } else {
-      return category.charAt(0).toUpperCase() + category.slice(1);
-    }
   }
 
   getMonthlyData() {
@@ -465,38 +458,12 @@ class ReportsPagePieChart extends React.Component {
       dayText += new Date().getFullYear();
     } else {
       // console.log("hellloooo", this.state.dateTo);
-      dayText += this.dateFormat(this.state.dateFrom.seconds);
+      dayText += dateFormat(this.state.dateFrom.seconds);
       dayText += " - ";
-      dayText += this.dateFormat(this.state.dateTo.seconds);
+      dayText += dateFormat(this.state.dateTo.seconds);
     }
     return dayText;
   }
-
-  dateFormat = (seconds) => {
-    const date = new Date(seconds * 1000);
-    const [day, month, year] = [
-      date.getDate(),
-      date.getMonth(),
-      date.getFullYear(),
-    ];
-
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
-    return day.toString() + " " + months[month] + " " + year.toString();
-  };
 
   timeUserWantText() {
     if (this.state.timeUserWants == "This Month") {

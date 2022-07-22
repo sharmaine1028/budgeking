@@ -6,6 +6,8 @@ import Icon from "react-native-vector-icons/AntDesign";
 import { auth, db } from "../../config/firebase";
 import { BlackButton } from "../../config/reusableButton";
 import { GreyLine } from "../../config/reusablePart";
+import { dateFormat, categoryFormat, timeFormat } from "../Home/HomePage";
+import { renderNoRecords } from "../Home/HomePage";
 
 class AllTableView extends React.Component {
   constructor() {
@@ -42,7 +44,8 @@ class AllTableView extends React.Component {
   getCollectionExpense = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { notes, value, category, date, time, photoURL, address } = res.data();
+      const { notes, value, category, date, time, photoURL, address } =
+        res.data();
       expenseArrPush.push({
         key: res.id,
         value,
@@ -50,8 +53,8 @@ class AllTableView extends React.Component {
         category,
         date,
         time,
-        photoURL, 
-        address
+        photoURL,
+        address,
       });
     });
     this.setState({
@@ -62,7 +65,8 @@ class AllTableView extends React.Component {
   getCollectionIncome = (querySnapshot) => {
     const incomeArrPush = [];
     querySnapshot.forEach((res) => {
-      const { category, date, notes, value, time, photoURL, address} = res.data();
+      const { category, date, notes, value, time, photoURL, address } =
+        res.data();
       incomeArrPush.push({
         key: res.id,
         value,
@@ -71,7 +75,7 @@ class AllTableView extends React.Component {
         date,
         time,
         photoURL,
-        address
+        address,
       });
     });
     this.setState({
@@ -79,65 +83,63 @@ class AllTableView extends React.Component {
     });
   };
 
-  dateFormat = (seconds) => {
-    const date = new Date(seconds * 1000);
-    const [day, month, year] = [
-      date.getDate(),
-      date.getMonth(),
-      date.getFullYear(),
-    ];
-
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
-    return day.toString() + " " + months[month] + " " + year.toString();
-  };
-
-  categoryFormat(category) {
-    if (category == "food and drinks") {
-      return "Food & Drinks";
-    } else {
-      return category.charAt(0).toUpperCase() + category.slice(1);
-    }
-  }
-
-  timeFormat(seconds) {
-    var t = new Date(seconds * 1000);
-    // console.log("t", t.getHours());
-    var hours = t.getHours();
-    var minutes = t.getMinutes();
-    var newFormat = t.getHours() > 12 ? "PM" : "AM";
-
-    hours = hours % 12;
-
-    hours = hours != 0 ? hours : 12;
-
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-    var formatted = hours + ":" + minutes + " " + newFormat;
-    return formatted;
-  }
-
   sortedArr(arr) {
     let sortedArr = arr.sort((a, b) => {
-      if (this.dateFormat(a.date.seconds) == this.dateFormat(b.date.seconds)) {
+      if (dateFormat(a.date.seconds) == dateFormat(b.date.seconds)) {
         return b.time.seconds - a.time.seconds;
       } else {
         return b.date.seconds - a.date.seconds;
       }
     });
     return sortedArr;
+  }
+
+  generatePhotoAttached(doc) {
+    console.log("photo", doc.photoURL);
+    return (
+      <View>
+        <Text>{doc.photoURL}</Text>
+        <Image
+          source={{ uri: doc.photoURL }}
+          style={{ width: 200, height: 200 }}
+        />
+        <TouchableOpacity onPress={() => this.toggleModal()}>
+          <Image
+            style={{
+              width: 50,
+              height: 50,
+            }}
+            source={{ uri: doc.photoURL }}
+          />
+        </TouchableOpacity>
+
+        <View style={styles.modalView}>
+          <Modal visible={this.state.showModal} animated>
+            <View style={styles.modalView}>
+              <View style={styles.modal}>
+                <TouchableOpacity onPress={() => this.toggleModal()}>
+                  <MaterialCommunityIcons
+                    name="close-circle"
+                    size={30}
+                    color="black"
+                    style={styles.logo}
+                  />
+                </TouchableOpacity>
+
+                <Image
+                  style={{
+                    resizeMode: "contain",
+                    width: 350,
+                    height: 350,
+                  }}
+                  source={{ uri: doc.photoURL }}
+                />
+              </View>
+            </View>
+          </Modal>
+        </View>
+      </View>
+    );
   }
 
   generatePhotoAttached(doc) {
@@ -202,7 +204,7 @@ class AllTableView extends React.Component {
             iconStyle={{ marginLeft: 5, marginRight: 0 }}
           />
           <Header
-            text={${dateFormat(doc.date.seconds)}}
+            text={`${dateFormat(doc.date.seconds)}`}
             style={{ fontWeight: "bold", marginTop: 12 }}
           />
         </View>
@@ -214,7 +216,7 @@ class AllTableView extends React.Component {
             style={styles.expenseCategory}
           />
 
-          <Text style={styles.valueText}>{$${doc.value}}</Text>
+          <Text style={styles.valueText}>{`$${doc.value}`}</Text>
         </View>
 
         <View style={styles.notesRow}>
@@ -268,15 +270,9 @@ class AllTableView extends React.Component {
         this.generateExpensesIncome(doc)
       );
     } else {
-      return this.renderNoRecords();
+      return renderNoRecords();
     }
   }
-
-  renderNoRecords = () => {
-    return (
-      <Text style={{ alignSelf: "center", marginTop: 20 }}>No Records Yet</Text>
-    );
-  };
 
   budgetButtons = () => {
     return (

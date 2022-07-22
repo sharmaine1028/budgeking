@@ -11,23 +11,20 @@ import {
   Dimensions,
   TouchableOpacity,
   Modal,
-  TextInput,
-  Easing,
 } from "react-native";
 import colours from "../../config/colours";
 import { auth, db } from "../../config/firebase";
 import RedLine from "../../config/reusablePart";
-import { Header, Title, SmallTextInput } from "../../config/reusableText";
+import { Header, Title } from "../../config/reusableText";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { PieChart } from "react-native-gifted-charts";
 import CurrencyInput, { TextWithCursor } from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { SmallBlackButton } from "../../config/reusableButton";
-import Icon from "react-native-vector-icons/AntDesign";
 import { GreyLine } from "../../config/reusablePart";
 import { BlackButton } from "../../config/reusableButton";
 import { Divider } from "react-native-elements";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
@@ -305,7 +302,7 @@ class HomePage extends React.Component {
     var text = "";
     pieText.map((item, i) => {
       if (category == pieText[i]["category"]) {
-        text += this.categoryFormat(category);
+        text += categoryFormat(category);
         text += ", ";
         text += pieText[i]["text"];
         return text;
@@ -389,7 +386,7 @@ class HomePage extends React.Component {
 
   sortedArr(arr) {
     let sortedArr = arr.sort((a, b) => {
-      if (this.dateFormat(a.date.seconds) == this.dateFormat(b.date.seconds)) {
+      if (dateFormat(a.date.seconds) == dateFormat(b.date.seconds)) {
         return b.time.seconds - a.time.seconds;
       } else {
         return b.date.seconds - a.date.seconds;
@@ -412,93 +409,6 @@ class HomePage extends React.Component {
     }
     return show3Ex;
   }
-
-  dateFormat = (seconds) => {
-    const date = new Date(seconds * 1000);
-    const [day, month, year] = [
-      date.getDate(),
-      date.getMonth(),
-      date.getFullYear(),
-    ];
-
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
-    return day.toString() + " " + months[month] + " " + year.toString();
-  };
-
-  categoryFormat(category) {
-    if (category == "food and drinks") {
-      return "Food & Drinks";
-    } else {
-      return category.charAt(0).toUpperCase() + category.slice(1);
-    }
-  }
-
-  timeFormat(seconds) {
-    var t = new Date(seconds * 1000);
-    var hours = t.getHours();
-    var minutes = t.getMinutes();
-    var newFormat = t.getHours() > 12 ? "PM" : "AM";
-
-    hours = hours % 12;
-
-    hours = hours != 0 ? hours : 12;
-
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-    var formatted = hours + ":" + minutes + " " + newFormat;
-    return formatted;
-  }
-
-  generate3ExpensesLR = (doc) => {
-    // console.log("docs", doc);
-    return (
-      <View key={doc.key} style={styles.row}>
-        <View style={styles.dateRow}>
-          <Icon.Button
-            name="arrowright"
-            size={20}
-            color={colours.tomato}
-            backgroundColor={"transparent"}
-            iconStyle={{ marginLeft: 5, marginRight: 0 }}
-          />
-          <Header
-            text={`${this.dateFormat(doc.date.seconds)}`}
-            style={{ fontWeight: "bold", marginTop: 12 }}
-          />
-        </View>
-
-        <View style={styles.categoryRow}>
-          <Header
-            text={this.categoryFormat(doc.category)}
-            style={styles.expenseCategory}
-          />
-
-          <Text style={styles.valueText}>{`$${doc.value}`}</Text>
-        </View>
-
-        <View style={styles.notesRow}>
-          <Text style={styles.noteText}>{doc.notes}</Text>
-          <Text style={styles.timeText}>
-            {this.timeFormat(doc.time.seconds)}
-          </Text>
-        </View>
-        <GreyLine />
-      </View>
-    );
-  };
 
   maybePieChart() {
     const dummyPieData = [{ value: 100, color: colours.pieGrey }];
@@ -577,12 +487,6 @@ class HomePage extends React.Component {
     this.updateInputVal(0.0, "tempBudgetValue");
     this.setState({ showBudgetValueModal: false });
   }
-
-  renderNoRecords = () => {
-    return (
-      <Text style={{ alignSelf: "center", marginTop: 20 }}>No Records Yet</Text>
-    );
-  };
 
   renderLegend = (text, color) => {
     return (
@@ -852,7 +756,7 @@ class HomePage extends React.Component {
           <View style={styles.reportPieChart}>
             <Header
               style={{ fontWeight: "500" }}
-              text={`${"\n"} Categories (${this.textBesideCategories()} ${this.categoryFormat(
+              text={`${"\n"} Categories (${this.textBesideCategories()} ${categoryFormat(
                 this.state.timeUserWants
               )} Expenses)\n\n`}
             />
@@ -912,8 +816,8 @@ class HomePage extends React.Component {
             <RedLine />
             {/* console.log(this.state.expenseArr.length) */}
             {this.state.expenseArr.length !== 0
-              ? this.show3Expenses().map((doc) => this.generate3ExpensesLR(doc))
-              : this.renderNoRecords()}
+              ? this.show3Expenses().map((doc) => generate3ExpensesLR(doc))
+              : renderNoRecords()}
             <BlackButton
               text={"Show more"}
               style={{ flexGrow: 0.5, marginTop: 10, marginBottom: 10 }}
@@ -927,8 +831,100 @@ class HomePage extends React.Component {
   }
 }
 
-// const win = Dimensions.get('window')
+// export to test
+export const dateFormat = (seconds) => {
+  const date = new Date(seconds * 1000);
+  const [day, month, year] = [
+    date.getDate(),
+    date.getMonth(),
+    date.getFullYear(),
+  ];
 
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  return day.toString() + " " + months[month] + " " + year.toString();
+};
+
+// export to test
+export function categoryFormat(category) {
+  if (category == "food and drinks") {
+    return "Food & Drinks";
+  } else {
+    return category.charAt(0).toUpperCase() + category.slice(1);
+  }
+}
+
+// export to test
+export function timeFormat(seconds) {
+  var t = new Date(seconds * 1000);
+  var hours = t.getHours();
+  var minutes = t.getMinutes();
+  var newFormat = t.getHours() >= 12 ? "PM" : "AM";
+
+  hours = hours % 12;
+
+  hours = hours != 0 ? hours : 12;
+
+  minutes = minutes < 10 ? "0" + minutes : minutes;
+  var formatted = hours + ":" + minutes + " " + newFormat;
+  return formatted;
+}
+
+export const renderNoRecords = () => {
+  return (
+    <Text style={{ alignSelf: "center", marginTop: 20 }}>No Records Yet</Text>
+  );
+};
+
+export const generate3ExpensesLR = (doc) => {
+  return (
+    <View key={doc.key} style={styles.row}>
+      <View style={styles.dateRow}>
+        <MaterialCommunityIcons
+          name="arrow-right"
+          size={20}
+          color={colours.tomato}
+          backgroundColor={"transparent"}
+          style={{ marginLeft: 5, marginRight: 5, marginTop: 7 }}
+        />
+        <Header
+          text={`${doc.date.seconds ? dateFormat(doc.date.seconds) : ""}`}
+          style={{ fontWeight: "bold", marginTop: 12 }}
+        />
+      </View>
+
+      <View style={styles.categoryRow}>
+        <Header
+          text={categoryFormat(doc.category)}
+          style={styles.expenseCategory}
+        />
+
+        <Text style={styles.valueText}>{`$${doc.value}`}</Text>
+      </View>
+
+      <View style={styles.notesRow}>
+        <Text style={styles.noteText}>{doc.notes}</Text>
+        <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
+      </View>
+      <GreyLine />
+    </View>
+  );
+};
+
+// const win = Dimensions.get('window')
 const styles = StyleSheet.create({
   container: {
     flex: 1,
