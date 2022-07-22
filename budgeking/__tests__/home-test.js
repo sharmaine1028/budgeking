@@ -1,5 +1,9 @@
 import { dateFormat, categoryFormat, timeFormat } from "../pages/Home/HomePage";
-import { renderNoRecords, generate3ExpensesLR } from "../pages/Home/HomePage";
+import {
+  renderNoRecords,
+  generate3ExpensesLR,
+  renderLegend,
+} from "../pages/Home/HomePage";
 import TestRenderer from "react-test-renderer";
 
 // dateFormat
@@ -107,4 +111,20 @@ test("expenses renders correctly with data", async () => {
   } catch (e) {
     console.log(e);
   }
+});
+
+test("pie chart renders legend correctly", async () => {
+  const legend = [
+    ["Food & Drinks", "#177AD5"],
+    ["Transportation", "#79D2DE"],
+    ["Housing", "#F7D8B5"],
+    ["Shopping", "#8F80E4"],
+    ["Health", "#FB8875"],
+    ["Education", "#FDE74C"],
+    ["Others", "#E8E0CE"],
+  ];
+  const tree = TestRenderer.create(
+    legend.map((doc) => renderLegend(doc[0], doc[1]))
+  );
+  expect(tree).toMatchSnapshot();
 });

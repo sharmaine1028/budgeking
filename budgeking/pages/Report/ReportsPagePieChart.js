@@ -16,7 +16,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { BlackButton } from "../../config/reusableButton";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { dateFormat, categoryFormat } from "../Home/HomePage";
+import { dateFormat, categoryFormat, renderLegend } from "../Home/HomePage";
 
 // **************custom date choosing - chart only changes after refreshing (idk how to refresh)
 
@@ -538,23 +538,6 @@ class ReportsPagePieChart extends React.Component {
     }
   }
 
-  renderLegend = (text, color) => {
-    return (
-      <View style={{ flexDirection: "row", marginBottom: 12 }}>
-        <View
-          style={{
-            height: 18,
-            width: 18,
-            marginRight: 10,
-            borderRadius: 4,
-            backgroundColor: color || "white",
-          }}
-        />
-        <Text style={{ color: "#444444", fontSize: 16 }}>{text || ""}</Text>
-      </View>
-    );
-  };
-
   maybeLegend() {
     return <View></View>;
   }
@@ -608,9 +591,7 @@ class ReportsPagePieChart extends React.Component {
               }}
             >
               {this.checkEmptyPieData()
-                ? legendArr.map((legend) =>
-                    this.renderLegend(legend[0], legend[1])
-                  )
+                ? legendArr.map((legend) => renderLegend(legend[0], legend[1]))
                 : this.maybeLegend()}
             </View>
           </View>

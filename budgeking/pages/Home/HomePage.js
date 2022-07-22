@@ -686,17 +686,31 @@ class HomePage extends React.Component {
           </View>
           <RedLine />
 
-          <Image
-            style={{
-              width: 30,
-              height: 30,
-              left: `${this.percentProfilePicture()}%`,
-              borderRadius: 9999,
-              justifyContent: "flex-end",
-              backgroundColor: colours.white,
-            }}
-            source={{ uri: this.state.photoURL }}
-          />
+          {this.addExpenses() <= this.whichBudgetValue() ? (
+            <Image
+              style={{
+                width: 30,
+                height: 30,
+                left: `${this.percentProfilePicture()}%`,
+                borderRadius: 9999,
+                justifyContent: "flex-end",
+                backgroundColor: colours.white,
+              }}
+              source={{ uri: this.state.photoURL }}
+            />
+          ) : (
+            <Image
+              style={{
+                width: 40,
+                height: 30,
+                left: `${this.percentProfilePicture()}%`,
+                // borderRadius: 9999,
+                justifyContent: "flex-end",
+                backgroundColor: colours.white,
+              }}
+              source={require("../../assets/home/rip.png")}
+            />
+          )}
 
           <View style={styles.progressArea}>
             <View style={styles.progressBar}>
@@ -907,7 +921,7 @@ export const generate3ExpensesLR = (doc) => {
 
 export const renderLegend = (text, color) => {
   return (
-    <View style={{ flexDirection: "row", marginBottom: 12 }}>
+    <View key={text} style={{ flexDirection: "row", marginBottom: 12 }}>
       <View
         style={{
           height: 18,

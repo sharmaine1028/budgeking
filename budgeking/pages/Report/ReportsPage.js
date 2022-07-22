@@ -81,18 +81,10 @@ class ReportsPage extends React.Component {
     });
   };
 
-  addExpensesIncomeAllTime(exIn) {
-    let sum = 0;
-    exIn.map((item, i) => {
-      sum += item.value;
-    });
-    return sum.toFixed(2); //255.78
-  }
-
   getOverallBalance() {
     const diff =
-      this.addExpensesIncomeAllTime(this.state.incomeArr) -
-      this.addExpensesIncomeAllTime(this.state.expenseArr);
+      addExpensesIncomeAllTime(this.state.incomeArr) -
+      addExpensesIncomeAllTime(this.state.expenseArr);
     return diff.toFixed(2);
   }
 
@@ -112,13 +104,21 @@ class ReportsPage extends React.Component {
           onPress={() => navigation.navigate("Pie Chart View")}
         >
           <Text style={styles.reportTitle}>TOTAL SPENDING</Text>
-          <Text style={styles.reportInText}>{`$${this.addExpensesIncomeAllTime(
+          <Text style={styles.reportInText}>{`$${addExpensesIncomeAllTime(
             this.state.expenseArr
           )}`}</Text>
         </TouchableOpacity>
       </KeyboardAwareScrollView>
     );
   }
+}
+
+export function addExpensesIncomeAllTime(exIn) {
+  let sum = 0;
+  exIn.map((item, i) => {
+    sum += item.value;
+  });
+  return sum.toFixed(2); //255.78
 }
 
 const styles = StyleSheet.create({
