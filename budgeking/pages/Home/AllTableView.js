@@ -1,5 +1,13 @@
 import React from "react";
-import { StyleSheet, ScrollView, View, Text } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Modal,
+} from "react-native";
 import { Header, Title } from "../../config/reusableText";
 import colours from "../../config/colours";
 import Icon from "react-native-vector-icons/AntDesign";
@@ -8,6 +16,8 @@ import { BlackButton } from "../../config/reusableButton";
 import { GreyLine } from "../../config/reusablePart";
 import { dateFormat, categoryFormat, timeFormat } from "../Home/HomePage";
 import { renderNoRecords } from "../Home/HomePage";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Linking } from "react-native";
 
 class AllTableView extends React.Component {
   constructor() {
@@ -24,6 +34,7 @@ class AllTableView extends React.Component {
       expenseArr: [],
       incomeArr: [],
       budget: "Expense",
+      showModal: false,
     };
   }
 
@@ -41,11 +52,20 @@ class AllTableView extends React.Component {
     this.unsubscribeIncomeRef();
   }
 
+  toggleModalTrue() {
+    this.setState({ showModal: true });
+  }
+
+  toggleModalFalse() {
+    this.setState({ showModal: false });
+  }
+
   getCollectionExpense = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
       const { notes, value, category, date, time, photoURL, address } =
         res.data();
+
       expenseArrPush.push({
         key: res.id,
         value,
@@ -95,29 +115,24 @@ class AllTableView extends React.Component {
   }
 
   generatePhotoAttached(doc) {
-    console.log("photo", doc.photoURL);
     return (
       <View>
-        <Text>{doc.photoURL}</Text>
-        <Image
-          source={{ uri: doc.photoURL }}
-          style={{ width: 200, height: 200 }}
-        />
-        <TouchableOpacity onPress={() => this.toggleModal()}>
-          <Image
-            style={{
-              width: 50,
-              height: 50,
+        <TouchableOpacity>
+          <Text
+            onPress={() => {
+              Linking.openURL(doc.photoURL);
             }}
-            source={{ uri: doc.photoURL }}
-          />
+            style={{ marginTop: 8, fontWeight: "300", fontSize: 14 }}
+          >
+            Click here to view
+          </Text>
         </TouchableOpacity>
 
-        <View style={styles.modalView}>
-          <Modal visible={this.state.showModal} animated>
+        {/* <View style={styles.modalView}>
+          <Modal visible={this.state.showModal}>
             <View style={styles.modalView}>
               <View style={styles.modal}>
-                <TouchableOpacity onPress={() => this.toggleModal()}>
+                <TouchableOpacity onPress={() => this.toggleModalFalse()}>
                   <MaterialCommunityIcons
                     name="close-circle"
                     size={30}
@@ -128,7 +143,7 @@ class AllTableView extends React.Component {
 
                 <Image
                   style={{
-                    resizeMode: "contain",
+                    // resizeMode: "contain",
                     width: 350,
                     height: 350,
                   }}
@@ -137,55 +152,7 @@ class AllTableView extends React.Component {
               </View>
             </View>
           </Modal>
-        </View>
-      </View>
-    );
-  }
-
-  generatePhotoAttached(doc) {
-    console.log("photo", doc.photoURL);
-    return (
-      <View>
-        <Text>{doc.photoURL}</Text>
-        <Image
-          source={{ uri: doc.photoURL }}
-          style={{ width: 200, height: 200 }}
-        />
-        <TouchableOpacity onPress={() => this.toggleModal()}>
-          <Image
-            style={{
-              width: 50,
-              height: 50,
-            }}
-            source={{ uri: doc.photoURL }}
-          />
-        </TouchableOpacity>
-
-        <View style={styles.modalView}>
-          <Modal visible={this.state.showModal} animated>
-            <View style={styles.modalView}>
-              <View style={styles.modal}>
-                <TouchableOpacity onPress={() => this.toggleModal()}>
-                  <MaterialCommunityIcons
-                    name="close-circle"
-                    size={30}
-                    color="black"
-                    style={styles.logo}
-                  />
-                </TouchableOpacity>
-
-                <Image
-                  style={{
-                    resizeMode: "contain",
-                    width: 350,
-                    height: 350,
-                  }}
-                  source={{ uri: doc.photoURL }}
-                />
-              </View>
-            </View>
-          </Modal>
-        </View>
+        </View> */}
       </View>
     );
   }
@@ -232,7 +199,7 @@ class AllTableView extends React.Component {
           {doc.photoURL != "" ? (
             this.generatePhotoAttached(doc)
           ) : (
-            <Text style={{ marginTop: 8, fontWeight: "200", fontSize: 14 }}>
+            <Text style={{ marginTop: 8, fontWeight: "300", fontSize: 14 }}>
               No photo attached
             </Text>
           )}
@@ -247,7 +214,7 @@ class AllTableView extends React.Component {
               {doc.address}
             </Text>
           ) : (
-            <Text style={{ marginTop: 8, fontWeight: "200", fontSize: 14 }}>
+            <Text style={{ marginTop: 8, fontWeight: "300", fontSize: 14 }}>
               No location
             </Text>
           )}
@@ -377,14 +344,48 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   noteText: {
-    fontWeight: "200",
+    fontWeight: "300",
     marginLeft: 10,
     marginBottom: 10,
   },
   timeText: {
-    fontWeight: "200",
+    fontWeight: "300",
     marginRight: 10,
     marginBottom: 10,
+  },
+  image: {
+    width: 20,
+    height: 20,
+    margin: 5,
+    marginLeft: 20,
+    overflow: "visible",
+    resizeMode: "contain",
+  },
+  logo: {
+    paddingLeft: 310,
+    margin: 5,
+  },
+  modal: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  modalView: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

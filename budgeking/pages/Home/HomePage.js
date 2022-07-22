@@ -19,7 +19,7 @@ import { Header, Title } from "../../config/reusableText";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { PieChart } from "react-native-gifted-charts";
-import CurrencyInput, { TextWithCursor } from "react-native-currency-input";
+import CurrencyInput from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { GreyLine } from "../../config/reusablePart";
 import { BlackButton } from "../../config/reusableButton";
@@ -76,6 +76,7 @@ class HomePage extends React.Component {
       showBudgetValueModal: false,
       offTrackGoals: [],
       tempBudgetValue: 0.0,
+      showMore: false,
     };
   }
 
@@ -766,11 +767,37 @@ class HomePage extends React.Component {
             <View
               style={{
                 width: "100%",
-                justifyContent: "space-evenly",
-                marginTop: 20,
+                // justifyContent: "space-evenly",
+                // marginTop: 20,
+                marginHorizontal: 10,
+                marginBottom: 10,
               }}
             >
-              {this.checkEmptyPieData()
+              {this.state.showMore ? (
+                <TouchableOpacity
+                  onPress={() => this.setState({ showMore: false })}
+                  style={{ alignSelf: "flex-end", paddingRight: 20 }}
+                >
+                  <MaterialCommunityIcons
+                    name="chevron-up"
+                    size={30}
+                    color={colours.darkgrey}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => this.setState({ showMore: true })}
+                  style={{ alignSelf: "flex-end", paddingRight: 20 }}
+                >
+                  <MaterialCommunityIcons
+                    name="chevron-down"
+                    size={30}
+                    color={colours.darkgrey}
+                  />
+                </TouchableOpacity>
+              )}
+
+              {this.state.showMore && this.checkEmptyPieData()
                 ? legendArr.map((legend) =>
                     this.renderLegend(legend[0], legend[1])
                   )
