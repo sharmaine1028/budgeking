@@ -6,6 +6,7 @@ import Icon from "react-native-vector-icons/AntDesign";
 import { auth, db } from "../../config/firebase";
 import { BlackButton } from "../../config/reusableButton";
 import { GreyLine } from "../../config/reusablePart";
+import { Image } from "react-native";
 
 // dateFormat, timeFormat() to localdatestring() and localtimestring()
 
@@ -70,7 +71,7 @@ class ReportsPageTable extends React.Component {
   getCollectionExpense = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { notes, value, category, date, time } = res.data();
+      const { notes, value, category, date, time, photoURL } = res.data();
       expenseArrPush.push({
         key: res.id,
         value,
@@ -78,6 +79,7 @@ class ReportsPageTable extends React.Component {
         category,
         date,
         time,
+        photoURL,
       });
     });
     this.setState({
@@ -243,6 +245,11 @@ class ReportsPageTable extends React.Component {
             style={{ fontWeight: "bold", marginTop: 12 }}
           />
         </View>
+        <Image
+          source={{ uri: doc.photoURL }}
+          style={{ width: 200, height: 200 }}
+        />
+        {/* <Text>{doc.photoURL}</Text> */}
         <GreyLine />
 
         <View style={styles.categoryRow}>
