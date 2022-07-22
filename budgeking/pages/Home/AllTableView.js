@@ -42,7 +42,7 @@ class AllTableView extends React.Component {
   getCollectionExpense = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { notes, value, category, date, time } = res.data();
+      const { notes, value, category, date, time, photoURL, address } = res.data();
       expenseArrPush.push({
         key: res.id,
         value,
@@ -50,6 +50,8 @@ class AllTableView extends React.Component {
         category,
         date,
         time,
+        photoURL, 
+        address
       });
     });
     this.setState({
@@ -60,7 +62,7 @@ class AllTableView extends React.Component {
   getCollectionIncome = (querySnapshot) => {
     const incomeArrPush = [];
     querySnapshot.forEach((res) => {
-      const { category, date, notes, value, time } = res.data();
+      const { category, date, notes, value, time, photoURL, address} = res.data();
       incomeArrPush.push({
         key: res.id,
         value,
@@ -68,6 +70,8 @@ class AllTableView extends React.Component {
         notes,
         date,
         time,
+        photoURL,
+        address
       });
     });
     this.setState({
@@ -136,6 +140,54 @@ class AllTableView extends React.Component {
     return sortedArr;
   }
 
+  generatePhotoAttached(doc) {
+    console.log("photo", doc.photoURL);
+    return (
+      <View>
+        <Text>{doc.photoURL}</Text>
+        <Image
+          source={{ uri: doc.photoURL }}
+          style={{ width: 200, height: 200 }}
+        />
+        <TouchableOpacity onPress={() => this.toggleModal()}>
+          <Image
+            style={{
+              width: 50,
+              height: 50,
+            }}
+            source={{ uri: doc.photoURL }}
+          />
+        </TouchableOpacity>
+
+        <View style={styles.modalView}>
+          <Modal visible={this.state.showModal} animated>
+            <View style={styles.modalView}>
+              <View style={styles.modal}>
+                <TouchableOpacity onPress={() => this.toggleModal()}>
+                  <MaterialCommunityIcons
+                    name="close-circle"
+                    size={30}
+                    color="black"
+                    style={styles.logo}
+                  />
+                </TouchableOpacity>
+
+                <Image
+                  style={{
+                    resizeMode: "contain",
+                    width: 350,
+                    height: 350,
+                  }}
+                  source={{ uri: doc.photoURL }}
+                />
+              </View>
+            </View>
+          </Modal>
+        </View>
+      </View>
+    );
+  }
+
   generateExpensesIncome = (doc) => {
     return (
       <View key={doc.key} style={styles.row}>
@@ -150,7 +202,7 @@ class AllTableView extends React.Component {
             iconStyle={{ marginLeft: 5, marginRight: 0 }}
           />
           <Header
-            text={`${this.dateFormat(doc.date.seconds)}`}
+            text={${dateFormat(doc.date.seconds)}}
             style={{ fontWeight: "bold", marginTop: 12 }}
           />
         </View>
@@ -158,18 +210,46 @@ class AllTableView extends React.Component {
 
         <View style={styles.categoryRow}>
           <Header
-            text={this.categoryFormat(doc.category)}
+            text={categoryFormat(doc.category)}
             style={styles.expenseCategory}
           />
 
-          <Text style={styles.valueText}>{`$${doc.value}`}</Text>
+          <Text style={styles.valueText}>{$${doc.value}}</Text>
         </View>
 
         <View style={styles.notesRow}>
           <Text style={styles.noteText}>{doc.notes}</Text>
-          <Text style={styles.timeText}>
-            {this.timeFormat(doc.time.seconds)}
-          </Text>
+          <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
+        </View>
+
+        <GreyLine />
+        <View style={styles.dateRow}>
+          <Image
+            source={require("../../assets/addphoto.png")}
+            style={styles.image}
+          />
+          {doc.photoURL != "" ? (
+            this.generatePhotoAttached(doc)
+          ) : (
+            <Text style={{ marginTop: 8, fontWeight: "200", fontSize: 14 }}>
+              No photo attached
+            </Text>
+          )}
+        </View>
+        <View style={styles.dateRow}>
+          <Image
+            source={require("../../assets/location.png")}
+            style={styles.image}
+          />
+          {doc.address != "" ? (
+            <Text style={{ marginTop: 8, fontSize: 14, color: colours.black }}>
+              {doc.address}
+            </Text>
+          ) : (
+            <Text style={{ marginTop: 8, fontWeight: "200", fontSize: 14 }}>
+              No location
+            </Text>
+          )}
         </View>
       </View>
     );
