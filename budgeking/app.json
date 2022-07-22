@@ -22,9 +22,12 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sharwin.budgeking"
     },
     "android": {
       "adaptiveIcon": {
@@ -42,10 +45,11 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-
     "description": "Budgeting app with simple and clean user interface",
     "packagerOpts": {
-      "sourceExts": ["cjs"]
+      "sourceExts": [
+        "cjs"
+      ]
     }
   }
 }

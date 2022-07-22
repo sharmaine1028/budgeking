@@ -1,5 +1,9 @@
 import { dateFormat, categoryFormat, timeFormat } from "../pages/Home/HomePage";
-import { renderNoRecords, generate3ExpensesLR } from "../pages/Home/HomePage";
+import {
+  renderNoRecords,
+  generate3ExpensesLR,
+  renderLegend,
+} from "../pages/Home/HomePage";
 import TestRenderer from "react-test-renderer";
 
 // dateFormat
@@ -108,269 +112,20 @@ test("expenses renders correctly with data", async () => {
     console.log(e);
   }
 });
-//   const expenses = [
-//     (item = {
-//       category: "food and drinks",
-//       date: {
-//         nanoseconds: 591000000,
-//         seconds: 1658382053,
-//       },
-//       key: "VBjtiejjNZO2yLUV2nGj",
-//       notes: "",
-//       time: {
-//         nanoseconds: 591000000,
-//         seconds: 1658382053,
-//       },
-//       value: 10.5,
-//     }),
-//     (item = {
-//       category: "health",
-//       date: {
-//         nanoseconds: 868000000,
-//         seconds: 1658122274,
-//       },
-//       key: "lwX2I0eq9oYaWL01nbW3",
-//       notes: "Annual detailed checkup",
-//       time: {
-//         nanoseconds: 402000000,
-//         seconds: 1658179874,
-//       },
-//       value: 60,
-//     }),
-//     (item = {
-//       category: "health",
-//       date: {
-//         nanoseconds: 0,
-//         seconds: 1624202293,
-//       },
-//       key: "S10W60mbFClRQ2DZifxP",
-//       notes: "Uniqlo ",
-//       time: {
-//         nanoseconds: 0,
-//         seconds: 1655695093,
-//       },
-//       value: 12.78,
-//     }),
-//   ];
-//   try {
-//     const tree = TestRenderer.create(
-//       <View>{expenses.map((doc) => generate3ExpensesLR(doc))}</View>
-//     ).toJSON();
-//     expect(tree).toMatchSnapshot();
-//   } catch (e) {
-//     console.log(e);
-//   }
-// });
 
-expenseArrayTimeConverted = [
-  {
-    category: "food and drinks",
-    date: {
-      nanoseconds: 591000000,
-      seconds: 1658382053,
-    },
-    key: "VBjtiejjNZO2yLUV2nGj",
-    notes: "",
-    time: {
-      nanoseconds: 591000000,
-      seconds: 1658382053,
-    },
-    value: 10,
-  },
-  {
-    category: "transportation",
-    date: {
-      nanoseconds: 271000000,
-      seconds: 1658388773,
-    },
-    key: "ZWcspIIBTGGdrF7SG9wf",
-    notes: "",
-    time: {
-      nanoseconds: 0,
-      seconds: 1658376053,
-    },
-    value: 15.55,
-  },
-  {
-    category: "food and drinks",
-    date: {
-      nanoseconds: 328000000,
-      seconds: 1658331027,
-    },
-    key: "2hxBUn7RvQwg99pSq8Aj",
-    notes: "",
-    time: {
-      nanoseconds: 328000000,
-      seconds: 1658331027,
-    },
-    value: 12,
-  },
-  {
-    category: "education",
-    date: {
-      nanoseconds: 0,
-      seconds: 1658229345,
-    },
-    key: "fCyTvlqG6ymIrvqjNRz1",
-    notes: "",
-    time: {
-      nanoseconds: 174000000,
-      seconds: 1658315745,
-    },
-    value: 20,
-  },
-  {
-    category: "health",
-    date: {
-      nanoseconds: 868000000,
-      seconds: 1658122274,
-    },
-    key: "lwX2I0eq9oYaWL01nbW3",
-    notes: "Annual detailed checkup",
-    time: {
-      nanoseconds: 402000000,
-      seconds: 1658179874,
-    },
-    value: 60,
-  },
-  {
-    category: "food and drinks",
-    date: {
-      nanoseconds: 0,
-      seconds: 1658036981,
-    },
-    key: "eka9wiAzI1Dvzf3BLo6k",
-    notes: "",
-    time: {
-      nanoseconds: 0,
-      seconds: 1658191781,
-    },
-    value: 1.79,
-  },
-  {
-    category: "others",
-    date: {
-      nanoseconds: 195000000,
-      seconds: 1657744387,
-    },
-    key: "Ruvwoyeur91Ww87yeb7L",
-    notes: "",
-    time: {
-      nanoseconds: 195000000,
-      seconds: 1657744387,
-    },
-    value: 0.45,
-  },
-  {
-    category: "food and drinks",
-    date: {
-      nanoseconds: 825000000,
-      seconds: 1657743891,
-    },
-    key: "l3Q90QTVFMWpExKGL9LE",
-    notes: "",
-    time: {
-      nanoseconds: 825000000,
-      seconds: 1657743891,
-    },
-    value: 0.43,
-  },
-  {
-    category: "shopping",
-    date: {
-      nanoseconds: 673000000,
-      seconds: 1656912459,
-    },
-    key: "RFJNtPN7zq8RwWQL4RcJ",
-    notes: "",
-    time: {
-      nanoseconds: 619000000,
-      seconds: 1658122059,
-    },
-    value: 12.22,
-  },
-  {
-    category: "shopping",
-    date: {
-      nanoseconds: 576000000,
-      seconds: 1656080421,
-    },
-    key: "WjLx5SQnTHjKxxKfn4NW",
-    notes: "Uniqlo",
-    time: {
-      nanoseconds: 278000000,
-      seconds: 1656080421,
-    },
-    value: 12,
-  },
-  {
-    category: "health",
-    date: {
-      nanoseconds: 121000000,
-      seconds: 1655968071,
-    },
-    key: "UXhKu3Nk5nOi6PdeHMt2",
-    notes: "uhc",
-    time: {
-      nanoseconds: 0,
-      seconds: 1655924871,
-    },
-    value: 12,
-  },
-  {
-    category: "transportation",
-    date: {
-      nanoseconds: 68000000,
-      seconds: 1655699341,
-    },
-    key: "8fvXByUNztNXUYtf1kBT",
-    notes: "Top up card",
-    time: {
-      nanoseconds: 68000000,
-      seconds: 1655699341,
-    },
-    value: 20,
-  },
-  {
-    category: "others",
-    date: {
-      nanoseconds: 668000000,
-      seconds: 1652885839,
-    },
-    key: "yYbJvvhXz7zkQbxVZB4B",
-    notes: "",
-    time: {
-      nanoseconds: 654000000,
-      seconds: 1652885839,
-    },
-    value: 20.5,
-  },
-  {
-    category: "housing",
-    date: {
-      nanoseconds: 0,
-      seconds: 1624641464,
-    },
-    key: "4eJR7VhR4UjotkVWeYyo",
-    notes: "",
-    time: {
-      nanoseconds: 657000000,
-      seconds: 1656177464,
-    },
-    value: 100,
-  },
-  {
-    category: "health",
-    date: {
-      nanoseconds: 0,
-      seconds: 1624202293,
-    },
-    key: "S10W60mbFClRQ2DZifxP",
-    notes: "Uniqlo ",
-    time: {
-      nanoseconds: 0,
-      seconds: 1655695093,
-    },
-    value: 12.78,
-  },
-];
+// renderLegend
+test("pie chart renders legend correctly", async () => {
+  const legend = [
+    ["Food & Drinks", "#177AD5"],
+    ["Transportation", "#79D2DE"],
+    ["Housing", "#F7D8B5"],
+    ["Shopping", "#8F80E4"],
+    ["Health", "#FB8875"],
+    ["Education", "#FDE74C"],
+    ["Others", "#E8E0CE"],
+  ];
+  const tree = TestRenderer.create(
+    legend.map((doc) => renderLegend(doc[0], doc[1]))
+  );
+  expect(tree).toMatchSnapshot();
+});
