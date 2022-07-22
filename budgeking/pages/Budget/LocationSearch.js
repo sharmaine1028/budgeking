@@ -31,7 +31,6 @@ export class LocationSearch extends React.Component {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       alert("Permission to access location was denied");
-      return;
     }
     Location.installWebGeolocationPolyfill();
     try {
