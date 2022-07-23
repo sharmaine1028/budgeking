@@ -384,9 +384,12 @@ class BudgetPage extends React.Component {
       address: this.state.address,
       location: this.state.location,
       category: this.state.category,
+      budget: this.state.budget,
     });
 
-    alert("Budget updated");
+    alert(
+      "Budget updated. Check your lastest updates on Home Page under Last records."
+    );
 
     this.reset();
   };
