@@ -31,21 +31,22 @@ export class LocationSearch extends React.Component {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       alert("Permission to access location was denied");
-      return;
-    }
-    Location.installWebGeolocationPolyfill();
-    try {
-      let location = await Location.getCurrentPositionAsync({});
-      this.setState({
-        region: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: latitudeDelta,
-          longitudeDelta: longitudeDelta,
-        },
-      });
-    } catch (error) {
-      console.log(error);
+      Location.installWebGeolocationPolyfill();
+    } else {
+      Location.installWebGeolocationPolyfill();
+      try {
+        let location = await Location.getCurrentPositionAsync({});
+        this.setState({
+          region: {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: latitudeDelta,
+            longitudeDelta: longitudeDelta,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 

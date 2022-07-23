@@ -22,9 +22,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.sharwin.budgeking"
@@ -37,18 +35,17 @@
       "permissions": [
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "android.permission.RECORD_AUDIO"
-      ]
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "package": "com.sharwin.budgeking",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "description": "Budgeting app with simple and clean user interface",
     "packagerOpts": {
-      "sourceExts": [
-        "cjs"
-      ]
+      "sourceExts": ["cjs"]
     }
   }
 }
