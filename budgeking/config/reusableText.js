@@ -248,6 +248,7 @@ export function BudgetInput({
         keyboardType={keyboardType}
         onPressIn={onPressIn}
         value={value}
+        maxLength={50}
         onChangeText={onChangeText}
       />
     </View>
