@@ -25,6 +25,7 @@ import { GreyLine } from "../../config/reusablePart";
 import { BlackButton } from "../../config/reusableButton";
 import { Divider } from "react-native-elements";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { getMonthlyData, getDailyData } from "../Report/ReportsPageTable";
 
 const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
@@ -179,7 +180,7 @@ class HomePage extends React.Component {
 
   addExpensesMonthly() {
     let sum = 0;
-    this.getMonthlyData().map((item, i) => {
+    getMonthlyData(this.state.expenseArr).map((item, i) => {
       sum += item.value;
     });
     return sum.toFixed(2); //255.78
@@ -187,7 +188,7 @@ class HomePage extends React.Component {
 
   addExpensesDaily() {
     let sum = 0;
-    this.getDailyData().map((item, i) => {
+    getDailyData(this.state.expenseArr).map((item, i) => {
       sum += item.value;
     });
     return sum.toFixed(2); //12
@@ -239,7 +240,7 @@ class HomePage extends React.Component {
       { category: "education", value: 0, color: "#FDE74C" },
       { category: "others", value: 0, color: "#E8E0CE" },
     ];
-    this.getMonthlyData().map((item, i) => {
+    getMonthlyData(this.state.expenseArr).map((item, i) => {
       if (item.category == "food and drinks") {
         pieDataPush[0]["value"] += item.value;
       } else if (item.category == "transportation") {
@@ -269,7 +270,7 @@ class HomePage extends React.Component {
       { category: "education", value: 0, color: "#FDE74C" },
       { category: "others", value: 0, color: "#E8E0CE" },
     ];
-    this.getDailyData().map((item, i) => {
+    getDailyData(this.state.expenseArr).map((item, i) => {
       if (item.category == "food and drinks") {
         pieDataPush[0]["value"] += item.value;
       } else if (item.category == "transportation") {
@@ -310,48 +311,6 @@ class HomePage extends React.Component {
       }
     });
     return text;
-  }
-
-  // convertTimeStamp() {
-  //   var expenseArrTime = this.state.expenseArr;
-  //   this.state.expenseArr.map((item, i) => {
-  //     // var dateFirestore = expenseArrTime[i]["date"];
-  //     console.log("datefirestore", expenseArrTime[i]["date"].toDate())
-  //     // expenseArrTime[i]["date"] = expenseArrTime[i]["date"].toDate();
-  //   });
-  //   return expenseArrTime;
-  // }
-
-  getMonthlyData() {
-    const currMonth = new Date().getMonth();
-    const currYear = new Date().getFullYear();
-    const expenseArrayTimeConverted = this.state.expenseArr;
-    const monthlyExpenseArray = [];
-    expenseArrayTimeConverted.map((item, i) => {
-      const dateItem = expenseArrayTimeConverted[i]["date"];
-      // console.log("dateitem", dateItem)
-      if (
-        dateItem.toDate().getMonth() == currMonth &&
-        dateItem.toDate().getFullYear() == currYear
-      ) {
-        monthlyExpenseArray.push(expenseArrayTimeConverted[i]);
-      }
-    });
-    return monthlyExpenseArray;
-  }
-
-  getDailyData() {
-    const currDate = new Date().toLocaleDateString();
-    const expenseArrayTimeConverted = this.state.expenseArr;
-    const dailyExpenseArray = [];
-    expenseArrayTimeConverted.map((item, i) => {
-      const dateItem = expenseArrayTimeConverted[i]["date"];
-      // console.log("dateitem", dateItem)
-      if (dateItem.toDate().toLocaleDateString() == currDate) {
-        dailyExpenseArray.push(expenseArrayTimeConverted[i]);
-      }
-    });
-    return dailyExpenseArray;
   }
 
   toggleMonthlyDaily = (val) => {
@@ -458,9 +417,9 @@ class HomePage extends React.Component {
 
   checkEmptyPieData() {
     if (this.state.timeUserWants === "monthly") {
-      return this.getMonthlyData().length != 0;
+      return getMonthlyData(this.state.expenseArr).length != 0;
     } else {
-      return this.getDailyData().length != 0;
+      return getDailyData(this.state.expenseArr).length != 0;
     }
   }
 
@@ -488,23 +447,6 @@ class HomePage extends React.Component {
     this.updateInputVal(0.0, "tempBudgetValue");
     this.setState({ showBudgetValueModal: false });
   }
-
-  renderLegend = (text, color) => {
-    return (
-      <View style={{ flexDirection: "row", marginBottom: 12 }}>
-        <View
-          style={{
-            height: 18,
-            width: 18,
-            marginRight: 10,
-            borderRadius: 4,
-            backgroundColor: color || "white",
-          }}
-        />
-        <Text style={{ color: "#444444", fontSize: 16 }}>{text || ""}</Text>
-      </View>
-    );
-  };
 
   maybeLegend() {
     return <View></View>;
@@ -704,17 +646,31 @@ class HomePage extends React.Component {
           </View>
           <RedLine />
 
-          <Image
-            style={{
-              width: 30,
-              height: 30,
-              left: `${this.percentProfilePicture()}%`,
-              borderRadius: 9999,
-              justifyContent: "flex-end",
-              backgroundColor: colours.white,
-            }}
-            source={{ uri: this.state.photoURL }}
-          />
+          {this.addExpenses() <= this.whichBudgetValue() ? (
+            <Image
+              style={{
+                width: 30,
+                height: 30,
+                left: `${this.percentProfilePicture()}%`,
+                borderRadius: 9999,
+                justifyContent: "flex-end",
+                backgroundColor: colours.white,
+              }}
+              source={{ uri: this.state.photoURL }}
+            />
+          ) : (
+            <Image
+              style={{
+                width: 40,
+                height: 30,
+                left: `${this.percentProfilePicture()}%`,
+                // borderRadius: 9999,
+                justifyContent: "flex-end",
+                backgroundColor: colours.white,
+              }}
+              source={require("../../assets/home/rip.png")}
+            />
+          )}
 
           <View style={styles.progressArea}>
             <View style={styles.progressBar}>
@@ -947,6 +903,23 @@ export const generate3ExpensesLR = (doc) => {
         <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
       </View>
       <GreyLine />
+    </View>
+  );
+};
+
+export const renderLegend = (text, color) => {
+  return (
+    <View key={text} style={{ flexDirection: "row", marginBottom: 12 }}>
+      <View
+        style={{
+          height: 18,
+          width: 18,
+          marginRight: 10,
+          borderRadius: 4,
+          backgroundColor: color || "white",
+        }}
+      />
+      <Text style={{ color: "#444444", fontSize: 16 }}>{text || ""}</Text>
     </View>
   );
 };

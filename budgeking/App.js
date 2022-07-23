@@ -121,7 +121,7 @@ export function GoalsAll() {
 export function BudgetAll() {
   return (
     <Stack.Navigator
-      initialRouteName="Budget"
+      initialRouteName="BudgetPage"
       screenOptions={{
         headerStyle: {
           backgroundColor: colours.whiteRock,
@@ -130,7 +130,7 @@ export function BudgetAll() {
       }}
     >
       <Stack.Screen
-        name="Budget"
+        name="BudgetPage"
         component={BudgetPage}
         options={{
           headerLeft: false,

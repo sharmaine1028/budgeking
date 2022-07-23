@@ -350,6 +350,221 @@ Array [
 ]
 `;
 
+exports[`pie chart renders legend correctly 1`] = `
+Array [
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "backgroundColor": "#177AD5",
+          "borderRadius": 4,
+          "height": 18,
+          "marginRight": 10,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      style={
+        Object {
+          "color": "#444444",
+          "fontSize": 16,
+        }
+      }
+    >
+      Food & Drinks
+    </Text>
+  </View>,
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "backgroundColor": "#79D2DE",
+          "borderRadius": 4,
+          "height": 18,
+          "marginRight": 10,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      style={
+        Object {
+          "color": "#444444",
+          "fontSize": 16,
+        }
+      }
+    >
+      Transportation
+    </Text>
+  </View>,
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "backgroundColor": "#F7D8B5",
+          "borderRadius": 4,
+          "height": 18,
+          "marginRight": 10,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      style={
+        Object {
+          "color": "#444444",
+          "fontSize": 16,
+        }
+      }
+    >
+      Housing
+    </Text>
+  </View>,
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "backgroundColor": "#8F80E4",
+          "borderRadius": 4,
+          "height": 18,
+          "marginRight": 10,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      style={
+        Object {
+          "color": "#444444",
+          "fontSize": 16,
+        }
+      }
+    >
+      Shopping
+    </Text>
+  </View>,
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "backgroundColor": "#FB8875",
+          "borderRadius": 4,
+          "height": 18,
+          "marginRight": 10,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      style={
+        Object {
+          "color": "#444444",
+          "fontSize": 16,
+        }
+      }
+    >
+      Health
+    </Text>
+  </View>,
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "backgroundColor": "#FDE74C",
+          "borderRadius": 4,
+          "height": 18,
+          "marginRight": 10,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      style={
+        Object {
+          "color": "#444444",
+          "fontSize": 16,
+        }
+      }
+    >
+      Education
+    </Text>
+  </View>,
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "backgroundColor": "#E8E0CE",
+          "borderRadius": 4,
+          "height": 18,
+          "marginRight": 10,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      style={
+        Object {
+          "color": "#444444",
+          "fontSize": 16,
+        }
+      }
+    >
+      Others
+    </Text>
+  </View>,
+]
+`;
+
 exports[`table view renders no records yet if empty database 1`] = `
 <Text
   style={
