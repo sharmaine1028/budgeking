@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { auth, db } from "../../config/firebase";
-import { BlackButton } from "../../config/reusableButton";
-import { Title } from "../../config/reusableText";
+import { BlackButton } from "../../components/reusableButton";
+import { Title } from "../../components/reusableText";
 import GenerateOldGoal from "./GenerateOldGoal";
 
 class GoalHistory extends React.Component {

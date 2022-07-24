@@ -1,10 +1,10 @@
 import React from "react";
 import { StyleSheet, View, Image } from "react-native";
 import DatePicker from "react-native-date-ranges";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { auth, db } from "../../config/firebase";
-import { BlackButton } from "../../config/reusableButton";
+import { BlackButton } from "../../components/reusableButton";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // choose custom date

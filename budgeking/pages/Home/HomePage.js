@@ -12,17 +12,17 @@ import {
   TouchableOpacity,
   Modal,
 } from "react-native";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import { auth, db } from "../../config/firebase";
-import RedLine from "../../config/reusablePart";
-import { Header, Title } from "../../config/reusableText";
+import RedLine from "../../components/reusablePart";
+import { Header, Title } from "../../components/reusableText";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { PieChart } from "react-native-gifted-charts";
 import CurrencyInput from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { GreyLine } from "../../config/reusablePart";
-import { BlackButton } from "../../config/reusableButton";
+import { GreyLine } from "../../components/reusablePart";
+import { BlackButton } from "../../components/reusableButton";
 import { Divider } from "react-native-elements";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { getMonthlyData, getDailyData } from "../Report/ReportsPageTable";
@@ -38,6 +38,10 @@ class HomePage extends React.Component {
       .collection("users")
       .doc(auth.currentUser.uid)
       .collection("expense");
+    this.fireStoreRefIncome = db
+      .collection("users")
+      .doc(auth.currentUser.uid)
+      .collection("income");
     this.activeGoalsRef = db.collection("active goals");
     this.activeGoalsOri = this.activeGoalsRef.where(
       "createdBy",
@@ -78,6 +82,7 @@ class HomePage extends React.Component {
       offTrackGoals: [],
       tempBudgetValue: 0.0,
       showMore: false,
+      incomeArr: [],
     };
   }
 
@@ -90,6 +95,9 @@ class HomePage extends React.Component {
   // calling budgetValue from firestore
   componentDidMount() {
     this.unsubscribe = this.fireStoreRef.onSnapshot(this.getCollection);
+    this.unsubscribeIncome = this.fireStoreRefIncome.onSnapshot(
+      this.getCollectionIncome
+    );
     this.unsubscribeActiveGoalsOri = this.activeGoalsOri.onSnapshot(
       this.getOffTrackGoals
     );
@@ -114,6 +122,7 @@ class HomePage extends React.Component {
 
   componentWillUnmount() {
     this.unsubscribe();
+    this.unsubscribeIncome();
     this.unsubscribeActiveGoalsOri();
     this.unsubscribeActiveGoalsShared();
   }
@@ -121,7 +130,7 @@ class HomePage extends React.Component {
   getCollection = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { notes, value, category, date, time } = res.data();
+      const { notes, value, category, date, time, budget } = res.data();
       expenseArrPush.push({
         key: res.id,
         notes,
@@ -129,14 +138,13 @@ class HomePage extends React.Component {
         category,
         date,
         time,
+        budget,
       });
-      // console.log(expenseArr, "+>", res.id, "=>", res.data());
     });
     this.setState({
       expenseArr: expenseArrPush,
       isLoading: false,
     });
-
     // console.log("pie", this.addExpensesDaily() == 0);
     // console.log("piepushed =>", this.updatePieData())
     // console.log(auth.currentUser.displayName)
@@ -144,6 +152,25 @@ class HomePage extends React.Component {
     // console.log(this.state.expenseArr);
     // console.log(new Date().toLocaleDateString('en-us', {  weekday: 'short' }))
     // console.log(auth.currentUser.uid)
+  };
+
+  getCollectionIncome = (querySnapshot) => {
+    const incomeArrPush = [];
+    querySnapshot.forEach((res) => {
+      const { category, date, notes, value, time, budget } = res.data();
+      incomeArrPush.push({
+        key: res.id,
+        value,
+        category,
+        notes,
+        date,
+        time,
+        budget,
+      });
+    });
+    this.setState({
+      incomeArr: incomeArrPush,
+    });
   };
 
   //input budgetvalue to firestore
@@ -214,7 +241,7 @@ class HomePage extends React.Component {
 
   textBesideWalking() {
     var leftExceeded = "";
-    if (this.whichBudgetValue() <= this.addExpenses()) {
+    if (this.whichBudgetValue() < this.addExpenses()) {
       leftExceeded += "Exceeded";
     } else {
       leftExceeded += "Left";
@@ -344,6 +371,13 @@ class HomePage extends React.Component {
     }
   }
 
+  combineTwoArr(expense, income) {
+    const combinedArr = [];
+    expense.map((item, i) => combinedArr.push(item));
+    income.map((item, i) => combinedArr.push(item));
+    return combinedArr;
+  }
+
   sortedArr(arr) {
     let sortedArr = arr.sort((a, b) => {
       if (dateFormat(a.date.seconds) == dateFormat(b.date.seconds)) {
@@ -355,11 +389,11 @@ class HomePage extends React.Component {
     return sortedArr;
   }
 
-  show3Expenses() {
+  show3Expenses(arr) {
     var show3Ex = [];
-    const sortedEx = this.sortedArr(this.state.expenseArr);
-    if (this.state.expenseArr.length <= 3) {
-      for (let i = 0; i < this.state.expenseArr.length; i++) {
+    const sortedEx = this.sortedArr(arr);
+    if (arr.length <= 3) {
+      for (let i = 0; i < arr.length; i++) {
         show3Ex.push(sortedEx[i]);
       }
     } else {
@@ -450,6 +484,38 @@ class HomePage extends React.Component {
 
   maybeLegend() {
     return <View></View>;
+  }
+
+  emptyPhotoURL() {
+    if (this.state.photoURL == null) {
+      return (
+        <Image
+          style={{
+            width: 30,
+            height: 30,
+            left: `${this.percentProfilePicture()}%`,
+            borderRadius: 9999,
+            justifyContent: "flex-end",
+            backgroundColor: colours.white,
+          }}
+          source={require("../../assets/loginsignup/profile.png")}
+        />
+      );
+    } else {
+      return (
+        <Image
+          style={{
+            width: 30,
+            height: 30,
+            left: `${this.percentProfilePicture()}%`,
+            borderRadius: 9999,
+            justifyContent: "flex-end",
+            backgroundColor: colours.white,
+          }}
+          source={{ uri: this.state.photoURL }}
+        />
+      );
+    }
   }
 
   getOffTrackGoals = (querySnapshot) => {
@@ -647,17 +713,7 @@ class HomePage extends React.Component {
           <RedLine />
 
           {this.addExpenses() <= this.whichBudgetValue() ? (
-            <Image
-              style={{
-                width: 30,
-                height: 30,
-                left: `${this.percentProfilePicture()}%`,
-                borderRadius: 9999,
-                justifyContent: "flex-end",
-                backgroundColor: colours.white,
-              }}
-              source={{ uri: this.state.photoURL }}
-            />
+            this.emptyPhotoURL()
           ) : (
             <Image
               style={{
@@ -756,9 +812,7 @@ class HomePage extends React.Component {
               ) : null}
 
               {this.state.showMore && this.checkEmptyPieData()
-                ? legendArr.map((legend) =>
-                    this.renderLegend(legend[0], legend[1])
-                  )
+                ? legendArr.map((legend) => renderLegend(legend[0], legend[1]))
                 : this.maybeLegend()}
             </View>
           </View>
@@ -799,9 +853,14 @@ class HomePage extends React.Component {
           <View style={styles.lastRecordTitle}>
             <Header style={styles.lastRecordText} text={"Last records"} />
             <RedLine />
-            {/* console.log(this.state.expenseArr.length) */}
-            {this.state.expenseArr.length !== 0
-              ? this.show3Expenses().map((doc) => generate3ExpensesLR(doc))
+            {this.combineTwoArr(this.state.expenseArr, this.state.incomeArr)
+              .length !== 0
+              ? this.show3Expenses(
+                  this.combineTwoArr(
+                    this.state.expenseArr,
+                    this.state.incomeArr
+                  )
+                ).map((doc) => generate3ExpensesLR(doc))
               : renderNoRecords()}
             <BlackButton
               text={"Show more"}
@@ -878,17 +937,35 @@ export const generate3ExpensesLR = (doc) => {
   return (
     <View key={doc.key} style={styles.row}>
       <View style={styles.dateRow}>
-        <MaterialCommunityIcons
-          name="arrow-right"
-          size={20}
-          color={colours.tomato}
-          backgroundColor={"transparent"}
-          style={{ marginLeft: 5, marginRight: 5, marginTop: 7 }}
-        />
+        {doc.budget == "Expense" ? (
+          <MaterialCommunityIcons
+            name="arrow-right"
+            size={20}
+            color={colours.tomato}
+            backgroundColor={"transparent"}
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 7 }}
+          />
+        ) : (
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={20}
+            color={colours.green}
+            backgroundColor={"transparent"}
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 7 }}
+          />
+        )}
+
         <Header
           text={`${doc.date.seconds ? dateFormat(doc.date.seconds) : ""}`}
           style={{ fontWeight: "bold", marginTop: 12 }}
         />
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <Text
+            style={[styles.timeText, { alignSelf: "flex-end", marginTop: 12 }]}
+          >
+            {timeFormat(doc.time.seconds)}
+          </Text>
+        </View>
       </View>
 
       <View style={styles.categoryRow}>
@@ -902,7 +979,6 @@ export const generate3ExpensesLR = (doc) => {
 
       <View style={styles.notesRow}>
         <Text style={styles.noteText}>{doc.notes}</Text>
-        <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
       </View>
       <GreyLine />
     </View>

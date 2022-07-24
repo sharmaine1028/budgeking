@@ -7,13 +7,13 @@ import {
   Modal,
   TouchableOpacity,
 } from "react-native";
-import { BlackButton } from "../../config/reusableButton";
-import { Title } from "../../config/reusableText";
+import { BlackButton } from "../../components/reusableButton";
+import { Title } from "../../components/reusableText";
 import { auth, db } from "../../config/firebase";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import GenerateGoal from "./GenerateGoal";
 import { Image } from "react-native";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 
 LogBox.ignoreLogs([
   "Non-serializable values were found in the navigation state",
@@ -242,6 +242,7 @@ class GoalsPage extends React.Component {
       const newList = this.state.longTermGoals.filter((item) => item.id !== id);
       this.setState({ longTermGoals: newList });
     }
+    this.activeGoalsRef.doc(id).update({ currSavingsAmt: newAmt });
   };
 
   deleteGoal = (id, time, data) => {
