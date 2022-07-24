@@ -106,11 +106,11 @@ function EditGoal({ route, navigation }) {
       freqAmount = days === 0 ? target : target / days;
     }
 
-    const format = (num) => {
-      return (Math.ceil(num * 100) / 100).toFixed(2);
-    };
-
     setData({ ...data, freqAmount: format(freqAmount) });
+  };
+
+  const format = (num) => {
+    return (Math.ceil(num * 100) / 100).toFixed(2);
   };
 
   const deleteEmail = (tobeRemoved) => {

@@ -26,7 +26,12 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
     (item) => item !== doc.createdByEmail
   );
 
-  useEffect(() => isOffTrack(), [doc.isOffTrack]);
+  useEffect(() => {
+    async function UpdateOffTrack() {
+      await isOffTrack();
+    }
+    UpdateOffTrack();
+  }, [doc.isOffTrack]);
 
   const dateFormat = () => {
     const date = doc.deadline;
@@ -100,40 +105,40 @@ function GenerateGoal({ doc, time, deleteItem, saveItem, editItem }) {
         .collection("active goals")
         .doc(doc.id)
         .update({ isOffTrack: true });
-      return;
-    }
-    // Get supposed amount based on frequency
-    const years = today.getFullYear() - dateCreated.getFullYear();
-    let supposedAmt;
-    if (doc.frequency === "Yearly") {
-      supposedAmt = doc.freqAmount * years;
-    } else if (doc.frequency === "Monthly") {
-      const months =
-        years * 12 + today.getMonth() - dateCreated.getMonth() <= 0
-          ? 0
-          : years * 12 + today.getMonth() - dateCreated.getMonth();
-      supposedAmt = doc.freqAmount * months;
-    } else if (doc.frequency === "Weekly") {
-      const msInWeek = 1000 * 60 * 60 * 24 * 7;
-      const weeks = Math.round(Math.abs(today - dateCreated) / msInWeek);
-      supposedAmt = doc.freqAmount * weeks;
     } else {
-      const msInDay = 1000 * 3600 * 24;
-      const days = Math.round(Math.abs(today - dateCreated) / msInDay);
-      supposedAmt = doc.freqAmount * days;
-    }
+      // Get supposed amount based on frequency
+      const years = today.getFullYear() - dateCreated.getFullYear();
+      let supposedAmt;
+      if (doc.frequency === "Yearly") {
+        supposedAmt = doc.freqAmount * years;
+      } else if (doc.frequency === "Monthly") {
+        const months =
+          years * 12 + today.getMonth() - dateCreated.getMonth() <= 0
+            ? 0
+            : years * 12 + today.getMonth() - dateCreated.getMonth();
+        supposedAmt = doc.freqAmount * months;
+      } else if (doc.frequency === "Weekly") {
+        const msInWeek = 1000 * 60 * 60 * 24 * 7;
+        const weeks = Math.round(Math.abs(today - dateCreated) / msInWeek);
+        supposedAmt = doc.freqAmount * weeks;
+      } else {
+        const msInDay = 1000 * 3600 * 24;
+        const days = Math.round(Math.abs(today - dateCreated) / msInDay);
+        supposedAmt = doc.freqAmount * days;
+      }
 
-    // Compare supposed amount with curramount
-    if (doc.currSavingsAmt < supposedAmt) {
-      await db
-        .collection("active goals")
-        .doc(doc.id)
-        .update({ isOffTrack: true });
-    } else {
-      await db
-        .collection("active goals")
-        .doc(doc.id)
-        .update({ isOffTrack: false });
+      // Compare supposed amount with curramount
+      if (doc.currSavingsAmt < supposedAmt) {
+        await db
+          .collection("active goals")
+          .doc(doc.id)
+          .update({ isOffTrack: true });
+      } else {
+        await db
+          .collection("active goals")
+          .doc(doc.id)
+          .update({ isOffTrack: false });
+      }
     }
   };
 

@@ -242,6 +242,7 @@ class GoalsPage extends React.Component {
       const newList = this.state.longTermGoals.filter((item) => item.id !== id);
       this.setState({ longTermGoals: newList });
     }
+    this.activeGoalsRef.doc(id).update({ currSavingsAmt: newAmt });
   };
 
   deleteGoal = (id, time, data) => {
