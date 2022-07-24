@@ -8,8 +8,8 @@ import {
   Platform,
 } from "react-native";
 import { auth, db } from "../config/firebase";
-import { BlackButton } from "../config/reusableButton";
-import { Footer, BrownTextInput } from "../config/reusableText";
+import { BlackButton } from "../components/reusableButton";
+import { Footer, BrownTextInput } from "../components/reusableText";
 
 export default class LoginPage extends React.Component {
   constructor() {

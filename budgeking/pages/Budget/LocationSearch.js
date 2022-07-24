@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 

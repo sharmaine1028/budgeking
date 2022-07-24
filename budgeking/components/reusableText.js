@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import colours from "./colours";
+import colours from "../styles/colours";
 import RadioButtonRN from "radio-buttons-react-native";
 
 function reusableText(props) {

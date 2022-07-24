@@ -8,14 +8,14 @@ import {
   Dimensions,
   Text,
 } from "react-native";
-import colours from "../../config/colours";
-import { BlackButton } from "../../config/reusableButton";
+import colours from "../../styles/colours";
+import { BlackButton } from "../../components/reusableButton";
 import {
   BudgetInput,
   Title,
   Header,
   IconTextInput,
-} from "../../config/reusableText";
+} from "../../components/reusableText";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";

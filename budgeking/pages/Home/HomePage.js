@@ -12,17 +12,17 @@ import {
   TouchableOpacity,
   Modal,
 } from "react-native";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import { auth, db } from "../../config/firebase";
-import RedLine from "../../config/reusablePart";
-import { Header, Title } from "../../config/reusableText";
+import RedLine from "../../components/reusablePart";
+import { Header, Title } from "../../components/reusableText";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { PieChart } from "react-native-gifted-charts";
 import CurrencyInput from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { GreyLine } from "../../config/reusablePart";
-import { BlackButton } from "../../config/reusableButton";
+import { GreyLine } from "../../components/reusablePart";
+import { BlackButton } from "../../components/reusableButton";
 import { Divider } from "react-native-elements";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { getMonthlyData, getDailyData } from "../Report/ReportsPageTable";
