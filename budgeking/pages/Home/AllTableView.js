@@ -6,14 +6,14 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  Linking
+  Linking,
 } from "react-native";
-import { Header, Title } from "../../config/reusableText";
-import colours from "../../config/colours";
+import { Header, Title } from "../../components/reusableText";
+import colours from "../../styles/colours";
 import Icon from "react-native-vector-icons/AntDesign";
 import { auth, db } from "../../config/firebase";
-import { BlackButton } from "../../config/reusableButton";
-import { GreyLine } from "../../config/reusablePart";
+import { BlackButton } from "../../components/reusableButton";
+import { GreyLine } from "../../components/reusablePart";
 import { dateFormat, categoryFormat, timeFormat } from "../Home/HomePage";
 import { renderNoRecords } from "../Home/HomePage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";

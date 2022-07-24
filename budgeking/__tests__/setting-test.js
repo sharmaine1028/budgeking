@@ -1,7 +1,7 @@
 import * as React from "react";
 jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper");
 import { render, screen } from "@testing-library/react-native";
-import { ChangeUsername, ChangePassword } from "../config/reusableText";
+import { ChangeUsername, ChangePassword } from "../components/reusableText";
 
 describe("testing setting components", () => {
   test("changeusername should render without throwing an error", async () => {

@@ -11,7 +11,7 @@ import {
   View,
   Text,
 } from "react-native";
-import colours from "./config/colours";
+import colours from "./styles/colours";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/Home/HomePage";
@@ -31,8 +31,8 @@ import GoalHistory from "./pages/Goal/GoalHistory";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { Header } from "./config/reusableText";
-import { BlackButton } from "./config/reusableButton";
+import { Header } from "./components/reusableText";
+import { BlackButton } from "./components/reusableButton";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();

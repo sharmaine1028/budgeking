@@ -8,9 +8,9 @@ import {
   Platform,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import colours from "../config/colours";
-import { BlackButton, AddButton } from "../config/reusableButton";
-import { Footer, BrownTextInput } from "../config/reusableText";
+import colours from "../styles/colours";
+import { BlackButton, AddButton } from "../components/reusableButton";
+import { Footer, BrownTextInput } from "../components/reusableText";
 import { auth, db, storage } from "../config/firebase";
 import * as ImagePicker from "expo-image-picker";
 import uuid from "uuid";

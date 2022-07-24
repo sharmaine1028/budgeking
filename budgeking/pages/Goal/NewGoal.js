@@ -1,10 +1,10 @@
 import React from "react";
-import { BlackButton } from "../../config/reusableButton";
+import { BlackButton } from "../../components/reusableButton";
 import {
   IconTextInput,
   NewGoalInput,
   YesOrNo,
-} from "../../config/reusableText";
+} from "../../components/reusableText";
 import {
   View,
   StyleSheet,
@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import CurrencyInput from "react-native-currency-input";
 import { auth, db } from "../../config/firebase";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
