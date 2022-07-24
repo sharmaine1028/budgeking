@@ -389,10 +389,14 @@ class ReportsPagePieChart extends React.Component {
     } else if (this.state.timeUserWants == "This Year") {
       dayText += new Date().getFullYear();
     } else {
-      // console.log("hellloooo", this.state.dateTo);
-      dayText += dateFormat(this.state.dateFrom.seconds);
+      console.log("hellloooo", this.state.dateTo);
+      console.log(
+        "hellloooo",
+        dateFormat(this.state.dateFrom.getTime() / 1000)
+      );
+      dayText += dateFormat(this.state.dateFrom.getTime() / 1000);
       dayText += " - ";
-      dayText += dateFormat(this.state.dateTo.seconds);
+      dayText += dateFormat(this.state.dateTo.getTime() / 1000);
     }
     return dayText;
   }
