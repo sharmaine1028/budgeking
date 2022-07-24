@@ -70,7 +70,7 @@ export function GoalsAll() {
           headerLeft: false,
           headerRight: () =>
             Help(
-              "1. Add new goals to achieve. Goals are categorised into short-term and long-term.\n\n 2. Once a goal is added, you can edit and delete your goal or add to your savings to complete the goal by clicking on the 3-dotted icon (...), which will then take you to separate pages to fulfill your request. \n\n3. Blue progress bar shows how far you are from your target savings amount.\n\n4. Click on the dropdown arrow to view more details of your goal. \n\n5. Goal box will turn red if your goal deadline has passed. \n\n6. Show goal history shows past goals you have completed. Long press to show delete button."
+              "1. Add new goals to achieve. Goals are categorised into short-term and long-term.\n\n 2. Once a goal is added, you can edit and delete your goal or add to your savings to complete the goal by clicking on the 3-dotted icon (...), which will then take you to separate pages to fulfill your request. \n\n3. Blue progress bar shows how far you are from your target savings amount.\n\n4. Click on the dropdown arrow to view more details of your goal. \n\n5. Goal box will turn red if your goal deadline has passed. \n\n6. Show goal history shows past goals you have completed. "
             ),
         }}
       />
@@ -90,7 +90,7 @@ export function GoalsAll() {
         options={{
           headerRight: () =>
             Help(
-              "Goal history shows an archive all of your past completed goals. For each goal, you can click on dropdown arrow to view the goal's details."
+              "Goal history shows an archive all of your past completed goals. For each goal, you can click on dropdown arrow to view the goal's details. Long press on the goal to show the delete button."
             ),
         }}
       />
