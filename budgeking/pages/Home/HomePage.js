@@ -729,29 +729,31 @@ class HomePage extends React.Component {
                 marginBottom: 10,
               }}
             >
-              {this.state.showMore ? (
-                <TouchableOpacity
-                  onPress={() => this.setState({ showMore: false })}
-                  style={{ alignSelf: "flex-end", paddingRight: 20 }}
-                >
-                  <MaterialCommunityIcons
-                    name="chevron-up"
-                    size={30}
-                    color={colours.darkgrey}
-                  />
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  onPress={() => this.setState({ showMore: true })}
-                  style={{ alignSelf: "flex-end", paddingRight: 20 }}
-                >
-                  <MaterialCommunityIcons
-                    name="chevron-down"
-                    size={30}
-                    color={colours.darkgrey}
-                  />
-                </TouchableOpacity>
-              )}
+              {this.checkEmptyPieData() ? (
+                this.state.showMore ? (
+                  <TouchableOpacity
+                    onPress={() => this.setState({ showMore: false })}
+                    style={{ alignSelf: "flex-end", paddingRight: 20 }}
+                  >
+                    <MaterialCommunityIcons
+                      name="chevron-up"
+                      size={30}
+                      color={colours.darkgrey}
+                    />
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => this.setState({ showMore: true })}
+                    style={{ alignSelf: "flex-end", paddingRight: 20 }}
+                  >
+                    <MaterialCommunityIcons
+                      name="chevron-down"
+                      size={30}
+                      color={colours.darkgrey}
+                    />
+                  </TouchableOpacity>
+                )
+              ) : null}
 
               {this.state.showMore && this.checkEmptyPieData()
                 ? legendArr.map((legend) =>
