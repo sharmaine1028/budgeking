@@ -37,7 +37,6 @@ class ChooseCustomDate extends React.Component {
     state[prop1] = new Date(val["endDate"]);
     state[prop2] = new Date(val["startDate"]);
     this.setState(state);
-    this.inputStartEndDateFireStore();
     // console.log("datefrom", this.state.dateFrom);
     // console.log("dateto", this.state.dateTo);
   }
@@ -68,6 +67,7 @@ class ChooseCustomDate extends React.Component {
     this.updateInputVal1("Choose custom dates", "timeUserWants");
     // console.log("after", this.state.timeUserWants);
     this.inputChooseTimeFireStore();
+    this.inputStartEndDateFireStore();
     this.props.navigation.navigate("Pie Chart View");
   }
 
