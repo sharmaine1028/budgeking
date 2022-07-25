@@ -9,7 +9,11 @@ import {
   Text,
 } from "react-native";
 import colours from "../../styles/colours";
-import { BlackButton } from "../../components/reusableButton";
+import {
+  AddBlackButton,
+  BlackButton,
+  CancelBlackButton,
+} from "../../components/reusableButton";
 import {
   BudgetInput,
   Title,
@@ -191,16 +195,8 @@ class BudgetPage extends React.Component {
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <BlackButton
-              text={"Add"}
-              style={{ flexGrow: 0.5 }}
-              onPress={() => this.addToBudget()}
-            />
-            <BlackButton
-              text={"Cancel"}
-              style={{ flexGrow: 0.5 }}
-              onPress={() => this.reset()}
-            />
+            <AddBlackButton onPress={() => this.addToBudget()} />
+            <CancelBlackButton onPress={() => this.reset()} />
           </View>
         </View>
       </KeyboardAwareScrollView>

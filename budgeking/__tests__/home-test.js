@@ -40,92 +40,94 @@ test("time formats correctly", () => {
   expect(timeFormat(convertToSecondsNoon)).toBe("12:00 PM");
 });
 
-// renderNoRecords
-test("table view renders no records yet if empty database", async () => {
-  try {
-    const expenses = [];
-    const tree = TestRenderer.create(
-      expenses.length !== 0
-        ? expenses.map((doc) => generate3ExpensesLR(doc))
-        : renderNoRecords()
-    );
-    expect(tree).toMatchSnapshot();
-  } catch (e) {
-    console.log(e);
-  }
-});
+describe("testing home components", () => {
+  // renderNoRecords
+  test("table view renders no records yet if empty database", async () => {
+    try {
+      const expenses = [];
+      const tree = TestRenderer.create(
+        expenses.length !== 0
+          ? expenses.map((doc) => generate3ExpensesLR(doc))
+          : renderNoRecords()
+      );
+      expect(tree).toMatchSnapshot();
+    } catch (e) {
+      console.log(e);
+    }
+  });
 
-// generate3ExpensesLR
-test("expenses renders correctly with data", async () => {
-  try {
-    const expenses = [
-      (item = {
-        category: "food and drinks",
-        date: {
-          nanoseconds: 591000000,
-          seconds: 1658382053,
-        },
-        key: "VBjtiejjNZO2yLUV2nGj",
-        notes: "",
-        time: {
-          nanoseconds: 591000000,
-          seconds: 1658382053,
-        },
-        value: 10.5,
-      }),
-      (item = {
-        category: "health",
-        date: {
-          nanoseconds: 868000000,
-          seconds: 1658122274,
-        },
-        key: "lwX2I0eq9oYaWL01nbW3",
-        notes: "Annual detailed checkup",
-        time: {
-          nanoseconds: 402000000,
-          seconds: 1658179874,
-        },
-        value: 60,
-      }),
-      (item = {
-        category: "health",
-        date: {
-          nanoseconds: 0,
-          seconds: 1624202293,
-        },
-        key: "S10W60mbFClRQ2DZifxP",
-        notes: "Uniqlo ",
-        time: {
-          nanoseconds: 0,
-          seconds: 1655695093,
-        },
-        value: 12.78,
-      }),
+  // generate3ExpensesLR
+  test("expenses renders correctly with data", async () => {
+    try {
+      const expenses = [
+        (item = {
+          category: "food and drinks",
+          date: {
+            nanoseconds: 591000000,
+            seconds: 1658382053,
+          },
+          key: "VBjtiejjNZO2yLUV2nGj",
+          notes: "",
+          time: {
+            nanoseconds: 591000000,
+            seconds: 1658382053,
+          },
+          value: 10.5,
+        }),
+        (item = {
+          category: "health",
+          date: {
+            nanoseconds: 868000000,
+            seconds: 1658122274,
+          },
+          key: "lwX2I0eq9oYaWL01nbW3",
+          notes: "Annual detailed checkup",
+          time: {
+            nanoseconds: 402000000,
+            seconds: 1658179874,
+          },
+          value: 60,
+        }),
+        (item = {
+          category: "health",
+          date: {
+            nanoseconds: 0,
+            seconds: 1624202293,
+          },
+          key: "S10W60mbFClRQ2DZifxP",
+          notes: "Uniqlo ",
+          time: {
+            nanoseconds: 0,
+            seconds: 1655695093,
+          },
+          value: 12.78,
+        }),
+      ];
+      const tree = TestRenderer.create(
+        expenses.length !== 0
+          ? expenses.map((doc) => generate3ExpensesLR(doc))
+          : renderNoRecords()
+      );
+      expect(tree).toMatchSnapshot();
+    } catch (e) {
+      console.log(e);
+    }
+  });
+
+  // renderLegend
+  test("pie chart renders legend correctly", async () => {
+    const legend = [
+      ["Food & Drinks", "#177AD5"],
+      ["Transportation", "#79D2DE"],
+      ["Housing", "#F7D8B5"],
+      ["Shopping", "#8F80E4"],
+      ["Health", "#FB8875"],
+      ["Education", "#FDE74C"],
+      ["Others", "#E8E0CE"],
     ];
     const tree = TestRenderer.create(
-      expenses.length !== 0
-        ? expenses.map((doc) => generate3ExpensesLR(doc))
-        : renderNoRecords()
+      legend.map((doc) => renderLegend(doc[0], doc[1]))
     );
     expect(tree).toMatchSnapshot();
-  } catch (e) {
-    console.log(e);
-  }
-});
-
-// renderLegend
-test("pie chart renders legend correctly", async () => {
-  const legend = [
-    ["Food & Drinks", "#177AD5"],
-    ["Transportation", "#79D2DE"],
-    ["Housing", "#F7D8B5"],
-    ["Shopping", "#8F80E4"],
-    ["Health", "#FB8875"],
-    ["Education", "#FDE74C"],
-    ["Others", "#E8E0CE"],
-  ];
-  const tree = TestRenderer.create(
-    legend.map((doc) => renderLegend(doc[0], doc[1]))
-  );
-  expect(tree).toMatchSnapshot();
+  });
 });

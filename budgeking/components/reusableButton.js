@@ -23,6 +23,18 @@ export function AddButton({ style, onPress }) {
   );
 }
 
+export function AddBlackButton({ onPress }) {
+  return (
+    <BlackButton text={"Add"} style={{ flexGrow: 0.5 }} onPress={onPress} />
+  );
+}
+
+export function CancelBlackButton({ onPress }) {
+  return (
+    <BlackButton text={"Cancel"} style={{ flexGrow: 0.5 }} onPress={onPress} />
+  );
+}
+
 export function BlackButton({ text, onPress, style, textStyle, onFocus }) {
   return (
     <>

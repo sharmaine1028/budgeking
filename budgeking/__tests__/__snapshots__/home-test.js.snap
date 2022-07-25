@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`expenses renders correctly with data 1`] = `
+exports[`testing home components expenses renders correctly with data 1`] = `
 Array [
   <View
     style={
@@ -395,7 +395,7 @@ Array [
 ]
 `;
 
-exports[`pie chart renders legend correctly 1`] = `
+exports[`testing home components pie chart renders legend correctly 1`] = `
 Array [
   <View
     style={
@@ -610,7 +610,7 @@ Array [
 ]
 `;
 
-exports[`table view renders no records yet if empty database 1`] = `
+exports[`testing home components table view renders no records yet if empty database 1`] = `
 <Text
   style={
     Object {
