@@ -287,15 +287,16 @@ class GoalsPage extends React.Component {
     if (data.createdBy === auth.currentUser.uid) {
       this.activeGoalsRef.doc(id).delete();
     } else {
-      if (data.sharingEmails.length === 0) {
+      if (data.sharingEmails.length === 1) {
         data.isSharing = false;
         data.sharingEmails = [];
+        this.editGoal(id, time, data);
       } else {
         data.sharingEmails = data.sharingEmails.filter(
           (item) => item !== auth.currentUser.email
         );
+        this.editGoal(id, time, data);
       }
-      this.editGoal(id, time, data);
     }
   };
 }
