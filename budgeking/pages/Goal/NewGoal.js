@@ -67,7 +67,7 @@ class NewGoal extends React.Component {
               this.updateInputVal(val, "target");
               this.updateFreqAmount();
             }}
-            placeholder="Type Here"
+            placeholder="$0.00"
           />
         </View>
 
