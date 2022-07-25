@@ -41,18 +41,21 @@ class GoalsPage extends React.Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.unsubscribeActiveGoalsOri = this.activeGoalsOri.onSnapshot(
-      this.getGoals
+      this.getGoalsOri
     );
     this.unsubscribeActiveGoalsShared = this.activeGoalsShared.onSnapshot(
-      this.getGoals
+      this.getGoalsShared
     );
 
-    this.unsubscribeSavings = this.props.navigation.addListener("focus", () => {
-      this.unsubscribeActiveGoalsOri;
-      this.unsubscribeActiveGoalsShared;
-    });
+    this.unsubscribeSavings = this.props.navigation.addListener(
+      "focus",
+      async () => {
+        this.unsubscribeActiveGoalsOri;
+        this.unsubscribeActiveGoalsShared;
+      }
+    );
   }
 
   componentWillUnmount() {
@@ -143,10 +146,34 @@ class GoalsPage extends React.Component {
   /*
   Getting goals from database and categorising to short and long term goal
   */
-  getGoals = (querySnapshot) => {
+  getGoalsOri = (querySnapshot) => {
     try {
-      this.setState({ shortTermGoals: [] });
-      this.setState({ longTermGoals: [] });
+      const shortTermState = [];
+      const longTermState = [];
+      querySnapshot.forEach((doc) => {
+        const deadlineYear = new Date(
+          doc.data().deadline.seconds * 1000
+        ).getFullYear();
+        const todayYear = new Date().getFullYear();
+
+        if (deadlineYear - todayYear < 5) {
+          shortTermState.push({ ...doc.data(), id: doc.id });
+        } else {
+          longTermState.push({ ...doc.data(), id: doc.id });
+        }
+      });
+
+      this.setState({
+        shortTermGoals: [...shortTermState],
+        longTermGoals: [...longTermState],
+      });
+    } catch {
+      (err) => console.log(err);
+    }
+  };
+
+  getGoalsShared = (querySnapshot) => {
+    try {
       querySnapshot.forEach((doc) => {
         const deadlineYear = new Date(
           doc.data().deadline.seconds * 1000
