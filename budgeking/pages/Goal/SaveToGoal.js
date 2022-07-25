@@ -34,10 +34,10 @@ function SaveToGoal({ route, navigation }) {
       .then((doc) => doc.data())
       .catch((err) => console.log(err));
 
-    const newAmt = Number(data.currSavingsAmt) + Number(val);
+    const newAmt = (Number(data.currSavingsAmt) + Number(val)).toFixed(2);
 
-    data.currSavingsAmt = newAmt;
-    saveItem(doc.id, time, newAmt, data);
+    data.currSavingsAmt = Number(newAmt);
+    saveItem(doc.id, time, Number(newAmt), data);
     navigation.navigate("Goals");
   };
 
@@ -68,8 +68,10 @@ function SaveToGoal({ route, navigation }) {
           separator="."
           precision={2}
           minValue={0}
-          maxValue={doc.target - doc.currSavingsAmt}
-          onChangeValue={(val) => setSavingsAmt(val)}
+          maxValue={(doc.target - doc.currSavingsAmt).toFixed(2)}
+          onChangeValue={(val) => {
+            setSavingsAmt(val);
+          }}
           placeholder="Type Here"
         />
       </View>
