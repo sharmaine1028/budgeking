@@ -181,13 +181,19 @@ function EditGoal({ route, navigation }) {
   };
 
   const editGoal = () => {
-    const finalData = data;
-    finalData.sharingEmails = sharingEmails;
-    finalData.deadline.setHours(23);
-    finalData.deadline.setMinutes(59);
-    finalData.deadline.setSeconds(59);
-    editItem(doc.id, time, finalData);
-    navigation.navigate("Goals");
+    if (!data.goalDescription || !data.target || !data.frequency) {
+      alert(
+        "Please fill in goal description, target amount to save and freqency"
+      );
+    } else {
+      const finalData = data;
+      finalData.sharingEmails = sharingEmails;
+      finalData.deadline.setHours(23);
+      finalData.deadline.setMinutes(59);
+      finalData.deadline.setSeconds(59);
+      editItem(doc.id, time, finalData);
+      navigation.navigate("Goals");
+    }
   };
 
   return (
@@ -213,7 +219,7 @@ function EditGoal({ route, navigation }) {
           minValue={0}
           maxValue={9999999999999}
           onChangeValue={(val) => setData({ ...data, target: val })}
-          placeholder="Type Here"
+          placeholder="$0.00"
         />
       </View>
 

@@ -28,14 +28,17 @@ function SaveToGoal({ route, navigation }) {
       alert("Please enter a value");
       return;
     }
-    const newAmt = Number(currSavingsAmt) + Number(val);
 
     const data = await dataRef
       .get()
       .then((doc) => doc.data())
       .catch((err) => console.log(err));
-    navigation.navigate("Goals");
+
+    const newAmt = Number(data.currSavingsAmt) + Number(val);
+
+    data.currSavingsAmt = newAmt;
     saveItem(doc.id, time, newAmt, data);
+    navigation.navigate("Goals");
   };
 
   return (

@@ -145,6 +145,8 @@ class GoalsPage extends React.Component {
   */
   getGoals = (querySnapshot) => {
     try {
+      this.setState({ shortTermGoals: [] });
+      this.setState({ longTermGoals: [] });
       querySnapshot.forEach((doc) => {
         const deadlineYear = new Date(
           doc.data().deadline.seconds * 1000
@@ -173,8 +175,8 @@ class GoalsPage extends React.Component {
     }
   };
 
-  moveToInactive = (id, data) => {
-    db.collection("inactive goals").doc(id).set({
+  moveToInactive = async (id, data) => {
+    await db.collection("inactive goals").doc(id).set({
       createdBy: data.createdBy,
       createdByEmail: data.createdByEmail,
       dateCreated: data.dateCreated,
@@ -188,6 +190,8 @@ class GoalsPage extends React.Component {
       sharingEmails: data.sharingEmails,
       currSavingsAmt: data.target,
     });
+
+    await db.collection("active goals").doc(id).delete();
   };
 
   editGoal = (id, time, data) => {
@@ -204,7 +208,6 @@ class GoalsPage extends React.Component {
     if (data.target <= data.currSavingsAmt) {
       this.setState({ showModal: true });
       this.moveToInactive(id, data);
-      this.deleteGoal(id, time);
       return;
     }
 
@@ -225,14 +228,6 @@ class GoalsPage extends React.Component {
   };
 
   saveToGoal = (id, time, newAmt, data) => {
-    if (newAmt >= data.target) {
-      this.setState({ showModal: true });
-      this.moveToInactive(id, data);
-      this.deleteGoal(id, time);
-    } else {
-      this.activeGoalsRef.doc(id).update({ currSavingsAmt: newAmt });
-    }
-
     if (time === "short term") {
       const newList = this.state.shortTermGoals.filter(
         (item) => item.id !== id
@@ -242,7 +237,13 @@ class GoalsPage extends React.Component {
       const newList = this.state.longTermGoals.filter((item) => item.id !== id);
       this.setState({ longTermGoals: newList });
     }
-    this.activeGoalsRef.doc(id).update({ currSavingsAmt: newAmt });
+
+    if (newAmt >= data.target) {
+      this.setState({ showModal: true });
+      this.moveToInactive(id, data);
+    } else {
+      this.activeGoalsRef.doc(id).update({ currSavingsAmt: newAmt });
+    }
   };
 
   deleteGoal = (id, time, data) => {
@@ -259,11 +260,9 @@ class GoalsPage extends React.Component {
     if (data.createdBy === auth.currentUser.uid) {
       this.activeGoalsRef.doc(id).delete();
     } else {
-      if (data.sharingEmails.length === 1) {
+      if (data.sharingEmails.length === 0) {
         data.isSharing = false;
-        data.sharingEmails = data.sharingEmails.filter(
-          (item) => item !== auth.currentUser.email
-        );
+        data.sharingEmails = [];
       } else {
         data.sharingEmails = data.sharingEmails.filter(
           (item) => item !== auth.currentUser.email
