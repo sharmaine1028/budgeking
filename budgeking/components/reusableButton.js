@@ -6,7 +6,7 @@ import {
   TextInput,
   Image,
 } from "react-native";
-import colours from "./colours";
+import colours from "../styles/colours";
 
 function reusableButton(props) {
   return <div></div>;
@@ -20,6 +20,18 @@ export function AddButton({ style, onPress }) {
         style={[styles.addButton, style]}
       />
     </TouchableOpacity>
+  );
+}
+
+export function AddBlackButton({ onPress }) {
+  return (
+    <BlackButton text={"Add"} style={{ flexGrow: 0.5 }} onPress={onPress} />
+  );
+}
+
+export function CancelBlackButton({ onPress }) {
+  return (
+    <BlackButton text={"Cancel"} style={{ flexGrow: 0.5 }} onPress={onPress} />
   );
 }
 
@@ -47,7 +59,7 @@ export function SmallBlackButton({ text, onPress, style, textStyle, onFocus }) {
         onPress={onPress}
         onFocus={onFocus}
       >
-        <Text style={{fontSize: 10, color: colours.white}}>{text}</Text>
+        <Text style={{ fontSize: 10, color: colours.white }}>{text}</Text>
       </TouchableOpacity>
     </>
   );

@@ -7,7 +7,7 @@ import {
   Dimensions,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import { auth, db } from "../../config/firebase";
 
 class ReportsPage extends React.Component {

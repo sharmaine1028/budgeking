@@ -1,6 +1,6 @@
 import React from "react";
 import { Divider } from "react-native-elements";
-import colours from "./colours";
+import colours from "../styles/colours";
 
 function reusablePart(props) {
   return <div></div>;

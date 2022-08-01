@@ -7,10 +7,10 @@ import {
   Animated,
   Alert,
 } from "react-native";
-import { GreyLine } from "../../config/reusablePart";
+import { GreyLine } from "../../components/reusablePart";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Header } from "../../config/reusableText";
-import colours from "../../config/colours";
+import { Header } from "../../components/reusableText";
+import colours from "../../styles/colours";
 import { Ionicons } from "@expo/vector-icons";
 import { Menu, MenuItem } from "react-native-material-menu";
 

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text, LogBox } from "react-native";
-import { NewGoalInput, Title } from "../../config/reusableText";
-import { BlackButton } from "../../config/reusableButton";
+import { NewGoalInput, Title } from "../../components/reusableText";
+import { BlackButton } from "../../components/reusableButton";
 import CurrencyInput from "react-native-currency-input";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import { db } from "../../config/firebase";
 
 // Replace object

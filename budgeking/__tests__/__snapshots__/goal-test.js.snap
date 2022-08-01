@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`goal renders correctly if empty database 1`] = `
+exports[`testing goal components goal renders correctly if empty database 1`] = `
 <Text
   style={
     Array [
@@ -16,7 +16,7 @@ exports[`goal renders correctly if empty database 1`] = `
 </Text>
 `;
 
-exports[`goal renders correctly with data 1`] = `
+exports[`testing goal components goal renders correctly with data 1`] = `
 <View>
   <View
     style={

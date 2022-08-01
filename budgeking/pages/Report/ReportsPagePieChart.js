@@ -6,12 +6,12 @@ import {
   ActivityIndicator,
   Dimensions,
 } from "react-native";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import { auth, db } from "../../config/firebase";
-import { Header, Title, SmallTextInput } from "../../config/reusableText";
+import { Header, Title, SmallTextInput } from "../../components/reusableText";
 import { PieChart } from "react-native-gifted-charts";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { BlackButton } from "../../config/reusableButton";
+import { BlackButton } from "../../components/reusableButton";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { dateFormat, categoryFormat, renderLegend } from "../Home/HomePage";
@@ -389,7 +389,6 @@ class ReportsPagePieChart extends React.Component {
     } else if (this.state.timeUserWants == "This Year") {
       dayText += new Date().getFullYear();
     } else {
-      // console.log("hellloooo", this.state.dateTo);
       dayText += dateFormat(this.state.dateFrom.seconds);
       dayText += " - ";
       dayText += dateFormat(this.state.dateTo.seconds);

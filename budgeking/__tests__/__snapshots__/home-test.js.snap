@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`expenses renders correctly with data 1`] = `
+exports[`testing home components expenses renders correctly with data 1`] = `
 Array [
   <View
     style={
@@ -34,6 +34,32 @@ Array [
       >
         21 Jul 2022
       </Text>
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "justifyContent": "center",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontWeight": "200",
+                "marginBottom": 10,
+                "marginRight": 10,
+              },
+              Object {
+                "alignSelf": "flex-end",
+                "marginTop": 12,
+              },
+            ]
+          }
+        >
+          1:40 PM
+        </Text>
+      </View>
     </View>
     <View
       style={
@@ -95,17 +121,6 @@ Array [
       >
         
       </Text>
-      <Text
-        style={
-          Object {
-            "fontWeight": "200",
-            "marginBottom": 10,
-            "marginRight": 10,
-          }
-        }
-      >
-        1:40 PM
-      </Text>
     </View>
     <View
       style={
@@ -149,6 +164,32 @@ Array [
       >
         18 Jul 2022
       </Text>
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "justifyContent": "center",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontWeight": "200",
+                "marginBottom": 10,
+                "marginRight": 10,
+              },
+              Object {
+                "alignSelf": "flex-end",
+                "marginTop": 12,
+              },
+            ]
+          }
+        >
+          5:31 AM
+        </Text>
+      </View>
     </View>
     <View
       style={
@@ -210,17 +251,6 @@ Array [
       >
         Annual detailed checkup
       </Text>
-      <Text
-        style={
-          Object {
-            "fontWeight": "200",
-            "marginBottom": 10,
-            "marginRight": 10,
-          }
-        }
-      >
-        5:31 AM
-      </Text>
     </View>
     <View
       style={
@@ -264,6 +294,32 @@ Array [
       >
         20 Jun 2021
       </Text>
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "justifyContent": "center",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontWeight": "200",
+                "marginBottom": 10,
+                "marginRight": 10,
+              },
+              Object {
+                "alignSelf": "flex-end",
+                "marginTop": 12,
+              },
+            ]
+          }
+        >
+          11:18 AM
+        </Text>
+      </View>
     </View>
     <View
       style={
@@ -325,17 +381,6 @@ Array [
       >
         Uniqlo 
       </Text>
-      <Text
-        style={
-          Object {
-            "fontWeight": "200",
-            "marginBottom": 10,
-            "marginRight": 10,
-          }
-        }
-      >
-        11:18 AM
-      </Text>
     </View>
     <View
       style={
@@ -350,7 +395,7 @@ Array [
 ]
 `;
 
-exports[`pie chart renders legend correctly 1`] = `
+exports[`testing home components pie chart renders legend correctly 1`] = `
 Array [
   <View
     style={
@@ -565,7 +610,7 @@ Array [
 ]
 `;
 
-exports[`table view renders no records yet if empty database 1`] = `
+exports[`testing home components table view renders no records yet if empty database 1`] = `
 <Text
   style={
     Object {

@@ -1,10 +1,10 @@
 import React from "react";
 import { StyleSheet, View, Image } from "react-native";
 import DatePicker from "react-native-date-ranges";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { auth, db } from "../../config/firebase";
-import { BlackButton } from "../../config/reusableButton";
+import { BlackButton } from "../../components/reusableButton";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // choose custom date
@@ -37,7 +37,6 @@ class ChooseCustomDate extends React.Component {
     state[prop1] = new Date(val["endDate"]);
     state[prop2] = new Date(val["startDate"]);
     this.setState(state);
-    this.inputStartEndDateFireStore();
     // console.log("datefrom", this.state.dateFrom);
     // console.log("dateto", this.state.dateTo);
   }
@@ -68,6 +67,7 @@ class ChooseCustomDate extends React.Component {
     this.updateInputVal1("Choose custom dates", "timeUserWants");
     // console.log("after", this.state.timeUserWants);
     this.inputChooseTimeFireStore();
+    this.inputStartEndDateFireStore();
     this.props.navigation.navigate("Pie Chart View");
   }
 
