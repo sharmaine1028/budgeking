@@ -1,7 +1,13 @@
 import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import { auth, db } from "../../config/firebase";
 
 class ReportsPage extends React.Component {
@@ -81,18 +87,10 @@ class ReportsPage extends React.Component {
     });
   };
 
-  addExpensesIncomeAllTime(exIn) {
-    let sum = 0;
-    exIn.map((item, i) => {
-      sum += item.value;
-    });
-    return sum.toFixed(2); //255.78
-  }
-
   getOverallBalance() {
     const diff =
-      this.addExpensesIncomeAllTime(this.state.incomeArr) -
-      this.addExpensesIncomeAllTime(this.state.expenseArr);
+      addExpensesIncomeAllTime(this.state.incomeArr) -
+      addExpensesIncomeAllTime(this.state.expenseArr);
     return diff.toFixed(2);
   }
 
@@ -112,7 +110,7 @@ class ReportsPage extends React.Component {
           onPress={() => navigation.navigate("Pie Chart View")}
         >
           <Text style={styles.reportTitle}>TOTAL SPENDING</Text>
-          <Text style={styles.reportInText}>{`$${this.addExpensesIncomeAllTime(
+          <Text style={styles.reportInText}>{`$${addExpensesIncomeAllTime(
             this.state.expenseArr
           )}`}</Text>
         </TouchableOpacity>
@@ -121,13 +119,21 @@ class ReportsPage extends React.Component {
   }
 }
 
+export function addExpensesIncomeAllTime(exIn) {
+  let sum = 0;
+  exIn.map((item, i) => {
+    sum += item.value;
+  });
+  return sum.toFixed(2); //255.78
+}
+
 const styles = StyleSheet.create({
   reportBlocks: {
     backgroundColor: colours.lightBrown,
     borderRadius: 20,
     marginTop: 20,
     height: 100,
-    width: 400,
+    width: Dimensions.get("window").width * 0.95,
     borderWidth: 0,
     alignSelf: "center",
   },

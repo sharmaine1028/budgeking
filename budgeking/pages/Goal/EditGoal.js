@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { BlackButton } from "../../config/reusableButton";
+import { BlackButton } from "../../components/reusableButton";
 import {
   IconTextInput,
   NewGoalInput,
   YesOrNo,
-} from "../../config/reusableText";
+} from "../../components/reusableText";
 import {
   View,
   StyleSheet,
@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import CurrencyInput from "react-native-currency-input";
 import { auth, db } from "../../config/firebase";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -106,11 +106,11 @@ function EditGoal({ route, navigation }) {
       freqAmount = days === 0 ? target : target / days;
     }
 
-    const format = (num) => {
-      return (Math.ceil(num * 100) / 100).toFixed(2);
-    };
-
     setData({ ...data, freqAmount: format(freqAmount) });
+  };
+
+  const format = (num) => {
+    return (Math.ceil(num * 100) / 100).toFixed(2);
   };
 
   const deleteEmail = (tobeRemoved) => {
@@ -181,13 +181,19 @@ function EditGoal({ route, navigation }) {
   };
 
   const editGoal = () => {
-    const finalData = data;
-    finalData.sharingEmails = sharingEmails;
-    finalData.deadline.setHours(23);
-    finalData.deadline.setMinutes(59);
-    finalData.deadline.setSeconds(59);
-    editItem(doc.id, time, finalData);
-    navigation.navigate("Goals");
+    if (!data.goalDescription || !data.target || !data.frequency) {
+      alert(
+        "Please fill in goal description, target amount to save and freqency"
+      );
+    } else {
+      const finalData = data;
+      finalData.sharingEmails = sharingEmails;
+      finalData.deadline.setHours(23);
+      finalData.deadline.setMinutes(59);
+      finalData.deadline.setSeconds(59);
+      editItem(doc.id, time, finalData);
+      navigation.navigate("Goals");
+    }
   };
 
   return (
@@ -213,7 +219,7 @@ function EditGoal({ route, navigation }) {
           minValue={0}
           maxValue={9999999999999}
           onChangeValue={(val) => setData({ ...data, target: val })}
-          placeholder="Type Here"
+          placeholder="$0.00"
         />
       </View>
 

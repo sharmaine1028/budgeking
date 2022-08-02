@@ -7,12 +7,20 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import colours from "./colours";
+import colours from "../styles/colours";
 import RadioButtonRN from "radio-buttons-react-native";
 
 function reusableText(props) {
   return <div></div>;
 }
+
+export const ChangeUsername = () => {
+  return <Header text={"Change username"} />;
+};
+
+export const ChangePassword = () => {
+  return <Header text={"Change password"} />;
+};
 
 export function Footer({ onPress, text, desc }) {
   return (
@@ -240,6 +248,7 @@ export function BudgetInput({
         keyboardType={keyboardType}
         onPressIn={onPressIn}
         value={value}
+        maxLength={50}
         onChangeText={onChangeText}
       />
     </View>

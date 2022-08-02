@@ -12,19 +12,20 @@ import {
   TouchableOpacity,
   Modal,
 } from "react-native";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import { auth, db } from "../../config/firebase";
-import RedLine from "../../config/reusablePart";
-import { Header, Title } from "../../config/reusableText";
+import RedLine from "../../components/reusablePart";
+import { Header, Title } from "../../components/reusableText";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { PieChart } from "react-native-gifted-charts";
-import CurrencyInput, { TextWithCursor } from "react-native-currency-input";
+import CurrencyInput from "react-native-currency-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { GreyLine } from "../../config/reusablePart";
-import { BlackButton } from "../../config/reusableButton";
+import { GreyLine } from "../../components/reusablePart";
+import { BlackButton } from "../../components/reusableButton";
 import { Divider } from "react-native-elements";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { getMonthlyData, getDailyData } from "../Report/ReportsPageTable";
 
 const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
@@ -37,6 +38,10 @@ class HomePage extends React.Component {
       .collection("users")
       .doc(auth.currentUser.uid)
       .collection("expense");
+    this.fireStoreRefIncome = db
+      .collection("users")
+      .doc(auth.currentUser.uid)
+      .collection("income");
     this.activeGoalsRef = db.collection("active goals");
     this.activeGoalsOri = this.activeGoalsRef.where(
       "createdBy",
@@ -76,6 +81,8 @@ class HomePage extends React.Component {
       showBudgetValueModal: false,
       offTrackGoals: [],
       tempBudgetValue: 0.0,
+      showMore: false,
+      incomeArr: [],
     };
   }
 
@@ -88,6 +95,9 @@ class HomePage extends React.Component {
   // calling budgetValue from firestore
   componentDidMount() {
     this.unsubscribe = this.fireStoreRef.onSnapshot(this.getCollection);
+    this.unsubscribeIncome = this.fireStoreRefIncome.onSnapshot(
+      this.getCollectionIncome
+    );
     this.unsubscribeActiveGoalsOri = this.activeGoalsOri.onSnapshot(
       this.getOffTrackGoals
     );
@@ -112,6 +122,7 @@ class HomePage extends React.Component {
 
   componentWillUnmount() {
     this.unsubscribe();
+    this.unsubscribeIncome();
     this.unsubscribeActiveGoalsOri();
     this.unsubscribeActiveGoalsShared();
   }
@@ -119,7 +130,7 @@ class HomePage extends React.Component {
   getCollection = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { notes, value, category, date, time } = res.data();
+      const { notes, value, category, date, time, budget } = res.data();
       expenseArrPush.push({
         key: res.id,
         notes,
@@ -127,14 +138,13 @@ class HomePage extends React.Component {
         category,
         date,
         time,
+        budget,
       });
-      // console.log(expenseArr, "+>", res.id, "=>", res.data());
     });
     this.setState({
       expenseArr: expenseArrPush,
       isLoading: false,
     });
-
     // console.log("pie", this.addExpensesDaily() == 0);
     // console.log("piepushed =>", this.updatePieData())
     // console.log(auth.currentUser.displayName)
@@ -142,6 +152,25 @@ class HomePage extends React.Component {
     // console.log(this.state.expenseArr);
     // console.log(new Date().toLocaleDateString('en-us', {  weekday: 'short' }))
     // console.log(auth.currentUser.uid)
+  };
+
+  getCollectionIncome = (querySnapshot) => {
+    const incomeArrPush = [];
+    querySnapshot.forEach((res) => {
+      const { category, date, notes, value, time, budget } = res.data();
+      incomeArrPush.push({
+        key: res.id,
+        value,
+        category,
+        notes,
+        date,
+        time,
+        budget,
+      });
+    });
+    this.setState({
+      incomeArr: incomeArrPush,
+    });
   };
 
   //input budgetvalue to firestore
@@ -178,7 +207,7 @@ class HomePage extends React.Component {
 
   addExpensesMonthly() {
     let sum = 0;
-    this.getMonthlyData().map((item, i) => {
+    getMonthlyData(this.state.expenseArr).map((item, i) => {
       sum += item.value;
     });
     return sum.toFixed(2); //255.78
@@ -186,7 +215,7 @@ class HomePage extends React.Component {
 
   addExpensesDaily() {
     let sum = 0;
-    this.getDailyData().map((item, i) => {
+    getDailyData(this.state.expenseArr).map((item, i) => {
       sum += item.value;
     });
     return sum.toFixed(2); //12
@@ -212,7 +241,7 @@ class HomePage extends React.Component {
 
   textBesideWalking() {
     var leftExceeded = "";
-    if (this.whichBudgetValue() <= this.addExpenses()) {
+    if (this.whichBudgetValue() < this.addExpenses()) {
       leftExceeded += "Exceeded";
     } else {
       leftExceeded += "Left";
@@ -238,7 +267,7 @@ class HomePage extends React.Component {
       { category: "education", value: 0, color: "#FDE74C" },
       { category: "others", value: 0, color: "#E8E0CE" },
     ];
-    this.getMonthlyData().map((item, i) => {
+    getMonthlyData(this.state.expenseArr).map((item, i) => {
       if (item.category == "food and drinks") {
         pieDataPush[0]["value"] += item.value;
       } else if (item.category == "transportation") {
@@ -268,7 +297,7 @@ class HomePage extends React.Component {
       { category: "education", value: 0, color: "#FDE74C" },
       { category: "others", value: 0, color: "#E8E0CE" },
     ];
-    this.getDailyData().map((item, i) => {
+    getDailyData(this.state.expenseArr).map((item, i) => {
       if (item.category == "food and drinks") {
         pieDataPush[0]["value"] += item.value;
       } else if (item.category == "transportation") {
@@ -311,48 +340,6 @@ class HomePage extends React.Component {
     return text;
   }
 
-  // convertTimeStamp() {
-  //   var expenseArrTime = this.state.expenseArr;
-  //   this.state.expenseArr.map((item, i) => {
-  //     // var dateFirestore = expenseArrTime[i]["date"];
-  //     console.log("datefirestore", expenseArrTime[i]["date"].toDate())
-  //     // expenseArrTime[i]["date"] = expenseArrTime[i]["date"].toDate();
-  //   });
-  //   return expenseArrTime;
-  // }
-
-  getMonthlyData() {
-    const currMonth = new Date().getMonth();
-    const currYear = new Date().getFullYear();
-    const expenseArrayTimeConverted = this.state.expenseArr;
-    const monthlyExpenseArray = [];
-    expenseArrayTimeConverted.map((item, i) => {
-      const dateItem = expenseArrayTimeConverted[i]["date"];
-      // console.log("dateitem", dateItem)
-      if (
-        dateItem.toDate().getMonth() == currMonth &&
-        dateItem.toDate().getFullYear() == currYear
-      ) {
-        monthlyExpenseArray.push(expenseArrayTimeConverted[i]);
-      }
-    });
-    return monthlyExpenseArray;
-  }
-
-  getDailyData() {
-    const currDate = new Date().toLocaleDateString();
-    const expenseArrayTimeConverted = this.state.expenseArr;
-    const dailyExpenseArray = [];
-    expenseArrayTimeConverted.map((item, i) => {
-      const dateItem = expenseArrayTimeConverted[i]["date"];
-      // console.log("dateitem", dateItem)
-      if (dateItem.toDate().toLocaleDateString() == currDate) {
-        dailyExpenseArray.push(expenseArrayTimeConverted[i]);
-      }
-    });
-    return dailyExpenseArray;
-  }
-
   toggleMonthlyDaily = (val) => {
     if (val === 0) {
       this.setState({ timeUserWants: "monthly" });
@@ -384,6 +371,13 @@ class HomePage extends React.Component {
     }
   }
 
+  combineTwoArr(expense, income) {
+    const combinedArr = [];
+    expense.map((item, i) => combinedArr.push(item));
+    income.map((item, i) => combinedArr.push(item));
+    return combinedArr;
+  }
+
   sortedArr(arr) {
     let sortedArr = arr.sort((a, b) => {
       if (dateFormat(a.date.seconds) == dateFormat(b.date.seconds)) {
@@ -395,11 +389,11 @@ class HomePage extends React.Component {
     return sortedArr;
   }
 
-  show3Expenses() {
+  show3Expenses(arr) {
     var show3Ex = [];
-    const sortedEx = this.sortedArr(this.state.expenseArr);
-    if (this.state.expenseArr.length <= 3) {
-      for (let i = 0; i < this.state.expenseArr.length; i++) {
+    const sortedEx = this.sortedArr(arr);
+    if (arr.length <= 3) {
+      for (let i = 0; i < arr.length; i++) {
         show3Ex.push(sortedEx[i]);
       }
     } else {
@@ -457,9 +451,9 @@ class HomePage extends React.Component {
 
   checkEmptyPieData() {
     if (this.state.timeUserWants === "monthly") {
-      return this.getMonthlyData().length != 0;
+      return getMonthlyData(this.state.expenseArr).length != 0;
     } else {
-      return this.getDailyData().length != 0;
+      return getDailyData(this.state.expenseArr).length != 0;
     }
   }
 
@@ -488,25 +482,40 @@ class HomePage extends React.Component {
     this.setState({ showBudgetValueModal: false });
   }
 
-  renderLegend = (text, color) => {
-    return (
-      <View style={{ flexDirection: "row", marginBottom: 12 }}>
-        <View
-          style={{
-            height: 18,
-            width: 18,
-            marginRight: 10,
-            borderRadius: 4,
-            backgroundColor: color || "white",
-          }}
-        />
-        <Text style={{ color: "#444444", fontSize: 16 }}>{text || ""}</Text>
-      </View>
-    );
-  };
-
   maybeLegend() {
     return <View></View>;
+  }
+
+  emptyPhotoURL() {
+    if (this.state.photoURL == null) {
+      return (
+        <Image
+          style={{
+            width: 30,
+            height: 30,
+            left: `${this.percentProfilePicture()}%`,
+            borderRadius: 9999,
+            justifyContent: "flex-end",
+            backgroundColor: colours.white,
+          }}
+          source={require("../../assets/loginsignup/profile.png")}
+        />
+      );
+    } else {
+      return (
+        <Image
+          style={{
+            width: 30,
+            height: 30,
+            left: `${this.percentProfilePicture()}%`,
+            borderRadius: 9999,
+            justifyContent: "flex-end",
+            backgroundColor: colours.white,
+          }}
+          source={{ uri: this.state.photoURL }}
+        />
+      );
+    }
   }
 
   getOffTrackGoals = (querySnapshot) => {
@@ -703,17 +712,21 @@ class HomePage extends React.Component {
           </View>
           <RedLine />
 
-          <Image
-            style={{
-              width: 30,
-              height: 30,
-              left: `${this.percentProfilePicture()}%`,
-              borderRadius: 9999,
-              justifyContent: "flex-end",
-              backgroundColor: colours.white,
-            }}
-            source={{ uri: this.state.photoURL }}
-          />
+          {this.addExpenses() <= this.whichBudgetValue() ? (
+            this.emptyPhotoURL()
+          ) : (
+            <Image
+              style={{
+                width: 40,
+                height: 30,
+                left: `${this.percentProfilePicture()}%`,
+                // borderRadius: 9999,
+                justifyContent: "flex-end",
+                backgroundColor: colours.white,
+              }}
+              source={require("../../assets/home/rip.png")}
+            />
+          )}
 
           <View style={styles.progressArea}>
             <View style={styles.progressBar}>
@@ -766,14 +779,40 @@ class HomePage extends React.Component {
             <View
               style={{
                 width: "100%",
-                justifyContent: "space-evenly",
-                marginTop: 20,
+                // justifyContent: "space-evenly",
+                // marginTop: 20,
+                marginHorizontal: 10,
+                marginBottom: 10,
               }}
             >
-              {this.checkEmptyPieData()
-                ? legendArr.map((legend) =>
-                    this.renderLegend(legend[0], legend[1])
-                  )
+              {this.checkEmptyPieData() ? (
+                this.state.showMore ? (
+                  <TouchableOpacity
+                    onPress={() => this.setState({ showMore: false })}
+                    style={{ alignSelf: "flex-end", paddingRight: 20 }}
+                  >
+                    <MaterialCommunityIcons
+                      name="chevron-up"
+                      size={30}
+                      color={colours.darkgrey}
+                    />
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => this.setState({ showMore: true })}
+                    style={{ alignSelf: "flex-end", paddingRight: 20 }}
+                  >
+                    <MaterialCommunityIcons
+                      name="chevron-down"
+                      size={30}
+                      color={colours.darkgrey}
+                    />
+                  </TouchableOpacity>
+                )
+              ) : null}
+
+              {this.state.showMore && this.checkEmptyPieData()
+                ? legendArr.map((legend) => renderLegend(legend[0], legend[1]))
                 : this.maybeLegend()}
             </View>
           </View>
@@ -814,9 +853,14 @@ class HomePage extends React.Component {
           <View style={styles.lastRecordTitle}>
             <Header style={styles.lastRecordText} text={"Last records"} />
             <RedLine />
-            {/* console.log(this.state.expenseArr.length) */}
-            {this.state.expenseArr.length !== 0
-              ? this.show3Expenses().map((doc) => generate3ExpensesLR(doc))
+            {this.combineTwoArr(this.state.expenseArr, this.state.incomeArr)
+              .length !== 0
+              ? this.show3Expenses(
+                  this.combineTwoArr(
+                    this.state.expenseArr,
+                    this.state.incomeArr
+                  )
+                ).map((doc) => generate3ExpensesLR(doc))
               : renderNoRecords()}
             <BlackButton
               text={"Show more"}
@@ -893,17 +937,35 @@ export const generate3ExpensesLR = (doc) => {
   return (
     <View key={doc.key} style={styles.row}>
       <View style={styles.dateRow}>
-        <MaterialCommunityIcons
-          name="arrow-right"
-          size={20}
-          color={colours.tomato}
-          backgroundColor={"transparent"}
-          style={{ marginLeft: 5, marginRight: 5, marginTop: 7 }}
-        />
+        {doc.budget == "Expense" ? (
+          <MaterialCommunityIcons
+            name="arrow-right"
+            size={20}
+            color={colours.tomato}
+            backgroundColor={"transparent"}
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 7 }}
+          />
+        ) : (
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={20}
+            color={colours.green}
+            backgroundColor={"transparent"}
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 7 }}
+          />
+        )}
+
         <Header
           text={`${doc.date.seconds ? dateFormat(doc.date.seconds) : ""}`}
           style={{ fontWeight: "bold", marginTop: 12 }}
         />
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <Text
+            style={[styles.timeText, { alignSelf: "flex-end", marginTop: 12 }]}
+          >
+            {timeFormat(doc.time.seconds)}
+          </Text>
+        </View>
       </View>
 
       <View style={styles.categoryRow}>
@@ -917,9 +979,25 @@ export const generate3ExpensesLR = (doc) => {
 
       <View style={styles.notesRow}>
         <Text style={styles.noteText}>{doc.notes}</Text>
-        <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
       </View>
       <GreyLine />
+    </View>
+  );
+};
+
+export const renderLegend = (text, color) => {
+  return (
+    <View key={text} style={{ flexDirection: "row", marginBottom: 12 }}>
+      <View
+        style={{
+          height: 18,
+          width: 18,
+          marginRight: 10,
+          borderRadius: 4,
+          backgroundColor: color || "white",
+        }}
+      />
+      <Text style={{ color: "#444444", fontSize: 16 }}>{text || ""}</Text>
     </View>
   );
 };

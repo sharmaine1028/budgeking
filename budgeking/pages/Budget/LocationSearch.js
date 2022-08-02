@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 
@@ -31,21 +31,22 @@ export class LocationSearch extends React.Component {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       alert("Permission to access location was denied");
-      return;
-    }
-    Location.installWebGeolocationPolyfill();
-    try {
-      let location = await Location.getCurrentPositionAsync({});
-      this.setState({
-        region: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: latitudeDelta,
-          longitudeDelta: longitudeDelta,
-        },
-      });
-    } catch (error) {
-      console.log(error);
+      Location.installWebGeolocationPolyfill();
+    } else {
+      Location.installWebGeolocationPolyfill();
+      try {
+        let location = await Location.getCurrentPositionAsync({});
+        this.setState({
+          region: {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: latitudeDelta,
+            longitudeDelta: longitudeDelta,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 

@@ -1,8 +1,8 @@
 import React from "react";
-import { BlackButton } from "../config/reusableButton";
+import { BlackButton } from "../components/reusableButton";
 import { auth, db, storage } from "../config/firebase";
-import { Header, IconTextInput, Title } from "../config/reusableText";
-import RedLine from "../config/reusablePart";
+import { Header, IconTextInput, Title } from "../components/reusableText";
+import RedLine from "../components/reusablePart";
 import {
   StyleSheet,
   View,
@@ -12,11 +12,12 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import { AddButton } from "../config/reusableButton";
-import colours from "../config/colours";
+import { AddButton } from "../components/reusableButton";
+import colours from "../styles/colours";
 import * as ImagePicker from "expo-image-picker";
 import uuid from "uuid";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { ChangeUsername, ChangePassword } from "../components/reusableText";
 
 class SettingsPage extends React.Component {
   constructor() {
@@ -89,7 +90,7 @@ class SettingsPage extends React.Component {
             </View>
           </TouchableOpacity>
         </View>
-        <Header text={"Change username"} />
+        <ChangeUsername />
         <IconTextInput
           placeholder={this.state.currDisplayName}
           icon={
@@ -112,7 +113,7 @@ class SettingsPage extends React.Component {
           onPress={(val) => this.updateUserDisplayName(val)}
         />
 
-        <Header text={"Change password"} />
+        <ChangePassword />
         <IconTextInput
           placeholder={"********"}
           icon={

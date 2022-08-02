@@ -1,11 +1,22 @@
 import React from "react";
-import { StyleSheet, ScrollView, View, Text } from "react-native";
-import { Header, Title } from "../../config/reusableText";
-import colours from "../../config/colours";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  Linking,
+} from "react-native";
+import { Header, Title } from "../../components/reusableText";
+import colours from "../../styles/colours";
 import Icon from "react-native-vector-icons/AntDesign";
 import { auth, db } from "../../config/firebase";
-import { BlackButton } from "../../config/reusableButton";
-import { GreyLine } from "../../config/reusablePart";
+import { BlackButton } from "../../components/reusableButton";
+import { GreyLine } from "../../components/reusablePart";
+import { Image } from "react-native";
+
+// dateFormat, timeFormat() to localdatestring() and localtimestring()
+
 import { dateFormat, categoryFormat, timeFormat } from "../Home/HomePage";
 import { renderNoRecords } from "../Home/HomePage";
 
@@ -70,7 +81,8 @@ class ReportsPageTable extends React.Component {
   getCollectionExpense = (querySnapshot) => {
     const expenseArrPush = [];
     querySnapshot.forEach((res) => {
-      const { notes, value, category, date, time } = res.data();
+      const { notes, value, category, date, time, photoURL, address } =
+        res.data();
       expenseArrPush.push({
         key: res.id,
         value,
@@ -78,6 +90,8 @@ class ReportsPageTable extends React.Component {
         category,
         date,
         time,
+        photoURL,
+        address,
       });
     });
     this.setState({
@@ -88,7 +102,8 @@ class ReportsPageTable extends React.Component {
   getCollectionIncome = (querySnapshot) => {
     const incomeArrPush = [];
     querySnapshot.forEach((res) => {
-      const { category, date, notes, value, time } = res.data();
+      const { category, date, notes, value, time, photoURL, address } =
+        res.data();
       incomeArrPush.push({
         key: res.id,
         value,
@@ -96,57 +111,14 @@ class ReportsPageTable extends React.Component {
         notes,
         date,
         time,
+        photoURL,
+        address,
       });
     });
     this.setState({
       incomeArr: incomeArrPush,
     });
   };
-
-  getMonthlyData(doc) {
-    const currMonth = new Date().getMonth();
-    const currYear = new Date().getFullYear();
-    // console.log("currmonth", currMonth)
-    const arrayTimeConverted = doc;
-    const monthlyArray = [];
-    arrayTimeConverted.map((item, i) => {
-      const dateItem = arrayTimeConverted[i]["date"];
-      // console.log("dateitem", dateItem)
-      if (
-        dateItem.toDate().getMonth() == currMonth &&
-        dateItem.toDate().getFullYear() == currYear
-      ) {
-        monthlyArray.push(arrayTimeConverted[i]);
-      }
-    });
-    return monthlyArray;
-  }
-
-  getDailyData(doc) {
-    const currDate = new Date().toLocaleDateString();
-    const arrayTimeConverted = doc;
-    const dailyArray = [];
-    arrayTimeConverted.map((item, i) => {
-      const dateItem = arrayTimeConverted[i]["date"];
-      if (dateItem.toDate().toLocaleDateString() == currDate) {
-        dailyArray.push(arrayTimeConverted[i]);
-      }
-    });
-    return dailyArray;
-  }
-
-  getYearlyData(doc) {
-    const currYear = new Date().getFullYear();
-    const arrayTimeConverted = doc;
-    const yearlyArray = [];
-    arrayTimeConverted.map((item, i) => {
-      const dateItem = arrayTimeConverted[i]["date"];
-      if (dateItem.toDate().getFullYear() == currYear) {
-        yearlyArray.push(arrayTimeConverted[i]);
-      }
-    });
-    return yearlyArray;
-  }
 
   getCustomData(doc) {
     // console.log("dateto", this.state.dateTo.seconds);
@@ -176,6 +148,23 @@ class ReportsPageTable extends React.Component {
     return sortedArr;
   }
 
+  generatePhotoAttached(doc) {
+    return (
+      <View>
+        <TouchableOpacity>
+          <Text
+            onPress={() => {
+              Linking.openURL(doc.photoURL);
+            }}
+            style={{ marginTop: 5, fontWeight: "300", fontSize: 14 }}
+          >
+            Click here to view
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   generateExpensesIncome = (doc) => {
     return (
       <View key={doc.key} style={styles.row}>
@@ -193,6 +182,14 @@ class ReportsPageTable extends React.Component {
             text={`${dateFormat(doc.date.seconds)}`}
             style={{ fontWeight: "bold", marginTop: 12 }}
           />
+
+          <View style={{ flex: 1, justifyContent: "center" }}>
+            <Text
+              style={[styles.timeText, { alignSelf: "flex-end", marginTop: 8 }]}
+            >
+              {timeFormat(doc.time.seconds)}
+            </Text>
+          </View>
         </View>
         <GreyLine />
 
@@ -205,9 +202,41 @@ class ReportsPageTable extends React.Component {
           <Text style={styles.valueText}>{`$${doc.value}`}</Text>
         </View>
 
-        <View style={styles.notesRow}>
-          <Text style={styles.noteText}>{doc.notes}</Text>
-          <Text style={styles.timeText}>{timeFormat(doc.time.seconds)}</Text>
+        {doc.notes ? (
+          <View style={styles.notesRow}>
+            <Text style={styles.noteText}>{doc.notes}</Text>
+          </View>
+        ) : (
+          <View style={{ marginBottom: 5 }} />
+        )}
+        <GreyLine />
+        <View style={styles.dateRow}>
+          <Image
+            source={require("../../assets/addphoto.png")}
+            style={styles.image}
+          />
+          {doc.photoURL != "" ? (
+            this.generatePhotoAttached(doc)
+          ) : (
+            <Text style={{ marginTop: 5, fontWeight: "300", fontSize: 14 }}>
+              No photo attached
+            </Text>
+          )}
+        </View>
+        <View style={[styles.dateRow, { marginBottom: 5 }]}>
+          <Image
+            source={require("../../assets/location.png")}
+            style={styles.image}
+          />
+          {doc.address != "" ? (
+            <Text style={{ marginTop: 8, fontSize: 14, color: colours.black }}>
+              {doc.address}
+            </Text>
+          ) : (
+            <Text style={{ marginTop: 8, fontWeight: "300", fontSize: 14 }}>
+              No location
+            </Text>
+          )}
         </View>
       </View>
     );
@@ -215,11 +244,11 @@ class ReportsPageTable extends React.Component {
 
   whichExpense() {
     if (this.state.timeUserWants === "This Month") {
-      return this.getMonthlyData(this.state.expenseArr);
+      return getMonthlyData(this.state.expenseArr);
     } else if (this.state.timeUserWants == "Today") {
-      return this.getDailyData(this.state.expenseArr);
+      return getDailyData(this.state.expenseArr);
     } else if (this.state.timeUserWants == "This Year") {
-      return this.getYearlyData(this.state.expenseArr);
+      return getYearlyData(this.state.expenseArr);
     } else {
       return this.getCustomData(this.state.expenseArr);
     }
@@ -227,11 +256,11 @@ class ReportsPageTable extends React.Component {
 
   whichIncome() {
     if (this.state.timeUserWants === "This Month") {
-      return this.getMonthlyData(this.state.incomeArr);
+      return getMonthlyData(this.state.incomeArr);
     } else if (this.state.timeUserWants == "Today") {
-      return this.getDailyData(this.state.incomeArr);
+      return getDailyData(this.state.incomeArr);
     } else if (this.state.timeUserWants == "This Year") {
-      return this.getYearlyData(this.state.incomeArr);
+      return getYearlyData(this.state.incomeArr);
     } else {
       return this.getCustomData(this.state.incomeArr);
     }
@@ -316,6 +345,50 @@ class ReportsPageTable extends React.Component {
   }
 }
 
+export function getMonthlyData(doc) {
+  const currMonth = new Date().getTime() / 1000;
+  const currYear = new Date().getFullYear().toString();
+  const arrayTimeConverted = doc;
+  const monthlyArray = [];
+  arrayTimeConverted.map((item, i) => {
+    const dateItem = arrayTimeConverted[i]["date"];
+    if (
+      dateFormat(dateItem.seconds).slice(-8, -5) ==
+        dateFormat(currMonth).slice(-8, -5) &&
+      dateFormat(dateItem.seconds).slice(-4) == currYear
+    ) {
+      monthlyArray.push(arrayTimeConverted[i]);
+    }
+  });
+  return monthlyArray;
+}
+
+export function getDailyData(doc) {
+  const currDate = new Date().getTime() / 1000;
+  const arrayTimeConverted = doc;
+  const dailyArray = [];
+  arrayTimeConverted.map((item, i) => {
+    const dateItem = arrayTimeConverted[i]["date"];
+    if (dateFormat(dateItem.seconds) == dateFormat(currDate)) {
+      dailyArray.push(arrayTimeConverted[i]);
+    }
+  });
+  return dailyArray;
+}
+
+export function getYearlyData(doc) {
+  const currYear = new Date().getFullYear().toString();
+  const arrayTimeConverted = doc;
+  const yearlyArray = [];
+  arrayTimeConverted.map((item, i) => {
+    const dateItem = arrayTimeConverted[i]["date"];
+    if (dateFormat(dateItem.seconds).slice(-4) == currYear) {
+      yearlyArray.push(arrayTimeConverted[i]);
+    }
+  });
+  return yearlyArray;
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -382,6 +455,40 @@ const styles = StyleSheet.create({
     fontWeight: "200",
     marginRight: 10,
     marginBottom: 10,
+  },
+  image: {
+    width: 20,
+    height: 20,
+    margin: 5,
+    marginLeft: 20,
+    overflow: "visible",
+    resizeMode: "contain",
+  },
+  logo: {
+    paddingLeft: 310,
+    margin: 5,
+  },
+  modal: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  modalView: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

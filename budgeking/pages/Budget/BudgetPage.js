@@ -8,14 +8,18 @@ import {
   Dimensions,
   Text,
 } from "react-native";
-import colours from "../../config/colours";
-import { BlackButton } from "../../config/reusableButton";
+import colours from "../../styles/colours";
+import {
+  AddBlackButton,
+  BlackButton,
+  CancelBlackButton,
+} from "../../components/reusableButton";
 import {
   BudgetInput,
   Title,
   Header,
   IconTextInput,
-} from "../../config/reusableText";
+} from "../../components/reusableText";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -191,16 +195,8 @@ class BudgetPage extends React.Component {
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <BlackButton
-              text={"Add"}
-              style={{ flexGrow: 0.5 }}
-              onPress={() => this.addToBudget()}
-            />
-            <BlackButton
-              text={"Cancel"}
-              style={{ flexGrow: 0.5 }}
-              onPress={() => this.reset()}
-            />
+            <AddBlackButton onPress={() => this.addToBudget()} />
+            <CancelBlackButton onPress={() => this.reset()} />
           </View>
         </View>
       </KeyboardAwareScrollView>
@@ -384,9 +380,12 @@ class BudgetPage extends React.Component {
       address: this.state.address,
       location: this.state.location,
       category: this.state.category,
+      budget: this.state.budget,
     });
 
-    alert("Budget updated");
+    alert(
+      "Budget updated. Check your lastest updates on Home Page under Last records."
+    );
 
     this.reset();
   };

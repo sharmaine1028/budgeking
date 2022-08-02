@@ -5,11 +5,25 @@ import {
   Text,
   TextInput,
   Image,
+  TouchableHighlight,
+  Dimensions,
 } from "react-native";
-import colours from "./colours";
+import colours from "../styles/colours";
 
 function reusableButton(props) {
   return <div></div>;
+}
+
+export function ModalOptions({ style, onPress, text }) {
+  return (
+    <TouchableHighlight
+      style={styles.modal}
+      underlayColor="gainsboro"
+      onPress={onPress}
+    >
+      <Text> {text}</Text>
+    </TouchableHighlight>
+  );
 }
 
 export function AddButton({ style, onPress }) {
@@ -20,6 +34,18 @@ export function AddButton({ style, onPress }) {
         style={[styles.addButton, style]}
       />
     </TouchableOpacity>
+  );
+}
+
+export function AddBlackButton({ onPress }) {
+  return (
+    <BlackButton text={"Add"} style={{ flexGrow: 0.5 }} onPress={onPress} />
+  );
+}
+
+export function CancelBlackButton({ onPress }) {
+  return (
+    <BlackButton text={"Cancel"} style={{ flexGrow: 0.5 }} onPress={onPress} />
   );
 }
 
@@ -47,7 +73,7 @@ export function SmallBlackButton({ text, onPress, style, textStyle, onFocus }) {
         onPress={onPress}
         onFocus={onFocus}
       >
-        <Text style={{fontSize: 10, color: colours.white}}>{text}</Text>
+        <Text style={{ fontSize: 10, color: colours.white }}>{text}</Text>
       </TouchableOpacity>
     </>
   );
@@ -102,6 +128,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colours.black,
+  },
+  modal: {
+    backgroundColor: "white",
+    padding: 20,
+    alignItems: "flex-start",
+    width: Dimensions.get("window").width * 0.8,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   text: {
     color: colours.white,

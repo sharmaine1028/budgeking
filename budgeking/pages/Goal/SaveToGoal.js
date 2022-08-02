@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text, LogBox } from "react-native";
-import { NewGoalInput, Title } from "../../config/reusableText";
-import { BlackButton } from "../../config/reusableButton";
+import { NewGoalInput, Title } from "../../components/reusableText";
+import { BlackButton } from "../../components/reusableButton";
 import CurrencyInput from "react-native-currency-input";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 import { db } from "../../config/firebase";
 
 // Replace object
@@ -28,14 +28,17 @@ function SaveToGoal({ route, navigation }) {
       alert("Please enter a value");
       return;
     }
-    const newAmt = Number(currSavingsAmt) + Number(val);
 
     const data = await dataRef
       .get()
       .then((doc) => doc.data())
       .catch((err) => console.log(err));
+
+    const newAmt = (Number(data.currSavingsAmt) + Number(val)).toFixed(2);
+
+    data.currSavingsAmt = Number(newAmt);
+    saveItem(doc.id, time, Number(newAmt), data);
     navigation.navigate("Goals");
-    saveItem(doc.id, time, newAmt, data);
   };
 
   return (
@@ -65,8 +68,10 @@ function SaveToGoal({ route, navigation }) {
           separator="."
           precision={2}
           minValue={0}
-          maxValue={doc.target - doc.currSavingsAmt}
-          onChangeValue={(val) => setSavingsAmt(val)}
+          maxValue={(doc.target - doc.currSavingsAmt).toFixed(2)}
+          onChangeValue={(val) => {
+            setSavingsAmt(val);
+          }}
           placeholder="Type Here"
         />
       </View>

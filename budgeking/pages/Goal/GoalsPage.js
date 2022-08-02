@@ -7,13 +7,13 @@ import {
   Modal,
   TouchableOpacity,
 } from "react-native";
-import { BlackButton } from "../../config/reusableButton";
-import { Title } from "../../config/reusableText";
+import { BlackButton } from "../../components/reusableButton";
+import { Title } from "../../components/reusableText";
 import { auth, db } from "../../config/firebase";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import GenerateGoal from "./GenerateGoal";
 import { Image } from "react-native";
-import colours from "../../config/colours";
+import colours from "../../styles/colours";
 
 LogBox.ignoreLogs([
   "Non-serializable values were found in the navigation state",
@@ -41,18 +41,21 @@ class GoalsPage extends React.Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.unsubscribeActiveGoalsOri = this.activeGoalsOri.onSnapshot(
-      this.getGoals
+      this.getGoalsOri
     );
     this.unsubscribeActiveGoalsShared = this.activeGoalsShared.onSnapshot(
-      this.getGoals
+      this.getGoalsShared
     );
 
-    this.unsubscribeSavings = this.props.navigation.addListener("focus", () => {
-      this.unsubscribeActiveGoalsOri;
-      this.unsubscribeActiveGoalsShared;
-    });
+    this.unsubscribeSavings = this.props.navigation.addListener(
+      "focus",
+      async () => {
+        this.unsubscribeActiveGoalsOri;
+        this.unsubscribeActiveGoalsShared;
+      }
+    );
   }
 
   componentWillUnmount() {
@@ -143,7 +146,33 @@ class GoalsPage extends React.Component {
   /*
   Getting goals from database and categorising to short and long term goal
   */
-  getGoals = (querySnapshot) => {
+  getGoalsOri = (querySnapshot) => {
+    try {
+      const shortTermState = [];
+      const longTermState = [];
+      querySnapshot.forEach((doc) => {
+        const deadlineYear = new Date(
+          doc.data().deadline.seconds * 1000
+        ).getFullYear();
+        const todayYear = new Date().getFullYear();
+
+        if (deadlineYear - todayYear < 5) {
+          shortTermState.push({ ...doc.data(), id: doc.id });
+        } else {
+          longTermState.push({ ...doc.data(), id: doc.id });
+        }
+      });
+
+      this.setState({
+        shortTermGoals: [...shortTermState],
+        longTermGoals: [...longTermState],
+      });
+    } catch {
+      (err) => console.log(err);
+    }
+  };
+
+  getGoalsShared = (querySnapshot) => {
     try {
       querySnapshot.forEach((doc) => {
         const deadlineYear = new Date(
@@ -173,8 +202,8 @@ class GoalsPage extends React.Component {
     }
   };
 
-  moveToInactive = (id, data) => {
-    db.collection("inactive goals").doc(id).set({
+  moveToInactive = async (id, data) => {
+    await db.collection("inactive goals").doc(id).set({
       createdBy: data.createdBy,
       createdByEmail: data.createdByEmail,
       dateCreated: data.dateCreated,
@@ -188,6 +217,8 @@ class GoalsPage extends React.Component {
       sharingEmails: data.sharingEmails,
       currSavingsAmt: data.target,
     });
+
+    await db.collection("active goals").doc(id).delete();
   };
 
   editGoal = (id, time, data) => {
@@ -204,7 +235,6 @@ class GoalsPage extends React.Component {
     if (data.target <= data.currSavingsAmt) {
       this.setState({ showModal: true });
       this.moveToInactive(id, data);
-      this.deleteGoal(id, time);
       return;
     }
 
@@ -225,12 +255,6 @@ class GoalsPage extends React.Component {
   };
 
   saveToGoal = (id, time, newAmt, data) => {
-    if (newAmt >= data.target) {
-      this.setState({ showModal: true });
-      this.moveToInactive(id, data);
-      this.deleteGoal(id, time);
-    }
-
     if (time === "short term") {
       const newList = this.state.shortTermGoals.filter(
         (item) => item.id !== id
@@ -240,7 +264,13 @@ class GoalsPage extends React.Component {
       const newList = this.state.longTermGoals.filter((item) => item.id !== id);
       this.setState({ longTermGoals: newList });
     }
-    this.activeGoalsRef.doc(id).update({ currSavingsAmt: newAmt });
+
+    if (newAmt >= data.target) {
+      this.setState({ showModal: true });
+      this.moveToInactive(id, data);
+    } else {
+      this.activeGoalsRef.doc(id).update({ currSavingsAmt: newAmt });
+    }
   };
 
   deleteGoal = (id, time, data) => {
@@ -259,15 +289,14 @@ class GoalsPage extends React.Component {
     } else {
       if (data.sharingEmails.length === 1) {
         data.isSharing = false;
-        data.sharingEmails = data.sharingEmails.filter(
-          (item) => item !== auth.currentUser.email
-        );
+        data.sharingEmails = [];
+        this.editGoal(id, time, data);
       } else {
         data.sharingEmails = data.sharingEmails.filter(
           (item) => item !== auth.currentUser.email
         );
+        this.editGoal(id, time, data);
       }
-      this.editGoal(id, time, data);
     }
   };
 }
