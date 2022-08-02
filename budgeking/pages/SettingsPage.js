@@ -14,8 +14,9 @@ import {
 } from "react-native";
 import { AddButton } from "../components/reusableButton";
 import colours from "../styles/colours";
+import { ModalOptions } from "../components/reusableButton";
 import * as ImagePicker from "expo-image-picker";
-import uuid from "uuid";
+
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ChangeUsername, ChangePassword } from "../components/reusableText";
 
@@ -31,6 +32,7 @@ class SettingsPage extends React.Component {
       displayNameEditable: false,
       passwordEditable: false,
       showModal: false,
+      showPasswordModal: false,
       passwordConfirmation: "",
     };
   }
@@ -39,7 +41,7 @@ class SettingsPage extends React.Component {
     return (
       <View style={styles.container}>
         {this.state.showModal && (
-          <View style={styles.modalView}>
+          <View>
             <Modal
               transparent={true}
               visible={this.state.showModal}
@@ -47,8 +49,37 @@ class SettingsPage extends React.Component {
             >
               <TouchableOpacity
                 style={{ flex: 1 }}
-                activeOpacity={1}
                 onPressOut={() => this.setState({ showModal: false })}
+              >
+                <View style={styles.modalView}>
+                  <ModalOptions
+                    text={"Take photo"}
+                    onPress={() => this.takePhoto()}
+                  />
+                  <ModalOptions
+                    text={"Your photos"}
+                    onPress={() => this.pickImage()}
+                  />
+                  <ModalOptions
+                    text={"Remove photo"}
+                    onPress={() => this.removePhoto()}
+                  />
+                </View>
+              </TouchableOpacity>
+            </Modal>
+          </View>
+        )}
+        {this.state.showPasswordModal && (
+          <View style={styles.modalView}>
+            <Modal
+              transparent={true}
+              visible={this.state.showPasswordModal}
+              onRequestClose={() => this.setState({ showPasswordModal: false })}
+            >
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                activeOpacity={1}
+                onPressOut={() => this.setState({ showPasswordModal: false })}
               >
                 <View style={styles.modalView}>
                   <View style={styles.modal}>
@@ -80,11 +111,11 @@ class SettingsPage extends React.Component {
         <RedLine />
         <View style={styles.beside}>
           <Header text={"Change profile picture"} />
-          <TouchableOpacity onPress={() => this.pickImage()}>
+          <TouchableOpacity onPress={() => this.setState({ showModal: true })}>
             {this.maybeRenderImage()}
             <View style={styles.button}>
               <AddButton
-                // onPress={() => this.pickImage()}
+                onPress={() => this.setState({ showModal: true })}
                 style={styles.addButton}
               />
             </View>
@@ -186,7 +217,7 @@ class SettingsPage extends React.Component {
   };
 
   editPassword = () => {
-    this.setState({ showModal: true });
+    this.setState({ showPasswordModal: true });
   };
 
   updateUserPassword = () => {
@@ -223,7 +254,7 @@ class SettingsPage extends React.Component {
 
       return;
     } else {
-      this.setState({ showModal: false });
+      this.setState({ showPasswordModal: false });
       this.setState({ passwordEditable: true });
       this.setState({ password: correctPassword });
       this.setState({ passwordConfirmation: "" });
@@ -252,18 +283,58 @@ class SettingsPage extends React.Component {
     return <Image style={styles.image} source={{ uri: this.state.photoURL }} />;
   };
 
-  pickImage = async () => {
-    let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-    }).catch((err) => console.log(error));
+  takePhoto = async () => {
+    if (Platform.OS !== "web") {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        alert("Sorry, we need camera permissions to make this work!");
+      } else {
+        let pickerResult = await ImagePicker.launchCameraAsync({
+          allowsEditing: true,
+          aspect: [1, 1],
+        }).catch((err) => console.log(error));
 
-    if (!pickerResult.cancelled) {
-      this.uploadImage(pickerResult.uri);
+        if (!pickerResult.cancelled) {
+          this.setState({ photoURL: pickerResult.uri });
+          this.uploadImage(pickerResult.uri);
+        }
+      }
     }
+    this.setState({ showModal: false });
   };
 
-  uploadImage = async (uri) => {
+  /**
+   * Asks for user permission for gallery first
+   * Allows user to pick image from gallery and updates state accordingly
+   */
+  pickImage = async () => {
+    if (Platform.OS !== "web") {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        alert("Sorry, we need gallery permissions to make this work!");
+      } else {
+        let pickerResult = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: true,
+          aspect: [1, 1],
+        }).catch((err) => console.log(error));
+
+        if (!pickerResult.cancelled) {
+          this.setState({ photoURL: pickerResult.uri });
+          this.uploadImage(pickerResult.uri);
+        }
+      }
+    }
+    this.setState({ showModal: false });
+  };
+
+  removePhoto = () => {
+    this.setState({ photoURL: "" });
+    this.setState({ showModal: false });
+    auth.currentUser.updateProfile({ photoURL: "" });
+  };
+
+  uploadImage = async () => {
     const blob = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.onload = function () {
@@ -274,18 +345,16 @@ class SettingsPage extends React.Component {
         reject(new TypeError("Network request failed"));
       };
       xhr.responseType = "blob";
-      xhr.open("GET", uri, true);
+      xhr.open("GET", this.state.photoURL, true);
       xhr.send(null);
     });
 
-    const ref = storage.ref().child(uuid.v4());
+    const ref = storage.ref().child(auth.currentUser.uid).child("profilePhoto");
     const snapshot = await ref.put(blob);
     blob.close();
     snapshot.ref.getDownloadURL().then((url) => {
-      this.setState({ photoURL: url });
-      auth.currentUser.updateProfile({
-        photoURL: url,
-      });
+      // this.setState({ photoURL: url });
+      auth.currentUser.updateProfile({ photoURL: url });
     });
     return await snapshot.ref.getDownloadURL();
   };
