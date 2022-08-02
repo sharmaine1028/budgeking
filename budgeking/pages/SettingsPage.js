@@ -331,6 +331,7 @@ class SettingsPage extends React.Component {
   removePhoto = () => {
     this.setState({ photoURL: "" });
     this.setState({ showModal: false });
+    auth.currentUser.updateProfile({ photoURL: "" });
   };
 
   uploadImage = async () => {
