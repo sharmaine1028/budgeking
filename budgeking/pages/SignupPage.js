@@ -6,10 +6,16 @@ import {
   ActivityIndicator,
   Image,
   Platform,
+  Modal,
+  TouchableOpacity,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import colours from "../styles/colours";
-import { BlackButton, AddButton } from "../components/reusableButton";
+import {
+  BlackButton,
+  AddButton,
+  ModalOptions,
+} from "../components/reusableButton";
 import { Footer, BrownTextInput } from "../components/reusableText";
 import { auth, db, storage } from "../config/firebase";
 import * as ImagePicker from "expo-image-picker";
@@ -24,7 +30,7 @@ export default class SignupPage extends React.Component {
       password: "",
       photoURL: "",
       isLoading: false,
-      cameraPermission: false,
+      showModal: false,
     };
   }
 
@@ -56,10 +62,39 @@ export default class SignupPage extends React.Component {
           flex: 1,
         }}
       >
+        {this.state.showModal && (
+          <View>
+            <Modal
+              transparent={true}
+              visible={this.state.showModal}
+              onRequestClose={() => this.setState({ showModal: false })}
+            >
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                onPressOut={() => this.setState({ showModal: false })}
+              >
+                <View style={styles.modalView}>
+                  <ModalOptions
+                    text={"Take photo"}
+                    onPress={() => this.takePhoto()}
+                  />
+                  <ModalOptions
+                    text={"Your photos"}
+                    onPress={() => this.pickImage()}
+                  />
+                  <ModalOptions
+                    text={"Remove photo"}
+                    onPress={() => this.removePhoto()}
+                  />
+                </View>
+              </TouchableOpacity>
+            </Modal>
+          </View>
+        )}
         <View>
           {this.maybeRenderImage()}
           <View style={styles.button}>
-            <AddButton onPress={() => this.addImageButton()} />
+            <AddButton onPress={() => this.setState({ showModal: true })} />
           </View>
         </View>
 
@@ -124,28 +159,55 @@ export default class SignupPage extends React.Component {
     return <Image style={styles.image} source={{ uri: this.state.photoURL }} />;
   };
 
-  /**
-   * Calls pick Image function
-   */
-  addImageButton = async () => {
-    this.pickImage();
+  takePhoto = async () => {
+    if (Platform.OS !== "web") {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        alert("Sorry, we need camera permissions to make this work!");
+      } else {
+        let pickerResult = await ImagePicker.launchCameraAsync({
+          allowsEditing: true,
+          aspect: [1, 1],
+        }).catch((err) => console.log(error));
+
+        if (!pickerResult.cancelled) {
+          this.setState({ photoURL: pickerResult.uri });
+        }
+      }
+    }
+    this.setState({ showModal: false });
   };
 
   /**
+   * Asks for user permission for gallery first
    * Allows user to pick image from gallery and updates state accordingly
    */
   pickImage = async () => {
-    let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-    }).catch((err) => console.log(error));
+    if (Platform.OS !== "web") {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        alert("Sorry, we need gallery permissions to make this work!");
+      } else {
+        let pickerResult = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: true,
+          aspect: [1, 1],
+        }).catch((err) => console.log(error));
 
-    if (!pickerResult.cancelled) {
-      this.uploadImage(pickerResult.uri);
+        if (!pickerResult.cancelled) {
+          this.setState({ photoURL: pickerResult.uri });
+        }
+      }
     }
+    this.setState({ showModal: false });
   };
 
-  uploadImage = async (uri) => {
+  removePhoto = () => {
+    this.setState({ photoURL: "" });
+    this.setState({ showModal: false });
+  };
+
+  uploadImage = async (uid) => {
     const blob = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.onload = function () {
@@ -156,11 +218,11 @@ export default class SignupPage extends React.Component {
         reject(new TypeError("Network request failed"));
       };
       xhr.responseType = "blob";
-      xhr.open("GET", uri, true);
+      xhr.open("GET", this.state.photoURL, true);
       xhr.send(null);
     });
 
-    const ref = storage.ref().child(uuid.v4());
+    const ref = storage.ref().child(uid).child("profilePhoto");
     const snapshot = await ref.put(blob);
     blob.close();
     snapshot.ref.getDownloadURL().then((url) => {
@@ -206,6 +268,8 @@ export default class SignupPage extends React.Component {
           db.collection("userLookup").doc(this.state.email).set({
             uid: res.user.uid,
           });
+
+          this.uploadImage(res.user.uid);
 
           res.user.updateProfile({
             displayName: this.state.firstName,
@@ -265,5 +329,14 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 999,
+  },
+
+  modalOptions: {
+    marginVertical: 2,
+  },
+  modalView: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
