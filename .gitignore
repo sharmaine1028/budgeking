@@ -1,1 +1,5 @@
+# Configuration files
 /budgeking/config
+
+# Snapshot files for test
+/budgeking/__tests__/__snapshots__
