@@ -1,5 +1,6 @@
 # Configuration files
-/budgeking/config
+/budgeking/config/
 
 # Snapshot files for test
-/budgeking/__tests__/__snapshots__
+/budgeking/__tests__/__snapshots__/
+/coverage/
