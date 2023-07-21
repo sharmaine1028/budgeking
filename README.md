@@ -13,11 +13,11 @@ Budgeking is a one-stop application for those who wish to live a financially-ind
 **Test the code**
 
 Prerequisites NodeJS LTS v16.15.0
-1. Install node and npm on your machine
+1. Install `node` and `npm` on your machine
 2. Clone this repo to your computer
-3. Run npm install expo-cli
-4. Run npm install to install dependencies
-5. Run expo start
+3. Run `npm install expo-cli`
+4. Run `npm install` to install dependencies
+5. Run `expo start`
 
 Note: To test the code, you will need to download either Expo Go on your phone or use an emulator such as Android Studio (Android) or XCode (IOS)
 
